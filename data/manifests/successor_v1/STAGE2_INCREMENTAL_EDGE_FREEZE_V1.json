@@ -1,0 +1,132 @@
+{
+  "freeze_id": "STAGE2_INCREMENTAL_EDGE_FREEZE_V1",
+  "project": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "status": "FROZEN_BEFORE_PROSPECTIVE_OUTCOME_EVALUATION",
+  "source_preflight_authority": {
+    "job005a_accepted_head": "28ccc29a7e15f320d50e3ff84d6d4a31869e6993",
+    "wide_t15_contract": "WIDE_T15_SOURCE_CONTRACT_V1 + AMENDMENT_001",
+    "t15_standard_required": true
+  },
+  "cohort": {
+    "primary_start_date": "2026-08-01",
+    "venues": [
+      "大井",
+      "川崎",
+      "浦和",
+      "船橋"
+    ],
+    "market_eligibility": "T15_STANDARD_ELIGIBLE only",
+    "same_day_update": false,
+    "date_causal_rule": "all scoring/calibration for race_date d uses only settled outcomes with race_date < d"
+  },
+  "successor_probability_engine": {
+    "continuation_mode": "JOB004_FOLD4_CONTINUATION_NO_RETRAIN",
+    "primary_candidate": "M2",
+    "catboost_training_end": "2025-12-31",
+    "temperature_selected": "M1",
+    "eb_component_mode": "FIXED_COMPONENT",
+    "eb_state_through_cutoff": "reconstruct date-causally through 2026-07-31, then continue date-causally",
+    "race_head_model": "Fold4 outer race-head model fixed",
+    "pl_parameters": "Fold4 M1 T0/gamma and upset standardization fixed",
+    "n3_rule": "use M0_T0 and no gamma modulation",
+    "retraining_before_stage2_close": false,
+    "model_pair_distribution": "q_model(i,j)=p_wide(i,j)/3",
+    "p_safe_used": false
+  },
+  "market_mapping": {
+    "primary": {
+      "id": "LOG_MIDPOINT_GEOMETRIC",
+      "odds_point": "sqrt(lower_odds * upper_odds)",
+      "log_signal": "-0.5*(log(lower_odds)+log(upper_odds))",
+      "raw_pair_distribution": "softmax(log_signal)"
+    },
+    "sensitivity": [
+      {
+        "id": "LOWER_ENDPOINT",
+        "log_signal": "-log(lower_odds)"
+      },
+      {
+        "id": "UPPER_ENDPOINT",
+        "log_signal": "-log(upper_odds)"
+      }
+    ],
+    "interpretation": "pair-allocation distribution q with sum 1; not direct WIDE event probability",
+    "no_takeout_estimation": true
+  },
+  "outcome_target": {
+    "winning_pairs_per_race": 3,
+    "target_mass": "1/3 on each of the three official Top3 unordered pairs, 0 otherwise",
+    "race_pair_cross_entropy": "-(1/3)*sum_{winning pairs} log(q_pair)"
+  },
+  "market_calibration": {
+    "parameter": "gamma",
+    "formula": "q_market_gamma = normalize(q_raw ** gamma)",
+    "bounds": [
+      0.25,
+      4.0
+    ],
+    "fit_unit": "equal race weight",
+    "fit_data": "strictly prior Stage2 eligible settled race_dates only",
+    "optimizer": "deterministic bounded scalar optimization on log(gamma), xatol=1e-8",
+    "warmup_min_prior_races": 20,
+    "warmup_min_prior_dates": 4,
+    "warmup_gate_eligible": false
+  },
+  "incremental_model": {
+    "signal": "s_pair = log(q_model) - log(q_market_gamma)",
+    "hybrid": "q_hybrid_beta = normalize(q_market_gamma * exp(beta*s_pair))",
+    "equivalent": "normalize(q_market_gamma**(1-beta) * q_model**beta)",
+    "beta_bounds": [
+      0.0,
+      1.0
+    ],
+    "fit_unit": "equal race weight",
+    "fit_data": "same strictly prior race-date cohort used for current-date calibration",
+    "optimizer": "deterministic bounded scalar optimization, xatol=1e-8",
+    "beta_zero_identity": "exact market baseline"
+  },
+  "primary_metric": {
+    "delta": "CE_hybrid - CE_market",
+    "better_direction": "negative",
+    "evaluation": "prequential out-of-sample by race_date"
+  },
+  "support_gate": {
+    "min_gate_evaluation_races": 100,
+    "min_gate_evaluation_dates": 12,
+    "min_gate_evaluation_races_per_venue": 10,
+    "insufficient_status": "STAGE2_ACCUMULATING"
+  },
+  "statistical_gate": {
+    "bootstrap_unit": "race_date",
+    "resamples": 10000,
+    "seed": 20260905,
+    "ci": "percentile 95%",
+    "min_valid_resamples": 9900,
+    "pass_conditions": [
+      "support gate PASS",
+      "pooled mean delta < 0",
+      "pooled bootstrap 95% upper bound < 0",
+      "LOWER_ENDPOINT sensitivity pooled mean delta <= 0",
+      "UPPER_ENDPOINT sensitivity pooled mean delta <= 0"
+    ],
+    "venue_results": "diagnostic only after per-venue support requirement is met"
+  },
+  "numerics": {
+    "log_epsilon": 1e-15,
+    "probability_mass_tolerance": 1e-10
+  },
+  "stage_boundary": {
+    "economic_edge": "DEFERRED_TO_STAGE3",
+    "no_roi": true,
+    "no_profit": true,
+    "no_ticket_selection": true
+  },
+  "anti_leakage": {
+    "prediction_artifact_before_target_result_access": true,
+    "same_day_outcomes_forbidden_before_all_same_day_predictions": true,
+    "future_outcomes_forbidden": true,
+    "market_time_unknown_as_t15_proxy_forbidden": true,
+    "t10_t05_as_t15_proxy_forbidden": true,
+    "post_hoc_mapping_or_gate_change_forbidden": true
+  }
+}
