@@ -8,6 +8,6 @@
 - pair rows checked: 2444
 - hard contract violations: 8
 - historical odds_snapshots count: 0
-- queried table names: `{"historical": ["odds_snapshots", "official_odds", "sqlite_master"], "prospective": ["current_info_snapshots", "current_runner_info", "market_snapshots", "race_registry", "source_captures", "sqlite_master"]}`
+- queried table names: `{"historical": ["odds_snapshots", "official_odds", "sqlite_master"], "prospective": ["current_info_snapshots", "current_runner_info", "market_snapshots", "race_registry", "source_captures"]}`
 - outcome tables read: 0
 - performance evaluated: false

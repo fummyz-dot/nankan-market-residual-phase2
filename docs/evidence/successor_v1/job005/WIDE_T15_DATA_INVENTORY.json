@@ -21,8 +21,7 @@
       "current_runner_info",
       "market_snapshots",
       "race_registry",
-      "source_captures",
-      "sqlite_master"
+      "source_captures"
     ]
   },
   "race_counts_by_classification": {
