@@ -53,6 +53,7 @@ class Job006InventoryTests(unittest.TestCase):
         guard_prospective_table("current_info_snapshots")
         with self.assertRaisesRegex(InventoryError, "PROSPECTIVE_OUTCOME_PATH_FORBIDDEN"):
             guard_inventory_path(Path("db/live_development.sqlite"))
+        guard_inventory_path(Path("outputs/successor_v1/job004/oof/runner_predictions.csv.gz"))
 
     def test_dynamic_eb_unseen_keys_are_zero(self) -> None:
         result = verify_eb_reference()

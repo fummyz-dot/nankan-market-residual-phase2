@@ -50,6 +50,9 @@ CRITICAL_ARTIFACTS: tuple[tuple[str, str, str | None], ...] = (
     ("m2_inner_raw_2023", f"{ATTEMPT3}/checkpoints/raw_predictions/m2_to_2023.npy", "31e75c08156cfc35b9b2626f286c03c0070c3da3f29aa98410e4fee745169a95"),
     ("m2_inner_raw_2024", f"{ATTEMPT3}/checkpoints/raw_predictions/m2_to_2024.npy", "01e237a0ad11ab031dc51a480b3ca89512b23120ab97ae0329220a625e4fcc4b"),
     ("m2_inner_raw_2025", f"{ATTEMPT3}/checkpoints/raw_predictions/m2_to_2025.npy", "4f7f0a3fede12d5c07d851948ef008374d8b809d0bb8e5279fdcfb600ca0298e"),
+    ("job004_historical_runner_residual_source", "outputs/successor_v1/job004/oof/runner_predictions.csv.gz", "87695b71cd25591af938757c175f809a7dda108e884a0ad47b1eecb3acf935d6"),
+    ("primary_dataset_manifest", "data/processed/successor_v1/runner_primary_deterministic_features_v1_1/_DATASET_MANIFEST.json", "5550b06f12a47bc85abfa889f6ac4fd1f57e047206dcbbb99a6e3fb568e787c7"),
+    ("primary_dataset_partition", "data/processed/successor_v1/runner_primary_deterministic_features_v1_1/year=all/part-000.csv.gz", "3ad5e47eab84e1e8f5f56ef1717e139b838d3a097d546f54aa9f1aff30a80bb6"),
     ("fold4_m1_parameters", "audit/successor_v1/job004/pl_temperature_fit.csv", "501205602fa8f5690a213682955aa7912da59cd200f89b3963ff00425d64bbeb"),
     ("fold4_candidate_selection", "audit/successor_v1/job004/model_selection_by_fold.csv", "fd97768d8ddb34950de7bcfc5e3da05b25925ac80ff0836b9ed78dc1f4828cb1"),
     ("primary_ordered_manifest", "data/manifests/successor_v1/PRIMARY_MODEL_INPUT_MANIFEST_V1.csv", "eb6bf0291f55e0a4d11f01987237b82af2e36d5065de395606d06d3600923954"),
@@ -133,6 +136,8 @@ def guard_prospective_table(table: str) -> None:
 
 def guard_inventory_path(path: Path) -> None:
     normalized = str(path).lower()
+    if normalized.endswith("outputs/successor_v1/job004/oof/runner_predictions.csv.gz"):
+        return
     if any(token in normalized for token in PROHIBITED_PATH_TOKENS):
         raise InventoryError(f"PROSPECTIVE_OUTCOME_PATH_FORBIDDEN:{path}")
 
@@ -152,18 +157,21 @@ def verify_eb_reference() -> dict[str, Any]:
         raise InventoryError("EB_LAYER_ORDER_MISMATCH")
     if signature.parameters["max_cycles"].default != 20 or signature.parameters["tolerance"].default != 1e-5:
         raise InventoryError("EB_CONVERGENCE_DEFAULT_MISMATCH")
-    empty = eb_state.BackfitResult(
-        effects={layer: {} for layer in eb_state.LAYERS},
-        components={layer: (1.0, 0.1) for layer in eb_state.LAYERS},
-        cycles=0, converged=True, final_max_abs_change=0.0, initialized_from_zero=True,
+    fitted = eb_state.backfit(
+        np.asarray([0.3, -0.2, 0.1, -0.1], dtype=np.float64),
+        np.asarray(["H1", "H1", "H2", "H2"], dtype=object),
+        np.asarray(["J1", "J1", "J2", "J2"], dtype=object),
+        np.asarray(["大井", "船橋", "大井", "船橋"], dtype=object),
+        mode="FIXED_COMPONENT",
+        fixed_components={layer: (1.0, 0.1) for layer in eb_state.LAYERS},
     )
     score = eb_state.score_effects(
-        empty,
+        fitted,
         np.asarray(["UNSEEN_H"], dtype=object),
         np.asarray(["UNSEEN_J"], dtype=object),
         np.asarray(["大井"], dtype=object),
     )
-    if score[0] != 0.0:
+    if score[0] != 0.0 or not fitted.initialized_from_zero:
         raise InventoryError("EB_UNSEEN_KEY_NOT_ZERO")
     return {
         "layers": list(eb_state.LAYERS), "full_rebackfit_from_zero": True,
@@ -364,7 +372,6 @@ def run(*, root: Path, implementation_git_commit: str) -> dict[str, Any]:
         "commands": ["python -m unittest tests.audit.test_p2s_job006_stage2_scorer_inventory", "python src/audit/p2s_job006_stage2_scorer_inventory.py --implementation-git-commit <SHA>"],
         "outputs": [str(path.relative_to(ROOT)) for path in sorted(LOCAL_OUTPUT.glob("*"))],
     }
-    _write_json(LOCAL_OUTPUT / "run_manifest.json", manifest)
     report = f"""# JOB006 Report
 
 STATUS: JOB006_PASS
@@ -402,6 +409,22 @@ STATUS: JOB006_PASS
 - Prospective outcome, payout, settlement, Stage2 performance, and network access were all zero/false.
 """
     (TRACKED_OUTPUT / "JOB006_SUMMARY.md").write_text(summary, encoding="utf-8")
+    generated = [
+        LOCAL_OUTPUT / "JOB006_REPORT.md",
+        LOCAL_OUTPUT / "job004_fold4_artifact_inventory.csv",
+        LOCAL_OUTPUT / "job004_fold4_parameter_inventory.json",
+        LOCAL_OUTPUT / "forward_scorer_component_readiness.csv",
+        LOCAL_OUTPUT / "feature_materialization_readiness.json",
+        LOCAL_OUTPUT / "outcome_access_audit.json",
+        design_path,
+        TRACKED_OUTPUT / "FOLD4_FORWARD_SCORER_INVENTORY.json",
+        TRACKED_OUTPUT / "JOB006_SUMMARY.md",
+    ]
+    manifest["outputs"] = [
+        {"path": str(path.relative_to(ROOT)), "size_bytes": path.stat().st_size, "sha256": sha256_file(path)}
+        for path in generated
+    ]
+    _write_json(LOCAL_OUTPUT / "run_manifest.json", manifest)
     return {"status": "JOB006_PASS", "artifact_count": len(inventory), "readiness": readiness, "parameters": params}
 
 
