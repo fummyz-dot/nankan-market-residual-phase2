@@ -1,0 +1,18 @@
+{
+  "backend": "LIGHTGBM_GBDT",
+  "backend_version": "4.7.0",
+  "boost_round_source": "P2-M10 H2-C04/WF3",
+  "boost_rounds": 19,
+  "confirmed_probability_edge": false,
+  "feature_list_hash": "ff1d6714be9cf889d8949105c1aa81c989e2867886ec7446ed4ef1a22ebc6cb2",
+  "feature_set": "FS04_LEGACY_SPD_PACE_CLASS_FULL",
+  "h1_config_source": "H1-C06",
+  "keibabook_model_input": false,
+  "market_offset": "POWER_GAMMA_V1",
+  "model_version": "DEV-LIVE-V1",
+  "p2_current_model_input": false,
+  "primary_live_model": false,
+  "shadow_gamma_artifact": "models/development/dev_live_v1/gamma.json",
+  "status": "DEVELOPMENT_SHADOW_ONLY",
+  "version": "P2_DEV_LIVE_V1"
+}

@@ -1,0 +1,25 @@
+{
+  "block": "WIN_NEW_FEATURE_RESIDUAL",
+  "max_candidates": 6,
+  "formal_evaluated_before_m10": 0,
+  "formal_candidates_m10": [
+    "H2-C01",
+    "H2-C02",
+    "H2-C03",
+    "H2-C04"
+  ],
+  "candidate_roles": {
+    "H2-C01": "SPEED_ABLATION",
+    "H2-C02": "PACE_CUMULATIVE_ABLATION",
+    "H2-C03": "CLASS_RULE_ABLATION",
+    "H2-C04": "NAR_CORE_PRIMARY_DEVELOPMENT_CANDIDATE"
+  },
+  "future_preauthorized": {
+    "H2-C05": "P2_CURRENT_PROSPECTIVE"
+  },
+  "unallocated": "H2-C06",
+  "automatic_use_of_unallocated_slot": false,
+  "performance_evaluated_after_m10": 4,
+  "remaining_after_m10": 2,
+  "vcs_mode": "none"
+}

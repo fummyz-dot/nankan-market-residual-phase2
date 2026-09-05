@@ -1,0 +1,28 @@
+{
+  "target": "WIN_ENGINEERING_GATE",
+  "probability_form": "MARKET_OFFSET_RACE_SOFTMAX",
+  "score": "gamma * log(q_ri) + f_theta(x_ri, R_r)",
+  "gamma": "exp(alpha); estimated in training fold only",
+  "market_q_requirements": [
+    "positive",
+    "race_local",
+    "approved_snapshot_only",
+    "scratch_adjusted_active_runner_universe"
+  ],
+  "market_baseline": "CALIBRATED_MARKET_GAMMA",
+  "loss": "RACE_EQUAL_WEIGHT_MULTINOMIAL_LOGLOSS",
+  "dead_heat": "WIN_SOFT_TIE_TARGET_V1",
+  "feature_set_registry": "P2_MAIN_FEATURE_SET_REGISTRY_V1",
+  "feature_sets": [
+    "FS00_LEGACY",
+    "FS01_LEGACY_SPD",
+    "FS02_LEGACY_SPD_PACE",
+    "FS03_LEGACY_SPD_PACE_CLASS_RULE",
+    "FS04_LEGACY_SPD_PACE_CLASS_FULL"
+  ],
+  "wide_science_stop_dependency": "NONE",
+  "trio_science_stop_dependency": "NONE",
+  "market_training_status": "NOT_EXECUTED",
+  "t15_status": "ENGINEERING_CANDIDATE_NOT_FROZEN",
+  "historical_market": "MARKET_TIME_UNKNOWN_DEVELOPMENT_REFERENCE_ONLY"
+}

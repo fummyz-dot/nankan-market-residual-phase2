@@ -1,0 +1,36 @@
+{
+  "backend": "lightgbm",
+  "backend_version": "4.7.0",
+  "bagging_fraction": 1.0,
+  "bagging_freq": 0,
+  "boosting": "gbdt",
+  "deterministic": true,
+  "device_type": "cpu",
+  "feature_fraction": 1.0,
+  "force_col_wise": true,
+  "hessian": "DIAGONAL_SOFTMAX_HESSIAN_APPROX_V1",
+  "market_offset_implementation": "NATIVE_INIT_SCORE_V1",
+  "native_market_offset": "CUSTOM_OBJECTIVE_VERIFIED",
+  "objective": "CUSTOM_MARKET_OFFSET_RACE_SOFTMAX_V1",
+  "random_seed": 20260819,
+  "residual_score_clip": "NONE",
+  "training_frame_schema": {
+    "label_column": "win_soft_target",
+    "market_as_tree_feature": "PROHIBITED",
+    "metadata_columns": [
+      "race_key",
+      "race_date",
+      "venue",
+      "race_number",
+      "horse_identity_key",
+      "horse_number",
+      "market_evidence_class",
+      "training_row_status"
+    ],
+    "model_feature_selector": "FS00_LEGACY_119_ONLY",
+    "offset_columns": [
+      "q_raw",
+      "log_q_raw"
+    ]
+  }
+}

@@ -53,14 +53,14 @@ token*.json
 *.sqlite-shm
 *.sqlite-wal
 *.db
-db/
+/db/
 
 # --- Immutable/reference source corpora ---
 reference/v1/
 data/raw/
 data/raw_*/
-raw/
-downloads/
+/raw/
+/downloads/
 
 # --- Processed / materialized datasets ---
 data/processed/
@@ -76,8 +76,8 @@ data/*
 # If data/processed already matched above, manifests remain separately tracked.
 
 # --- Model / binary artifacts ---
-artifacts/
-models/
+/artifacts/
+/models/
 *.cbm
 *.pkl
 *.pickle
@@ -88,15 +88,15 @@ models/
 *.bin
 
 # --- Prediction / experiment outputs ---
-outputs/
-runs/
-logs/
-tmp/
-temp/
+/outputs/
+/runs/
+/logs/
+/tmp/
+/temp/
 
 # --- Audit outputs: local by default ---
 # Curated evidence intended for Git should be copied to docs/evidence/
-audit/
+/audit/
 
 # --- Large tabular/binary data formats ---
 *.parquet
@@ -120,6 +120,6 @@ audit/
 *競馬ブック*
 
 # --- Local handoff bundles / generated inventory packages ---
-handoff/
-handoff_*/
-*_HANDOFF_BUNDLE/
+/handoff/
+/handoff_*/
+/*_HANDOFF_BUNDLE/
