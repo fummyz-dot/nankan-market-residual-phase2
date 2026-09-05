@@ -72,6 +72,18 @@ class Stage2TargetSourceParserTests(unittest.TestCase):
         )
         self.assertEqual(set(parsed), {1})
 
+    def test_eb_card_spaced_nonstarter_presentation_is_not_a_runner_number(self) -> None:
+        html = card().replace(
+            "</table>\n<h3>賞金</h3>",
+            '<tr><td>6</td><td>除 外</td><td><a href="/uma_info/101.do">馬B</a></td>'
+            '<td><a href="/kis_info/201.do">騎手B</a>（船橋）</td></tr></table>\n<h3>賞金</h3>',
+            1,
+        )
+        parsed = official.parse_pre_race_jockey_affiliations(
+            html, identity=IDENTITY, source_mode="POST_SETTLEMENT_EB_UPDATE"
+        )
+        self.assertEqual(set(parsed), {1})
+
     def test_prize_yen_and_manyen_parse_exactly(self) -> None:
         parsed = official.parse_pre_race_prize_schedule(card(), identity=IDENTITY)
         self.assertEqual(parsed[1]["yen"], 1_000_000)

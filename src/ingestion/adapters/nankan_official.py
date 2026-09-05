@@ -529,6 +529,8 @@ def _eb_card_active_numbers(html: str, identity: dict[str, Any]) -> set[int]:
     for row in _direct_table_rows(target):
         cells = [cell for cell in direct_cells(row) if cell.tag == "td"]
         values = [node_text(cell) for cell in cells]
+        if _eb_card_explicit_nonstarter(cells):
+            continue
         number = _current_card_row_number(cells)
         horse_cells = [
             index for index, cell in enumerate(cells)
@@ -540,8 +542,6 @@ def _eb_card_active_numbers(html: str, identity: dict[str, Any]) -> set[int]:
         if number is not None:
             horse_number, number_index = number
             status = [value for value in values[number_index + 1:horse_index] if value]
-            if status in (["除外"], ["取消"]):
-                continue
             if status:
                 raise ValueError(f"BLOCK_EB_CARD_RUNNER_STATUS_UNRESOLVED:{horse_number}:{'|'.join(status)}")
         else:
@@ -561,6 +561,10 @@ def _eb_card_active_numbers(html: str, identity: dict[str, Any]) -> set[int]:
     if len(active) != int(identity["field_size"]):
         raise ValueError(f"OFFICIAL_EB_CARD_ACTIVE_RUNNER_COUNT_MISMATCH:{len(active)}:{identity['field_size']}")
     return active
+
+
+def _eb_card_explicit_nonstarter(cells: list[Node]) -> bool:
+    return any("".join(node_text(cell).split()) in {"除外", "取消"} for cell in cells[:2])
 
 
 def parse_pre_race_jockey_affiliations(
@@ -587,6 +591,8 @@ def parse_pre_race_jockey_affiliations(
         invalid = False
         for row in _direct_table_rows(table):
             cells = [cell for cell in direct_cells(row) if cell.tag == "td"]
+            if source_mode == "POST_SETTLEMENT_EB_UPDATE" and _eb_card_explicit_nonstarter(cells):
+                continue
             number = _current_card_row_number(cells)
             if number is None:
                 continue
@@ -629,8 +635,18 @@ def parse_pre_race_jockey_affiliations(
             }
         if not invalid and set(parsed) == active:
             candidates.append(parsed)
-    if len(candidates) != 1:
+    if not candidates:
         raise ValueError(f"OFFICIAL_PRE_RACE_JOCKEY_AFFILIATION_TABLE_UNRESOLVED:{len(candidates)}")
+    canonical = {
+        tuple(
+            (number, item["official_horse_id"], item["official_jockey_id"],
+             item["source_status"], item["affiliation"])
+            for number, item in sorted(candidate.items())
+        )
+        for candidate in candidates
+    }
+    if len(canonical) != 1:
+        raise ValueError(f"OFFICIAL_PRE_RACE_JOCKEY_AFFILIATION_TABLE_CONFLICT:{len(canonical)}")
     return candidates[0]
 
 
