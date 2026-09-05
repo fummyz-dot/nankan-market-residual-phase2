@@ -13,6 +13,10 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
+import catboost
+import numpy
+import pandas
+
 from src.evaluation.successor_v1_stage2_prequential import validate_blinded_evidence
 from src.models.successor_v1.forward_scorer import EB_COMPONENT_PATH, EB_COMPONENT_SHA, M2_PATH, M2_SHA, RACE_HEAD_PATH, RACE_HEAD_SHA, require_hash
 from src.operations.stage2_confirmatory_live import (
@@ -151,7 +155,7 @@ def run(*, test_count: int) -> dict[str, Any]:
     write_json(AUDIT / "run_manifest.json", {
         "job_id": "JOB008", "vcs_mode": "git", "workspace_root": str(ROOT),
         "branch": git("branch", "--show-current"), "start_main_commit": START_MAIN,
-        "implementation_git_commit": implementation, "ending_commit": None,
+        "implementation_git_commit": implementation, "ending_commit": implementation,
         "package_sha256": PACKAGE_SHA,
         "authority_hashes": {"json": AUTHORITY_SHA, "md": AUTHORITY_MD_SHA},
         "frozen_model_hashes": {"m2": M2_SHA, "race_head": RACE_HEAD_SHA, "eb_components": EB_COMPONENT_SHA},
@@ -161,7 +165,15 @@ def run(*, test_count: int) -> dict[str, Any]:
             ROOT / "src/operations/specialized_collection_runtime.py",
         )},
         "input_hashes": {"market_db": sha256_file(ROOT / "db/market_snapshot.sqlite"), "development_bootstrap": sha256_file(OUTPUT_ROOT / "state/development_bootstrap.json")},
-        "runtime": {"python": sys.version, "platform": platform.platform()},
+        "runtime": {
+            "python": sys.version,
+            "platform": platform.platform(),
+            "libraries": {
+                "catboost": catboost.__version__,
+                "numpy": numpy.__version__,
+                "pandas": pandas.__version__,
+            },
+        },
         "random_seed": None,
         "commands": ["focused unittest JOB008 + specialized runtime", "p2s_job008_confirmatory_live.py --test-count"],
         "output_artifacts": ["audit/successor_v1/job008/prelive_readiness.json", "audit/successor_v1/job008/development_scorer_smoke.json", "audit/successor_v1/job008/run_manifest.json", "audit/successor_v1/job008/JOB008_REPORT.md"],
