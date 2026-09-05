@@ -94,14 +94,20 @@ def ordered_feature_names(path: Path) -> list[str]:
     return [row["feature_name"] for row in rows if row.get("included", "True").lower() != "false"]
 
 
-def ordered_feature_hash(names: Iterable[str]) -> str:
-    payload = json.dumps(list(names), ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+def ordered_feature_hash(names: Iterable[str], *, encoding: str = "compact_json") -> str:
+    values = list(names)
+    if encoding == "compact_json":
+        payload = json.dumps(values, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
+    elif encoding == "newline_joined":
+        payload = "\n".join(values).encode("utf-8")
+    else:
+        raise ValueError(f"unknown feature hash encoding: {encoding}")
     return hashlib.sha256(payload).hexdigest()
 
 
-def require_feature_manifest(path: Path, *, count: int, expected_hash: str) -> list[str]:
+def require_feature_manifest(path: Path, *, count: int, expected_hash: str, hash_encoding: str = "compact_json") -> list[str]:
     names = ordered_feature_names(path)
-    if len(names) != count or ordered_feature_hash(names) != expected_hash:
+    if len(names) != count or ordered_feature_hash(names, encoding=hash_encoding) != expected_hash:
         raise InventoryError(f"FEATURE_MANIFEST_MISMATCH:{path}")
     return names
 
@@ -291,7 +297,10 @@ def run(*, root: Path, implementation_git_commit: str) -> dict[str, Any]:
         inventory.append({"role": role, **validate_artifact(path, expected)})
 
     primary_names = require_feature_manifest(ROOT / "data/manifests/successor_v1/PRIMARY_MODEL_INPUT_MANIFEST_V1.csv", count=129, expected_hash=PRIMARY_HASH)
-    race_head_names = require_feature_manifest(ROOT / "data/manifests/successor_v1/RACE_HEAD_INPUT_MANIFEST_V1.csv", count=32, expected_hash=RACE_HEAD_HASH)
+    race_head_names = require_feature_manifest(
+        ROOT / "data/manifests/successor_v1/RACE_HEAD_INPUT_MANIFEST_V1.csv",
+        count=32, expected_hash=RACE_HEAD_HASH, hash_encoding="newline_joined",
+    )
     m2_names = _model_feature_names(ROOT / f"{ATTEMPT3}/checkpoints/models/m2_outer_fold4.cbm")
     head_names = _model_feature_names(ROOT / f"{ATTEMPT4}/checkpoints/models/race_head_outer_fold4.cbm")
     if m2_names != primary_names or head_names != race_head_names:
@@ -304,7 +313,7 @@ def run(*, root: Path, implementation_git_commit: str) -> dict[str, Any]:
     validate_lineage_values(
         selected_candidate=selection["selected_candidate"], selected_temperature=selected_temperature,
         cutoff="2026-07-31", primary_count=len(primary_names), primary_hash=ordered_feature_hash(primary_names),
-        race_head_count=len(race_head_names), race_head_hash=ordered_feature_hash(race_head_names),
+        race_head_count=len(race_head_names), race_head_hash=ordered_feature_hash(race_head_names, encoding="newline_joined"),
     )
     components = json.loads((ROOT / f"{ATTEMPT3}/checkpoints/eb/fold4_components.json").read_text(encoding="utf-8"))
     params = {

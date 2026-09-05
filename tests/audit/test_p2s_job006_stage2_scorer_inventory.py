@@ -76,6 +76,11 @@ class Job006InventoryTests(unittest.TestCase):
             self.assertEqual(require_feature_manifest(path, count=2, expected_hash=digest), names)
             with self.assertRaisesRegex(InventoryError, "FEATURE_MANIFEST_MISMATCH"):
                 require_feature_manifest(path, count=2, expected_hash="0" * 64)
+            line_digest = hashlib.sha256(b"a\nb").hexdigest()
+            self.assertEqual(
+                require_feature_manifest(path, count=2, expected_hash=line_digest, hash_encoding="newline_joined"),
+                names,
+            )
 
 
 if __name__ == "__main__":
