@@ -1,0 +1,109 @@
+{
+  "amendment_id": "STAGE2_INCREMENTAL_EDGE_FREEZE_V1_AMENDMENT_001_LOCKED_REPLAY_ACCUMULATION",
+  "project": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "base_freeze_json_sha256": "b628b05f68b5746be7543e20b6bea621850b6978fada46f9d0e041c404ec3070",
+  "status": "FROZEN_BEFORE_REAL_STAGE2_OUTCOME_REPLAY",
+  "scientific_classification": {
+    "initial_replay": "DEVELOPMENT_LOCKED_REPLAY",
+    "confirmatory": false,
+    "reason": "T15 market captures are prospective, but the successor forward scorer is reconstructed after the race dates. Model, market mapping, calibration form, and gates were frozen before Stage2 outcome evaluation."
+  },
+  "warmup": {
+    "prior_races_min": 20,
+    "prior_dates_min": 4,
+    "before_warmup_gamma": 1.0,
+    "before_warmup_beta": 0.0,
+    "before_warmup_gate_eligible": false,
+    "same_day_parameters": "identical for every eligible race on the same race_date"
+  },
+  "mapping_specific_calibration": {
+    "mappings": [
+      "LOG_MIDPOINT_GEOMETRIC",
+      "LOWER_ENDPOINT",
+      "UPPER_ENDPOINT"
+    ],
+    "gamma": "fit separately for each mapping on the same strictly-prior eligible settled cohort",
+    "beta": "fit separately for each mapping after that mapping's current-date gamma is fit",
+    "beta_training_market_distribution": "recompute each prior race q_market using the current-date gamma for that mapping",
+    "optimizer_failure": "BLOCK_DATE_NO_FALLBACK_AFTER_WARMUP"
+  },
+  "real_cohort_blinding": {
+    "blind_until_formal_support": true,
+    "job007_real_run_may_unblind": false,
+    "formal_unblind_requires_separate_research_lead_job": true,
+    "before_unblind_tracked_evidence_may_show": [
+      "support counts",
+      "date counts",
+      "venue counts",
+      "pre-outcome exclusion counts/reasons",
+      "prediction/reconciliation artifact counts",
+      "integrity and leakage status",
+      "hashes"
+    ],
+    "before_unblind_must_not_show_or_persist_in_tracked_evidence": [
+      "pooled mean delta",
+      "bootstrap confidence interval",
+      "mapping sensitivity performance",
+      "venue performance",
+      "CE/logloss/Brier aggregates",
+      "ROI/profit"
+    ],
+    "local_state_may_store": [
+      "frozen prediction distributions",
+      "official winning-pair labels after reconciliation",
+      "EB residual observations",
+      "calibration parameter values needed for next-date predictions"
+    ],
+    "local_state_must_not_persist": [
+      "formal pooled performance summaries before unblind"
+    ]
+  },
+  "cohort_semantics": {
+    "market_cohort": "race_date >= 2026-08-01 and JOB005A T15_STANDARD_ELIGIBLE",
+    "prediction_cohort": "market cohort with successfully frozen exact successor prediction artifact before that date's outcome reconciliation",
+    "evaluation_row": "prediction cohort with later official target having exactly three distinct Top3 starters",
+    "pre_outcome_model_input_failure": "MODEL_INPUT_BLOCKED; excluded deterministically before outcome access and always counted by reason",
+    "outcome_target_failure": "OUTCOME_TARGET_UNAVAILABLE; excluded after reconciliation and always counted by reason",
+    "no_outcome_based_prediction_exclusion": true
+  },
+  "outcome_target": {
+    "authority": "Job004 starter semantics and Amendment001 effective-rank/Top3 integrity",
+    "top3_requirement": "exactly three distinct actual starters with official Top3 positions",
+    "winning_pair_labels": "three unordered pairs among those three horses",
+    "late_t15_withdrawal": "T15 pair distribution remains on the frozen T15 roster; no post-scratch renormalization",
+    "label_not_in_frozen_pair_universe": "HARD_RECONCILIATION_BLOCK"
+  },
+  "eb_continuation": {
+    "cutoff_initialization": "reconstruct exact Fold4 state through 2026-07-31",
+    "post_cutoff_update_universe": "ALL South-Kanto target races after cutoff, not only T15 market-eligible races",
+    "post_settlement_state_update": "use Job004 actual-starter residual semantics after the date settles",
+    "raw_prediction_reconstruction": "fixed M2, strict history source_race_date < target_race_date, pre-race-safe target columns only, final actual-starter support allowed only because state update occurs after settlement and affects future dates only",
+    "outcome_fields_in_raw_prediction": false,
+    "same_day_update": false,
+    "date_d_state_used_for_scoring": "only residual observations with source race_date < d"
+  },
+  "historical_parity_before_real_replay": {
+    "required": true,
+    "feature_adapter_sample": "40 deterministic Fold4 races: 10 evenly-spaced sorted race keys per venue from 2026-01-01..2026-07-31",
+    "primary129_categorical": "exact",
+    "primary129_missing_mask": "exact",
+    "primary129_numeric_tolerance": "abs<=1e-12 and rel<=1e-12",
+    "racehead32_same_rules": true,
+    "scorer_parity_scope": "all Fold4 validation races 2026-01-01..2026-07-31 using frozen Job003B materialized inputs",
+    "raw_prediction_tolerance": "abs<=1e-12",
+    "wide_probability_tolerance": "abs<=1e-10",
+    "mass_tolerance": "1e-10",
+    "failure": "BLOCK_BEFORE_REAL_STAGE2_OUTCOME_ACCESS"
+  },
+  "artifact_policy": {
+    "prediction_artifacts": "immutable local outputs, content-hashed, no outcomes",
+    "date_freeze_marker": "required before any same-date outcome reconciliation",
+    "reconciliation_artifacts": "local untracked, official Top3 labels and EB residual state only; no formal aggregate performance",
+    "git_evidence": "aggregate counts and hashes only while blinded"
+  },
+  "stage_boundary": {
+    "formal_stage2_pass_fail_in_job007": false,
+    "economic_edge": "DEFERRED",
+    "betting": "PROHIBITED"
+  }
+}

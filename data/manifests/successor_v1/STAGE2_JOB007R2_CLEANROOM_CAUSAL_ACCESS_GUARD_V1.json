@@ -1,0 +1,83 @@
+{
+  "guard_id": "STAGE2_JOB007R1_CLEANROOM_CAUSAL_ACCESS_GUARD_V1",
+  "project": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "incident": {
+    "prior_status": "JOB007_BLOCKED_CAUSAL_ACCESS_BOUNDARY",
+    "cause": "post-cutoff normalized outcome-derived rows were opened before historical parity PASS",
+    "repo_commits_from_failed_attempt": 0,
+    "scientific_freeze_changed": false,
+    "performance_aggregates_computed": false
+  },
+  "retry_start": {
+    "main_commit": "c118e2a7af03f96f27b75febce15d64fe1e4031a",
+    "branch": "codex/job007-stage2-forward-locked-replay",
+    "branch_expected_ahead_of_main_commits": 0,
+    "worktree_clean_required": true
+  },
+  "phase_a": {
+    "name": "HISTORICAL_PARITY_CLEANROOM",
+    "post_cutoff_data_access": "ABSOLUTELY_FORBIDDEN",
+    "network_access": "FORBIDDEN",
+    "forbidden_exact_paths": [
+      "/home/nabe/projects/nankan-market-residual-phase2/db/p2_live_history_delta.sqlite",
+      "/home/nabe/projects/nankan-market-residual-phase2/db/p2_live_history_normalized_delta.sqlite",
+      "/home/nabe/projects/nankan-market-residual-phase2/db/market_snapshot.sqlite",
+      "/home/nabe/projects/nankan-market-residual-phase2/db/live_development.sqlite"
+    ],
+    "forbidden_prefixes": [
+      "/home/nabe/projects/nankan-market-residual-phase2/data/raw/live_history_delta",
+      "/home/nabe/projects/nankan-market-residual-phase2/data/raw/live_development_results",
+      "/home/nabe/projects/nankan-market-residual-phase2/outputs/prospective_collection",
+      "/home/nabe/projects/nankan-market-residual-phase2/outputs/successor_v1/stage2_locked_replay",
+      "/home/nabe/projects/nankan-market-residual-phase2/audit/successor_v1/job007_quarantine"
+    ],
+    "forbidden_operations": [
+      "sqlite open/query",
+      "file content read",
+      "hashing",
+      "schema inspection",
+      "row counts",
+      "ad-hoc Python inspection",
+      "sqlite3 CLI inspection",
+      "provider instantiation that opens a forbidden path"
+    ],
+    "safe_historical_boundary": "all data used for parity must have race_date <= 2026-07-31",
+    "normalized_history_provider_instantiation": "FORBIDDEN_UNTIL_PHASE_B",
+    "phase_b_lazy_import_required": true
+  },
+  "phase_a_runtime_guard": {
+    "required": true,
+    "intercept": [
+      "sqlite3.connect",
+      "builtins.open/io.open for forbidden paths",
+      "Path.open/read_text/read_bytes via io.open coverage"
+    ],
+    "forbidden_attempt_is_hard_block": true,
+    "access_audit_required": true
+  },
+  "phase_a_pass_marker": {
+    "path": "/home/nabe/projects/nankan-market-residual-phase2/audit/successor_v1/job007/PHASE_A_PASSED.json",
+    "must_bind": [
+      "implementation_git_commit",
+      "authority hashes",
+      "feature parity artifact hash",
+      "scorer parity artifact hash",
+      "postcutoff_live_db_open_count=0",
+      "network_access=false"
+    ]
+  },
+  "phase_b": {
+    "unlock_condition": "valid PHASE_A_PASSED.json bound to current HEAD",
+    "local_only_data_access": true,
+    "network_access_except_final_git_push": "FORBIDDEN",
+    "performance_blinding": true
+  },
+  "quarantine": {
+    "prior_attempt_artifacts_must_not_be_reused": true,
+    "move_without_content_inspection": true,
+    "audit_source": "/home/nabe/projects/nankan-market-residual-phase2/audit/successor_v1/job007",
+    "audit_destination": "/home/nabe/projects/nankan-market-residual-phase2/audit/successor_v1/job007_quarantine/JOB007_BLOCKED_CAUSAL_ACCESS_BOUNDARY_001",
+    "output_source": "/home/nabe/projects/nankan-market-residual-phase2/outputs/successor_v1/stage2_locked_replay",
+    "output_destination": "/home/nabe/projects/nankan-market-residual-phase2/outputs/successor_v1/stage2_locked_replay_quarantine/JOB007_BLOCKED_CAUSAL_ACCESS_BOUNDARY_001"
+  }
+}
