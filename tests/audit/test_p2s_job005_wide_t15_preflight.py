@@ -194,6 +194,16 @@ class WideT15PreflightTest(unittest.TestCase):
         self.assertEqual(1, result["eligible_count"])
         self.assertEqual(3, result["pair_rows_checked"])
         self.assertEqual(0, result["hard_contract_violation_count"])
+        self.assertEqual(
+            {
+                "race_registry",
+                "source_captures",
+                "current_info_snapshots",
+                "current_runner_info",
+                "market_snapshots",
+            },
+            result["query_audit"].tables["prospective"],
+        )
 
     def test_capture_later_than_decision_is_ordinary_ineligible(self) -> None:
         self._execute(

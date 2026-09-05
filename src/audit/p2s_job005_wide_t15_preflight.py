@@ -41,7 +41,6 @@ PROSPECTIVE_TABLES = {
     "current_info_snapshots",
     "current_runner_info",
     "market_snapshots",
-    "sqlite_master",
 }
 HISTORICAL_TABLES = {"official_odds", "odds_snapshots", "sqlite_master"}
 ORDINARY_REASONS = {
@@ -198,19 +197,26 @@ class QueryAudit:
 
 
 def required_schema(connection: sqlite3.Connection, database: str, query_audit: QueryAudit, tables: set[str]) -> dict[str, Any]:
-    existing = {
-        str(row["name"])
-        for row in query_audit.execute(
-            connection,
-            database,
-            "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
-        ).fetchall()
-    }
-    missing = sorted(tables - existing)
-    if missing:
-        raise Job005Error(f"REQUIRED_TABLES_MISSING:{database}:{','.join(missing)}")
-    return {
-        table: [
+    if database == "historical":
+        existing = {
+            str(row["name"])
+            for row in query_audit.execute(
+                connection,
+                database,
+                "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name",
+            ).fetchall()
+        }
+        missing = sorted(tables - existing)
+        if missing:
+            raise Job005Error(f"REQUIRED_TABLES_MISSING:{database}:{','.join(missing)}")
+    schema: dict[str, Any] = {}
+    missing = []
+    for table in sorted(tables):
+        rows = query_audit.execute(connection, database, f"PRAGMA table_info({table})").fetchall()
+        if not rows:
+            missing.append(table)
+            continue
+        schema[table] = [
             {
                 "cid": int(row["cid"]),
                 "name": str(row["name"]),
@@ -218,10 +224,11 @@ def required_schema(connection: sqlite3.Connection, database: str, query_audit: 
                 "notnull": int(row["notnull"]),
                 "pk": int(row["pk"]),
             }
-            for row in query_audit.execute(connection, database, f"PRAGMA table_info({table})").fetchall()
+            for row in rows
         ]
-        for table in sorted(tables)
-    }
+    if missing:
+        raise Job005Error(f"REQUIRED_TABLES_MISSING:{database}:{','.join(missing)}")
+    return schema
 
 
 def window_position(captured_at: Any, scheduled_post_time: Any) -> tuple[bool, float]:
@@ -497,7 +504,7 @@ def classify_race(
 def audit_prospective_db(path: Path, query_audit: QueryAudit | None = None) -> dict[str, Any]:
     query_audit = query_audit or QueryAudit()
     connection = readonly_connection(path)
-    required_tables = PROSPECTIVE_TABLES - {"sqlite_master"}
+    required_tables = PROSPECTIVE_TABLES
     try:
         quick_check = str(query_audit.execute(connection, "prospective", "PRAGMA quick_check").fetchone()[0])
         schema = required_schema(connection, "prospective", query_audit, required_tables)
