@@ -147,30 +147,22 @@ explicitly changes them.
 
 ## Repository and version-control contract
 
-This Project root, `/home/nabe/projects/nankan-market-residual-phase2`, is not
-a Git repository. Normal operations do not depend on Git metadata.
+This Project is Git-managed. The GitHub source of truth is
+`fummyz-dot/nankan-market-residual-phase2`.
 
-Codex must not treat `git rev-parse`, `git status`, `git diff`, `git log`, or
-similar Git commands as a success condition or validation condition for normal
-tasks. The absence of `.git` must not be treated as an error, a warning that
-requires remediation, or a `BLOCKED` reason.
-
-Without explicit user or design-authority instruction, Codex must not run
-`git init`, create `.git`, convert this Project into a Git repository, or add
-VCS metadata.
+- `main` is the accepted/reviewed state.
+- Normal Codex work uses a `codex/<job-id>` branch.
+- Every job records its starting and ending commit SHA.
+- Source/specification changes must be committed before any result-producing
+  long run that depends on them.
+- Local SQLite databases, processed data, outputs, and the root `audit/` runtime
+  tree remain untracked.
 
 When a task requires reporting changed files, report the paths actually written
 during the task, distinguish created from modified paths, and include SHA-256
-and executed validation when needed; do not rely on Git diff. When a task
-requires `repository files changed = 0`, confirm as an execution audit that no
-command wrote under the repository and that any allowed outputs were outside it
-(such as `/tmp`). A full-repository mtime or hash scan is not required.
-
-If generic task instructions include a Git check, and Git itself is not the
-task purpose in this Project, report
-`GIT: NOT_APPLICABLE_PROJECT_NOT_GIT_MANAGED` and continue the actual task.
-Real missing files, databases, or artifacts, and real contract violations,
-remain subject to the existing fail-closed / `BLOCKED` rules.
+and executed validation when needed. Git diff/status may provide the tracked
+write-set evidence, while runtime artifacts remain governed by their explicit
+SHA-256 manifests.
 
 ## Codex working rules
 Before editing:
@@ -184,7 +176,7 @@ For every job:
 - Define inputs, outputs, invariants, exclusions, and acceptance tests.
 - Preserve source immutability.
 - Prefer deterministic, auditable transformations.
-- Emit a run manifest with `vcs_mode: none`, `git_commit: null`, workspace root, code/input/config manifest hashes, platform and Python/library versions, random seed, commands, and output artifacts. Git is not currently part of this workspace workflow; SHA-256 manifests provide provenance.
+- Emit a run manifest with `vcs_mode: git`, `implementation_git_commit` set to the exact commit used for execution, starting/ending commit provenance, workspace root, code/input/config manifest hashes, platform and Python/library versions, random seed, commands, and output artifacts.
 - Add unit/integration/leakage tests appropriate to the change.
 - Do not silently change research semantics to make tests or metrics look better.
 

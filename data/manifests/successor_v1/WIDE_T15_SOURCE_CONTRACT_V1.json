@@ -1,0 +1,175 @@
+{
+  "contract_id": "WIDE_T15_SOURCE_CONTRACT_V1",
+  "project": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "stage": "STAGE2_INCREMENTAL_EDGE_SOURCE_PREFLIGHT",
+  "status": "FROZEN_BEFORE_STAGE2_MARKET_BASELINE_SELECTION",
+  "design_scope": "Source, timestamp, roster, pair-universe, interval-odds, and provenance eligibility only. No market probability mapping or performance evaluation.",
+  "github": {
+    "repository": "fummyz-dot/nankan-market-residual-phase2",
+    "authority_start_commit": "a11f507b8b14d1d812052188f93689c1b6db03c5"
+  },
+  "databases": {
+    "prospective_market_db": {
+      "absolute_path": "/home/nabe/projects/nankan-market-residual-phase2/db/market_snapshot.sqlite",
+      "mutable_operational_db": true,
+      "schema_owner": "src/ingestion/prospective_store.py",
+      "primary_tables": [
+        "race_registry",
+        "source_captures",
+        "current_info_snapshots",
+        "current_runner_info",
+        "market_snapshots"
+      ]
+    },
+    "historical_market_reference": {
+      "absolute_path": "/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_market.sqlite",
+      "expected_sha256": "62450b078badcf2fc675416a068c83548a620ae5aa02d22bd91d8fedca0001ad",
+      "semantic_class": "MARKET_TIME_UNKNOWN_DEVELOPMENT_REFERENCE_ONLY",
+      "stage2_primary_eligible": false,
+      "expected_odds_snapshots_rows": 0,
+      "permitted_job005_reads": [
+        "sqlite_master",
+        "PRAGMA table_info",
+        "PRAGMA quick_check",
+        "official_odds row count",
+        "odds_snapshots row count"
+      ],
+      "prohibited_reads": [
+        "payouts",
+        "race results",
+        "settlement outcomes"
+      ]
+    }
+  },
+  "source_contract": {
+    "source_name": "NANKANKEIBA_OFFICIAL",
+    "bet_type_code": "WIDE",
+    "odds_source_resolution": "Resolve WIDE only from the explicit official WIDE link exposed by the exact same T-mark official WIN page. No latest-page substitution.",
+    "capture_namespace": "P2_MKT_ONLY",
+    "raw_archive_required": true,
+    "raw_sha256_required": true,
+    "official_host_required": true
+  },
+  "t15_standard": {
+    "decision_time_definition": "scheduled_post_time - 15 minutes",
+    "eligible_capture_window": "[decision_time - 60 seconds, decision_time], inclusive",
+    "primary_mode": "T15_STANDARD",
+    "source_mark": "T15",
+    "current_snapshot_requirements": {
+      "snapshot_mark": "T15",
+      "target_decision_label": "T-15_ENGINEERING_CANDIDATE",
+      "t15_timing_status": "PREDECISION_VALID",
+      "capture_status": "COMPLETE",
+      "availability_evidence_allowed": [
+        "PUBLISHED_AT_CONFIRMED",
+        "OBSERVED_IN_PREDECISION_RAW_CAPTURE"
+      ],
+      "notes.market_wide_status": "COMPLETE",
+      "notes.market_wide_capture_id": "NON_NULL",
+      "notes.market_capture_set_rule": "EXACT_T_MARK_OFFICIAL_WIN_WIDE_AND_TRIO_NOT_LATEST"
+    },
+    "wide_source_capture_requirements": {
+      "source_type": "MARKET",
+      "source_name": "NANKANKEIBA_OFFICIAL",
+      "capture_status": "COLLECTED_OK",
+      "notes.mark": "T15",
+      "notes.namespace": "P2_MKT_ONLY",
+      "notes.same_t_mark_win_capture_id": "MUST_MATCH_CURRENT_NOTES_MARKET_WIN_CAPTURE_ID_IF_PRESENT",
+      "captured_at": "within eligible_capture_window",
+      "source_reference_host": "www.nankankeiba.com or nankankeiba.com"
+    },
+    "market_snapshot_requirements": {
+      "bet_type_code": "WIDE",
+      "snapshot_role": "PRIMARY_CANDIDATE",
+      "target_decision_time": "T-15_ENGINEERING_CANDIDATE",
+      "availability_status": "PROSPECTIVE_TIMESTAMPED_STABILIZATION",
+      "quality_status": "COMPLETE",
+      "captured_at": "exactly source_captures.captured_at",
+      "scheduled_post_time": "exactly race/current scheduled_post_time",
+      "minutes_to_post": "recompute from scheduled_post_time-captured_at; must be within [15,16] minutes subject to 1e-9 numeric tolerance",
+      "field_size": "exact active-runner count",
+      "response_sha256": "single value across pair rows and equal source_captures.raw_sha256"
+    }
+  },
+  "active_roster_and_pairs": {
+    "active_roster_source": "current_runner_info rows belonging to the eligible T15 current_snapshot_id",
+    "minimum_active_runners": 3,
+    "horse_number_rules": "positive integers, unique",
+    "canonical_pair": "(min(horse_number_1, horse_number_2), max(...))",
+    "normalized_combination_key": "decimal pair joined by '-' with ascending horse numbers",
+    "expected_pair_set": "all unordered pairs from active roster",
+    "expected_pair_count": "C(n,2)",
+    "duplicates_allowed": false,
+    "missing_pairs_allowed": false,
+    "extra_pairs_allowed": false
+  },
+  "wide_interval_odds": {
+    "lower_column": "market_snapshots.odds_value",
+    "upper_column": "market_snapshots.max_odds_value",
+    "source_parser_fields": [
+      "lower_odds",
+      "upper_odds",
+      "lower_odds_raw",
+      "upper_odds_raw"
+    ],
+    "requirements": [
+      "lower finite and > 0",
+      "upper finite and > 0",
+      "upper >= lower"
+    ],
+    "semantic": "official displayed WIDE odds interval; do not reinterpret as an exact single price in Job005",
+    "point_conversion": "DEFERRED",
+    "market_probability_mapping": "DEFERRED",
+    "market_calibration_gamma": "DEFERRED"
+  },
+  "primary_exclusions": {
+    "T20": "not T15 primary",
+    "T10": "future relative to T15; diagnostic only",
+    "T05": "future relative to T15; diagnostic only",
+    "RECOVERY": "PRE_RACE_FALLBACK; operational only, separate scientific semantic",
+    "PRE_RACE_FALLBACK": "not T15_STANDARD primary",
+    "MARKET_TIME_UNKNOWN": "historical development reference only",
+    "late_capture": "not primary",
+    "stale_t15_capture": "not primary",
+    "partial_pair_universe": "not primary"
+  },
+  "job005_prohibitions": [
+    "read race results",
+    "read payouts",
+    "read settlement outcomes",
+    "construct hit labels",
+    "compute market q/probabilities",
+    "choose lower/geometric/arithmetic or any other interval-to-point conversion",
+    "fit gamma/beta or any calibration parameter",
+    "read or join Job004 OOF performance for market comparison",
+    "compute CE/logloss/Brier/ROI/profit",
+    "bootstrap performance",
+    "use historical MARKET_TIME_UNKNOWN as T15 proxy",
+    "use T10/T05 as T15 replacement"
+  ],
+  "job005_race_classification": {
+    "eligible": "T15_STANDARD_ELIGIBLE",
+    "ordinary_ineligible_reasons": [
+      "NO_T15_CAPTURE",
+      "NON_STANDARD_REFERENCE",
+      "T15_TIMING_INVALID",
+      "CURRENT_CAPTURE_INCOMPLETE",
+      "WIDE_CAPTURE_MISSING",
+      "WIDE_CAPTURE_INCOMPLETE"
+    ],
+    "hard_contract_violation_reasons": [
+      "STANDARD_COMPLETE_PAIR_UNIVERSE_MISMATCH",
+      "STANDARD_COMPLETE_ODDS_INTERVAL_INVALID",
+      "STANDARD_COMPLETE_PROVENANCE_INVALID",
+      "STANDARD_COMPLETE_TIMESTAMP_INCONSISTENT",
+      "STANDARD_COMPLETE_HASH_INCONSISTENT"
+    ],
+    "ordinary_missing_or_late_capture_is_not_a_hard_contract_violation": true
+  },
+  "stage2_baseline_after_job005": {
+    "market_interval_point_mapping": "Research Lead freeze required after source preflight, without inspecting Stage2 performance",
+    "market_calibration_protocol": "Research Lead freeze required",
+    "incremental_edge_gate": "Research Lead freeze required",
+    "economic_edge": "DEFERRED_TO_STAGE3"
+  }
+}
