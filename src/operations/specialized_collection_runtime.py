@@ -14,6 +14,7 @@ import queue
 import signal
 import shutil
 import socket
+import subprocess
 import sys
 import time
 from dataclasses import dataclass
@@ -29,6 +30,7 @@ from src.operations.nankan_specialized_collection import (
     CollectionContractError, canonical_json, cumulative_status, persist_day,
     sha256_value, verify_frozen_contract,
 )
+from src.ingestion.prospective_store import DEFAULT_DB as DEFAULT_MARKET_DB
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_RUNTIME_ROOT = ROOT / "data" / "p2_nankan_specialized_collection_runtime"
@@ -257,16 +259,18 @@ def parse_header_values(value: dict[str, Any]) -> dict[str, Any]:
 
 class OfficialSource:
     """Official-only source adapter.  It performs no database writes."""
-    def __init__(self, date: str) -> None:
-        self.date = date
+    def __init__(self, date: str, market_db: Path = DEFAULT_MARKET_DB) -> None:
+        self.date, self.market_db = date, market_db
         self._tasks: dict[int, Any] = {}
+        self._collector: Any | None = None
     def now(self) -> datetime: return datetime.now(timezone.utc)
     def discover(self, date: str) -> dict[str, Any]:
         from src.operations.prospective_day_collector import DAY_URL, ProspectiveDayCollector
         header_fetch = official.fetch_race_page(DAY_URL, timeout_seconds=8)
         header_html = official.decode_html(header_fetch.raw, header_fetch.headers.get("Content-Type"))
         header = parse_day_header_html(header_html)
-        collector = ProspectiveDayCollector(race_date=date, max_initial_wait_seconds=0, timeout_seconds=8)
+        collector = ProspectiveDayCollector(race_date=date, db_path=self.market_db, max_initial_wait_seconds=0, timeout_seconds=8)
+        self._collector = collector
         tasks = collector.discover(); self._tasks = {int(item.identity["race_number"]): item for item in tasks}
         if not tasks: return {"status": "NO_MEETING", "date": date}
         venues = {item.identity["venue"] for item in tasks}
@@ -278,23 +282,37 @@ class OfficialSource:
                             "scheduled_post_time": _iso(item.scheduled_post_time), "scheduled_post_time_source": "NANKAN_OFFICIAL_DAY_PROGRAM", "decision_time": _iso(item.scheduled_post_time - timedelta(minutes=15)), "cancellation_status": "ACTIVE"} for item in tasks]}
     def revision(self, number: int) -> dict[str, Any] | None: return None
     def capture(self, race: dict[str, Any], header: dict[str, Any]) -> dict[str, Any]:
-        entry = official.fetch_race_page(str(race["entry_url"]), timeout_seconds=8)
-        html = official.decode_html(entry.raw, entry.headers.get("Content-Type")); task = self._tasks[int(race["race_number"])]
-        current = official.parse_current_card(html, identity=task.identity, captured_at=entry.captured_at)
-        roster = official.parse_pre_race_card_runner_statuses(html, identity=task.identity)
-        active = sorted(number for number, item in roster.items() if item["normalized_status"] == "ACTIVE")
-        urls = official.resolve_odds_urls(html, entry.final_url); win = official.fetch_odds_page(urls["WIN"], timeout_seconds=8)
-        odds_rows = official.parse_win_odds(official.decode_html(win.raw, win.headers.get("Content-Type")))
-        odds = {str(row["horse_number"]): float(row["odds_value"]) for row in odds_rows}
-        rows = {int(row["horse_number"]): row for row in current["runners"]}
-        artifact = build_race_artifact(race=race, header=header, runner_numbers=active, odds=odds, captured_at=entry.captured_at,
-            raw={"entry_raw": entry.raw.decode("latin1"), "entry_sha256": _sha_bytes(entry.raw), "entry_url": entry.final_url, "win_raw": win.raw.decode("latin1"), "win_sha256": _sha_bytes(win.raw), "win_url": win.final_url}, same_day=None)
+        if self._collector is None:
+            raise RuntimeFailure("PROSPECTIVE_COLLECTOR_NOT_INITIALIZED")
+        task = self._tasks[int(race["race_number"])]
+        # The accepted prospective collector owns the single exact T15
+        # CURRENT/WIN/WIDE/TRIO transaction.  Reusing it here makes that local
+        # commit visible to the isolated read-only Stage2 worker without a
+        # second or later network reconstruction.
+        record = self._collector._capture(task, "T15")
+        conn = sqlite3.connect(f"file:{self.market_db.resolve().as_posix()}?mode=ro", uri=True)
+        conn.row_factory = sqlite3.Row; conn.execute("PRAGMA query_only=ON")
+        try:
+            snapshot = conn.execute("SELECT * FROM current_info_snapshots WHERE current_snapshot_id=?", (record["snapshot_id"],)).fetchone()
+            if snapshot is None:
+                raise RuntimeFailure("T15_CURRENT_SNAPSHOT_COMMIT_MISSING")
+            notes = json.loads(str(snapshot["notes"] or "{}"))
+            win_capture = notes.get("market_win_capture_id")
+            rows = {int(row["horse_number"]): dict(row) for row in conn.execute("SELECT * FROM current_runner_info WHERE current_snapshot_id=? ORDER BY horse_number", (record["snapshot_id"],))}
+            odds = {str(int(row["normalized_combination_key"])): float(row["odds_value"]) for row in conn.execute("SELECT normalized_combination_key,odds_value FROM market_snapshots WHERE capture_id=? AND bet_type_code='WIN' ORDER BY normalized_combination_key", (win_capture,))}
+            captures = {str(row["capture_id"]): dict(row) for row in conn.execute("SELECT capture_id,source_reference,raw_sha256 FROM source_captures WHERE capture_id IN (?,?)", (record["raw_capture_id"], win_capture))}
+        finally:
+            conn.close()
+        active = sorted(rows)
+        raw = {"current_capture_id": record["raw_capture_id"], "current_sha256": record["raw_sha256"], "entry_url": captures.get(str(record["raw_capture_id"]), {}).get("source_reference"), "win_capture_id": win_capture, "win_sha256": captures.get(str(win_capture), {}).get("raw_sha256"), "win_url": captures.get(str(win_capture), {}).get("source_reference")}
+        artifact = build_race_artifact(race=race, header=header, runner_numbers=active, odds=odds, captured_at=record["captured_at"], raw=raw, same_day=None)
         for runner in artifact["current"]["runners"]:
             source_row = rows.get(int(runner["horse_number"]), {})
-            runner["current_fields"]["bodyweight_kg"] = {"status": "VALUE", "raw_value": source_row.get("body_weight"), "normalized_value": source_row.get("body_weight"), "source": entry.final_url, "captured_at": entry.captured_at} if source_row.get("body_weight") is not None else {"status": SOURCE_UNAVAILABLE, "source": entry.final_url, "captured_at": entry.captured_at}
-            runner["current_fields"]["bodyweight_change"] = {"status": "VALUE", "raw_value": source_row.get("body_weight_change"), "normalized_value": source_row.get("body_weight_change"), "source": entry.final_url, "captured_at": entry.captured_at} if source_row.get("body_weight_change") is not None else {"status": "STRUCTURAL_NA", "source": entry.final_url, "captured_at": entry.captured_at}
-            jockey = source_row.get("declared_jockey_id")
-            runner["current_fields"]["current_jockey_id"] = {"status": "VALUE", "raw_value": jockey, "normalized_value": jockey, "source": entry.final_url, "captured_at": entry.captured_at} if jockey else {"status": SOURCE_UNAVAILABLE, "source": entry.final_url, "captured_at": entry.captured_at}
+            source = captures.get(str(record["raw_capture_id"]), {}).get("source_reference")
+            runner["current_fields"]["bodyweight_kg"] = {"status": "VALUE", "raw_value": source_row.get("body_weight_kg"), "normalized_value": source_row.get("body_weight_kg"), "source": source, "captured_at": record["captured_at"]} if source_row.get("body_weight_kg") is not None else {"status": SOURCE_UNAVAILABLE, "source": source, "captured_at": record["captured_at"]}
+            runner["current_fields"]["bodyweight_change"] = {"status": "VALUE", "raw_value": source_row.get("body_weight_change_kg"), "normalized_value": source_row.get("body_weight_change_kg"), "source": source, "captured_at": record["captured_at"]} if source_row.get("body_weight_change_kg") is not None else {"status": "STRUCTURAL_NA", "source": source, "captured_at": record["captured_at"]}
+            jockey = source_row.get("declared_jockey_raw")
+            runner["current_fields"]["current_jockey_id"] = {"status": "VALUE", "raw_value": jockey, "normalized_value": jockey, "source": source, "captured_at": record["captured_at"]} if jockey else {"status": SOURCE_UNAVAILABLE, "source": source, "captured_at": record["captured_at"]}
         return artifact
     def p4_result(self, race_number: int) -> dict[str, Any]:
         return {"official_entry_url": self._tasks[race_number].entry_url}
@@ -587,7 +605,45 @@ def run_no_argument_live(*, date: str | None = None, db_path: Path | None = None
     # The injectable accelerated clock is the test date authority.  Normal
     # operation always derives the date locally in JST.
     jst_date = date or (str(source.fixture["date"]) if source is not None else datetime.now(JST).date().isoformat())
-    source = source or OfficialSource(jst_date)
     root = runtime_root or Path(os.environ.get("P2_SPECIALIZED_RUNTIME_ROOT", str(DEFAULT_RUNTIME_ROOT)))
     database = db_path or Path(os.environ.get("P2_SPECIALIZED_COLLECTION_DB", str(DEFAULT_DB)))
-    return RuntimeSupervisor(date=jst_date, db_path=database, runtime_root=root, source=source).run()
+    market_db = Path(os.environ.get("P2_STAGE2_MARKET_DB", str(DEFAULT_MARKET_DB)))
+    source = source or OfficialSource(jst_date, market_db=market_db)
+    worker_root = Path(os.environ.get(
+        "P2_STAGE2_OUTPUT_ROOT",
+        str((root.parent / "stage2_confirmatory_live") if fixture else ROOT / "outputs/successor_v1/stage2_confirmatory_live"),
+    ))
+    session = hashlib.sha256(f"{os.getpid()}:{time.time_ns()}:{jst_date}".encode()).hexdigest()[:16]
+    stop_file = worker_root / "runtime/control" / f"{session}.stop"
+    log_path = worker_root / "runtime/sessions" / f"{session}.log"
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    command = [sys.executable, "-m", "src.operations.stage2_confirmatory_live", "--market-db", str(market_db), "--output-root", str(worker_root), "--stop-file", str(stop_file)]
+    if fixture and "P2_STAGE2_MARKET_DB" not in os.environ:
+        command.append("--idle")
+    if os.environ.get("P2_STAGE2_WORKER_TEST_CRASH") == "1":
+        command.append("--test-crash")
+    worker: subprocess.Popen[bytes] | None = None
+    worker_launch_error: str | None = None
+    try:
+        with log_path.open("ab") as log:
+            worker = subprocess.Popen(command, cwd=ROOT, stdout=log, stderr=log)
+    except Exception as exc:
+        worker_launch_error = f"{type(exc).__name__}:{exc}"
+    code, result = RuntimeSupervisor(date=jst_date, db_path=database, runtime_root=root, source=source).run()
+    worker_result: dict[str, Any]
+    if worker is None:
+        worker_result = {"status": "WORKER_LAUNCH_FAILED", "error": worker_launch_error, "collector_independent": True}
+    else:
+        stop_file.parent.mkdir(parents=True, exist_ok=True)
+        stop_file.write_text("STOP\n", encoding="utf-8")
+        try:
+            worker.wait(timeout=30)
+        except subprocess.TimeoutExpired:
+            worker.terminate()
+            try: worker.wait(timeout=5)
+            except subprocess.TimeoutExpired:
+                worker.kill(); worker.wait(timeout=5)
+        worker_result = {"status": "SUCCEEDED" if worker.returncode == 0 else "FAILED", "pid": worker.pid, "exit_code": worker.returncode, "collector_independent": True, "log_path": str(log_path)}
+    result["stage2_worker"] = worker_result
+    result["collector_continued_after_stage2_worker_failure"] = True
+    return code, result

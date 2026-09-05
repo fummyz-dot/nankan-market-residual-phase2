@@ -1,0 +1,83 @@
+{
+  "contract_id": "STAGE2_CONFIRMATORY_LIVE_COHORT_V1",
+  "project": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "status": "FROZEN_BEFORE_CONFIRMATORY_LIVE_OUTCOME",
+  "accepted_r3_head": "a8b9dab1d6295d46d80e96d699325973c512264f",
+  "cohort": {
+    "classification": "CONFIRMATORY_LIVE_PREDECISION",
+    "earliest_race_date": "2026-09-07",
+    "venues": [
+      "大井",
+      "川崎",
+      "浦和",
+      "船橋"
+    ],
+    "market_requirement": "T15_STANDARD_ELIGIBLE",
+    "development_locked_replay_range": [
+      "2026-08-01",
+      "2026-09-03"
+    ],
+    "development_locked_replay_counts_for_formal_support": false,
+    "development_locked_replay_counts_for_formal_bootstrap": false
+  },
+  "prediction_eligibility": {
+    "required": [
+      "accepted Fold4 M2/M1/EB scorer lineage",
+      "Primary129/RaceHead32 hashes",
+      "T15_STANDARD_ELIGIBLE market/current capture",
+      "strict-prior history only",
+      "immutable content-hashed prediction artifact",
+      "frozen_at <= target_decision_time",
+      "outcome_accessed=false",
+      "payout_accessed=false"
+    ],
+    "late_or_missing_prediction_status": [
+      "LIVE_PREDICTION_LATE",
+      "LIVE_MODEL_INPUT_BLOCKED"
+    ],
+    "late_reconstruction_may_count_confirmatory": false
+  },
+  "calibration": {
+    "algorithm": "unchanged Stage2 prequential gamma/beta protocol",
+    "allowed_prior_rows": "valid reconciled DEVELOPMENT_LOCKED_REPLAY rows plus strictly-prior confirmatory rows",
+    "same_day_rows": "forbidden",
+    "warmup": ">=20 prior eligible races AND >=4 prior eligible race dates",
+    "development_rows_may_initialize_calibration": true
+  },
+  "eb_state": {
+    "allowed_prior_rows": "all settled South-Kanto target races with race_date < target_date",
+    "same_day_update": false,
+    "development_locked_replay_may_initialize_state": true
+  },
+  "formal_support": {
+    "eligible_classification": "CONFIRMATORY_LIVE_PREDECISION only",
+    "requires_warmup": true,
+    "min_races": 100,
+    "min_dates": 12,
+    "min_races_per_venue": 10,
+    "status_before_ready": "STAGE2_ACCUMULATING",
+    "status_when_ready": "STAGE2_READY_FOR_FORMAL_EVAL"
+  },
+  "blinding": {
+    "until_ready": true,
+    "auto_formal_evaluation": false
+  },
+  "runtime": {
+    "operator_command": "./specialized-collect",
+    "single_user_command": true,
+    "stage2_worker": "isolated subprocess; collection continues if worker fails",
+    "market_db_access": "read-only",
+    "network_access_by_stage2_worker": false,
+    "trigger": "new local T15 standard-complete capture",
+    "deadline": "target_decision_time",
+    "after_deadline": "never promote reconstructed artifact to confirmatory"
+  },
+  "pending_development": {
+    "2026-09-03_unsettled_predictions": 2,
+    "handling": "development-only when settled"
+  },
+  "stage_boundary": {
+    "economic_edge": "DEFERRED_TO_STAGE3",
+    "betting": "PROHIBITED"
+  }
+}
