@@ -486,6 +486,7 @@ def _card_target_race(
     from src.features.course_direction import resolve_current_target_direction
     from src.operations.build_normalized_live_history_delta import _card_static_rows, _race_type_raw
     from src.operations.live_feature_materializer import _target_card_rows
+    from src.operations.official_pedigree_identity import resolve_live_pre_race_identity
 
     if set(identity_rows) != active_numbers:
         raise Job007Error(f"TARGET_IDENTITY_ROSTER_MISMATCH:{race_key}")
@@ -511,9 +512,18 @@ def _card_target_race(
             raise Job007Error(f"TARGET_CARD_COMPONENT_MISSING:{race_key}:{number}")
         source_identity = identity_rows[number]
         name = str(source_identity["horse_name_exact"])
-        birth_date = str(source_identity["birth_date"])
         if static[number]["horse_name_exact"] != name:
             raise Job007Error(f"TARGET_CARD_HORSE_NAME_CONFLICT:{race_key}:{number}")
+        birth_value = source_identity.get("birth_date")
+        if birth_value is None or not str(birth_value).strip():
+            def deny_network(*_args: Any, **_kwargs: Any) -> Any:
+                raise Job007Error("NETWORK_IDENTITY_FETCH_FORBIDDEN")
+            resolved = resolve_live_pre_race_identity(
+                static[number], birth_date_raw=static[number].get("birth_date_raw"),
+                fetch=deny_network,
+            )
+            birth_value = resolved["birth_date"]
+        birth_date = str(birth_value)
         jockey = people[number]["jockey"]["v1_legacy_token"]
         trainer = people[number]["trainer"]["v1_legacy_token"]
         jockey_status = jockey_affiliations[number]["source_status"]
