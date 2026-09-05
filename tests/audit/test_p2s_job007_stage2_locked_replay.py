@@ -7,7 +7,8 @@ from pathlib import Path
 from unittest.mock import patch
 
 from src.audit.p2s_job007_stage2_locked_replay import (
-    AUTHORITY_HASHES, Job007Error, aggregate_hash, guard_data_path, validate_phase_a_marker,
+    AUTHORITY_HASHES, Job007Error, _forward_horse_key, _target_z,
+    aggregate_hash, guard_data_path, validate_phase_a_marker,
 )
 
 
@@ -38,6 +39,24 @@ class Job007AuditTests(unittest.TestCase):
             left.write_bytes(b"a"); right.write_bytes(b"b")
             with patch("src.audit.p2s_job007_stage2_locked_replay.ROOT", root):
                 self.assertEqual(aggregate_hash([left, right]), aggregate_hash([right, left]))
+
+    def test_forward_horse_key_reuses_exact_historical_identity(self) -> None:
+        known = {("馬名", "2022-01-02"): "NARH_exact"}
+        self.assertEqual(_forward_horse_key("馬名", "2022-01-02", known), "NARH_exact")
+        self.assertTrue(_forward_horse_key("新馬", "2023-01-02", known).startswith("STAGE2_COLD_"))
+
+    def test_target_z_matches_job004_dnf_and_tie_semantics(self) -> None:
+        rows = [
+            {"horse_number": 1, "result_status": "FINISHED", "finish_position": 1, "margin_raw": None},
+            {"horse_number": 2, "result_status": "FINISHED", "finish_position": 2, "margin_raw": None},
+            {"horse_number": 3, "result_status": "FINISHED", "finish_position": 2, "margin_raw": None},
+            {"horse_number": 4, "result_status": "RAW_FINISH_STATUS_MISSING", "finish_position": None, "margin_raw": "競走中止"},
+        ]
+        values = _target_z(rows)
+        self.assertEqual(set(values), {1, 2, 3, 4})
+        self.assertEqual(values[2], values[3])
+        self.assertGreater(values[1], values[2])
+        self.assertGreater(values[2], values[4])
 
 
 if __name__ == "__main__": unittest.main()

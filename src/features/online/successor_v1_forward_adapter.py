@@ -6,6 +6,8 @@ import csv
 import hashlib
 import json
 import math
+import statistics
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -188,3 +190,184 @@ def open_phase_b_live_history_source(*, phase: str, target_date: str, **kwargs: 
         raise ForwardAdapterError("LIVE_HISTORY_PROVIDER_LOCKED_UNTIL_PHASE_B")
     from src.features.online.normalized_history_provider import P2NormalizedHistoricalAsOfProvider
     return P2NormalizedHistoricalAsOfProvider(target_date=target_date, **kwargs)
+
+
+class Primary129ForwardState:
+    """Exact Job003/003B state continued one settled date at a time.
+
+    Target materialization is read-only.  ``update_settled_date`` is the only
+    mutation point and callers must invoke it only after every prediction on
+    that date has been frozen.
+    """
+
+    SUPPORT_FIELDS = (
+        "prior_starts", "starts_last_30d", "starts_last_90d", "starts_last_365d",
+        "same_venue_starts", "same_distance_starts", "same_venue_distance_starts",
+        "same_surface_starts", "same_direction_starts", "jockey_90d_starts",
+        "jockey_365d_starts", "trainer_90d_starts", "trainer_365d_starts",
+        "near_distance_200m_starts", "same_venue_near_distance_200m_starts",
+        "same_direction_distance_starts",
+    )
+
+    def __init__(self) -> None:
+        from src.audit.p2s_job003_materialized_feature_foundation import StandardState
+
+        self.horse: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.jockey: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.trainer: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.speed: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.pace: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.jockey_participation: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.trainer_participation: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        self.standard = StandardState()
+        self.max_history_date: str | None = None
+
+    @staticmethod
+    def _eligible(race: Mapping[str, Any]) -> bool:
+        starters = [row for row in race["runners"] if row.get("result_status") in {"FINISHED", "DNF"}]
+        top = {
+            rank: [row for row in starters if row.get("result_status") == "FINISHED" and row.get("finish_position") == rank]
+            for rank in (1, 2, 3)
+        }
+        return len(starters) >= 3 and all(len(top[rank]) == 1 for rank in top) and len(
+            {top[rank][0]["horse_number"] for rank in top}
+        ) == 3
+
+    @classmethod
+    def from_historical_races(cls, races: Mapping[str, dict[str, Any]]) -> "Primary129ForwardState":
+        """Rebuild the frozen state through the supplied historical cutoff."""
+        from src.audit.p2s_job003_materialized_feature_foundation import class_values, mean
+
+        state = cls()
+        by_date: dict[str, list[dict[str, Any]]] = defaultdict(list)
+        for source in races.values():
+            race = dict(source)
+            race["runners"] = [dict(row) for row in source["runners"]]
+            race["_class"] = class_values(race)
+            by_date[str(race["race_date"])].append(race)
+        for race_date in sorted(by_date):
+            field_strengths: dict[str, float | None] = {}
+            for race in by_date[race_date]:
+                if state._eligible(race):
+                    values = [
+                        mean([event["z"] for event in state.horse[row["horse_key"]] if event.get("z") is not None])
+                        for row in race["runners"]
+                    ]
+                    field_strengths[race["race_key"]] = mean([value for value in values if value is not None])
+            state.update_settled_date(by_date[race_date], field_strengths=field_strengths)
+        return state
+
+    @staticmethod
+    def _count_support(records: list[dict[str, Any]], target: date, days: int | None = None) -> int:
+        return sum(days is None or (target - row["day"]).days <= days for row in records)
+
+    def _support_values(self, race: Mapping[str, Any], runner: Mapping[str, Any], target: date) -> dict[str, int]:
+        from src.audit.p2s_job003_materialized_feature_foundation import clean
+
+        horse = self.horse[str(runner["horse_key"])]
+        jockey = self.jockey_participation[clean(runner["jockey"])]
+        trainer = self.trainer_participation[clean(runner["trainer"])]
+        return {
+            "prior_starts": len(horse),
+            "starts_last_30d": self._count_support(horse, target, 30),
+            "starts_last_90d": self._count_support(horse, target, 90),
+            "starts_last_365d": self._count_support(horse, target, 365),
+            "same_venue_starts": sum(row["venue"] == race["venue"] for row in horse),
+            "same_distance_starts": sum(row["distance_m"] == race["distance_m"] for row in horse),
+            "same_venue_distance_starts": sum(row["venue"] == race["venue"] and row["distance_m"] == race["distance_m"] for row in horse),
+            "same_surface_starts": sum(row["surface"] == race["surface"] for row in horse),
+            "same_direction_starts": sum(row["direction"] == race["direction"] for row in horse),
+            "jockey_90d_starts": self._count_support(jockey, target, 90),
+            "jockey_365d_starts": self._count_support(jockey, target, 365),
+            "trainer_90d_starts": self._count_support(trainer, target, 90),
+            "trainer_365d_starts": self._count_support(trainer, target, 365),
+            "near_distance_200m_starts": sum(abs(row["distance_m"] - race["distance_m"]) <= 200 for row in horse),
+            "same_venue_near_distance_200m_starts": sum(row["venue"] == race["venue"] and abs(row["distance_m"] - race["distance_m"]) <= 200 for row in horse),
+            "same_direction_distance_starts": sum(row["direction"] == race["direction"] and abs(row["distance_m"] - race["distance_m"]) <= 200 for row in horse),
+        }
+
+    def materialize_race(self, race: dict[str, Any]) -> AdaptedRace:
+        """Create the exact ordered 129/32 frames without changing history."""
+        from src.audit.p2s_job003_materialized_feature_foundation import (
+            b0_row, class_values, clean, composition, entity_features, primary_pre,
+        )
+
+        reject_outcome_fields(race.keys())
+        target = date.fromisoformat(str(race["race_date"])[:10])
+        validate_history_boundary(self.max_history_date, target.isoformat())
+        source = dict(race)
+        source["_class"] = class_values(source)
+        rows: list[dict[str, Any]] = []
+        for runner in source["runners"]:
+            reject_outcome_fields(runner.keys())
+            jockey_key, trainer_key = clean(runner["jockey"]), clean(runner["trainer"])
+            base = b0_row(
+                source, runner, target, self.horse[str(runner["horse_key"])],
+                self.jockey[jockey_key], self.trainer[trainer_key],
+                entity_features(self.jockey[jockey_key], target, "jockey"),
+                entity_features(self.trainer[trainer_key], target, "trainer"),
+                PRIMARY_HASH, "FORWARD_COMBINED_HISTORY",
+            )
+            base.update(self._support_values(source, runner, target))
+            row = {
+                **base,
+                **primary_pre(
+                    source, runner, base, self.horse[str(runner["horse_key"])],
+                    self.speed[str(runner["horse_key"])], self.pace[str(runner["horse_key"])],
+                ),
+            }
+            row["historical_roster_proxy"] = False
+            row["feature_manifest_hash"] = PRIMARY_HASH
+            rows.append(row)
+        composition(rows)
+        frame = pd.DataFrame(rows).sort_values("horse_number", kind="stable").reset_index(drop=True)
+        return adapt_materialized_rows(frame)
+
+    def update_settled_date(
+        self, races: Sequence[dict[str, Any]], *, field_strengths: Mapping[str, float | None]
+    ) -> None:
+        """Append one complete date only; mixed/same-day partial updates fail."""
+        from src.audit.p2s_job003_materialized_feature_foundation import (
+            clean, course, exchange, source_events,
+        )
+
+        if not races:
+            return
+        dates = {str(race["race_date"])[:10] for race in races}
+        if len(dates) != 1:
+            raise ForwardAdapterError("EB_UPDATE_MIXED_DATES")
+        race_date = dates.pop()
+        if self.max_history_date is not None and race_date <= self.max_history_date:
+            raise ForwardAdapterError("EB_UPDATE_NON_MONOTONIC_DATE")
+        target = date.fromisoformat(race_date)
+        standards = {race["race_key"]: self.standard.standard(race) for race in races}
+        clocks: list[tuple[dict[str, Any], float]] = []
+        all_events: list[dict[str, Any]] = []
+        for race in races:
+            events = source_events(race, target, standards[race["race_key"]])
+            for event in events:
+                event["field_strength"] = field_strengths.get(race["race_key"])
+            all_events.extend(events)
+            valid = [
+                float(row["finish_time_seconds"]) for row in race["runners"]
+                if row.get("result_status") == "FINISHED" and row.get("finish_time_seconds") is not None
+            ]
+            starters = sum(row.get("result_status") in {"FINISHED", "DNF"} for row in race["runners"])
+            if not exchange(race) and len(valid) >= 3 and starters and len(valid) / starters >= 0.5:
+                clocks.append((race, statistics.median(valid)))
+        for event in all_events:
+            self.horse[str(event["horse"])].append(event)
+            participation = {key: event[key] for key in ("day", "venue", "distance_m", "surface", "direction")}
+            self.jockey_participation[str(event["jockey"])].append(participation)
+            self.trainer_participation[str(event["trainer"])].append(participation)
+            if event.get("finish_pct") is not None:
+                self.jockey[str(event["jockey"])].append(event)
+                self.trainer[str(event["trainer"])].append(event)
+            if event.get("speed") is not None:
+                self.speed[str(event["horse"])].append({"day": target, "z": event["speed"], "course": event["course"]})
+            if event.get("rank") is not None or event.get("front") is not None:
+                self.pace[str(event["horse"])].append({"day": target, "rank": event.get("rank"), "adv": event.get("adv"), "front": event.get("front")})
+        for race, clock in clocks:
+            self.standard.update(race, clock)
+        self.standard.last_date = race_date
+        self.max_history_date = race_date
