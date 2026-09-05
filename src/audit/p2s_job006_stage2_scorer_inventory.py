@@ -12,7 +12,6 @@ import hashlib
 import inspect
 import json
 import subprocess
-from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 from typing import Any, Iterable
@@ -135,6 +134,8 @@ def prior_dates_only(observation_dates: Iterable[str], target_date: str) -> list
 
 
 def verify_eb_reference() -> dict[str, Any]:
+    import numpy as np
+
     from src.models.successor_v1 import eb_state
 
     signature = inspect.signature(eb_state.backfit)
@@ -144,11 +145,16 @@ def verify_eb_reference() -> dict[str, Any]:
         raise InventoryError("EB_CONVERGENCE_DEFAULT_MISMATCH")
     empty = eb_state.BackfitResult(
         effects={layer: {} for layer in eb_state.LAYERS},
-        components={layer: eb_state.VarianceComponent(1.0, 0.1) for layer in eb_state.LAYERS},
-        cycles=0, converged=True, initialized_from_zero=True,
+        components={layer: (1.0, 0.1) for layer in eb_state.LAYERS},
+        cycles=0, converged=True, final_max_abs_change=0.0, initialized_from_zero=True,
     )
-    row = {"horse": "UNSEEN_H", "jockey": "UNSEEN_J", "venue": "大井"}
-    if eb_state.score_effects([row], empty)[0] != 0.0:
+    score = eb_state.score_effects(
+        empty,
+        np.asarray(["UNSEEN_H"], dtype=object),
+        np.asarray(["UNSEEN_J"], dtype=object),
+        np.asarray(["大井"], dtype=object),
+    )
+    if score[0] != 0.0:
         raise InventoryError("EB_UNSEEN_KEY_NOT_ZERO")
     return {
         "layers": list(eb_state.LAYERS), "full_rebackfit_from_zero": True,
