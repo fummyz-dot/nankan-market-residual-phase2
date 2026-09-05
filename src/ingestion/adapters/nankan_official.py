@@ -522,13 +522,61 @@ def _affiliation_from_jockey_cell(cell: Node, anchor: Node) -> tuple[str, str | 
     return ("EXPLICIT_VALUE", value, candidates[0]) if value else ("EXPLICIT_EMPTY", None, candidates[0])
 
 
+def _eb_card_active_numbers(html: str, identity: dict[str, Any]) -> set[int]:
+    """Reuse the R6-approved explicit card nonstarter tokens for EB cards only."""
+    target = _current_card_identity_table(parse_html(html))
+    active: set[int] = set()
+    for row in _direct_table_rows(target):
+        cells = [cell for cell in direct_cells(row) if cell.tag == "td"]
+        values = [node_text(cell) for cell in cells]
+        number = _current_card_row_number(cells)
+        horse_cells = [
+            index for index, cell in enumerate(cells)
+            if any(re.fullmatch(r"/uma_info/\d+\.do", node.attrs.get("href", "")) for node in iter_nodes(cell, "a"))
+        ]
+        if len(horse_cells) != 1:
+            continue
+        horse_index = horse_cells[0]
+        if number is not None:
+            horse_number, number_index = number
+            status = [value for value in values[number_index + 1:horse_index] if value]
+            if status in (["除外"], ["取消"]):
+                continue
+            if status:
+                raise ValueError(f"BLOCK_EB_CARD_RUNNER_STATUS_UNRESOLVED:{horse_number}:{'|'.join(status)}")
+        else:
+            status = [value for value in values[:horse_index] if value in {"除外", "取消"}]
+            if len(status) != 1:
+                continue
+            selectors = {
+                int(match.group(1)) for value in values
+                for match in [re.fullmatch(r"writeOdds\((\d+)\);", value)] if match is not None
+            }
+            if len(selectors) != 1:
+                raise ValueError("OFFICIAL_CARD_PERSON_NONSTARTER_HORSE_NUMBER_UNRESOLVED")
+            continue
+        if horse_number in active:
+            raise ValueError(f"OFFICIAL_PRE_RACE_CARD_DUPLICATE_HORSE_NUMBER:{horse_number}")
+        active.add(horse_number)
+    if len(active) != int(identity["field_size"]):
+        raise ValueError(f"OFFICIAL_EB_CARD_ACTIVE_RUNNER_COUNT_MISMATCH:{len(active)}:{identity['field_size']}")
+    return active
+
+
 def parse_pre_race_jockey_affiliations(
-    html: str, *, identity: dict[str, Any]
+    html: str, *, identity: dict[str, Any], source_mode: str = "T15_PREDICTION"
 ) -> dict[int, dict[str, Any]]:
     """Parse only same-row, explicitly displayed official jockey affiliation."""
     _same_race_identity(parse_race_identity(html), identity)
-    statuses = parse_pre_race_card_runner_statuses(html, identity=identity)
-    active = {number for number, row in statuses.items() if row["normalized_status"] == _PRE_RACE_ACTIVE}
+    if source_mode == "T15_PREDICTION":
+        statuses = parse_pre_race_card_runner_statuses(html, identity=identity)
+        active = {number for number, row in statuses.items() if row["normalized_status"] == _PRE_RACE_ACTIVE}
+        official_horse_ids = {number: row["official_horse_id"] for number, row in statuses.items()}
+    elif source_mode == "POST_SETTLEMENT_EB_UPDATE":
+        active = _eb_card_active_numbers(html, identity)
+        official_horse_ids = {}
+    else:
+        raise ValueError(f"OFFICIAL_PRE_RACE_JOCKEY_SOURCE_MODE_INVALID:{source_mode}")
     root = parse_html(html)
     candidates: list[dict[int, dict[str, Any]]] = []
     for table in iter_nodes(root, "table"):
@@ -562,7 +610,10 @@ def parse_pre_race_jockey_affiliations(
                 break
             horse_match = re.fullmatch(r"/uma_info/(\d+)\.do", horse_anchors[0].attrs.get("href", ""))
             jockey_match = _CURRENT_CARD_JOCKEY_LINK.fullmatch(jockey_anchors[0].attrs.get("href", ""))
-            if horse_match is None or jockey_match is None or horse_match.group(1) != statuses[horse_number]["official_horse_id"]:
+            expected_horse_id = official_horse_ids.get(horse_number)
+            if horse_match is None or jockey_match is None or (
+                expected_horse_id is not None and horse_match.group(1) != expected_horse_id
+            ):
                 invalid = True
                 break
             status, value, raw = _affiliation_from_jockey_cell(jockey_cells[0], jockey_anchors[0])

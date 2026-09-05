@@ -259,7 +259,9 @@ def _source_status_counts(
     scope: str,
 ) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     prizes = official.parse_pre_race_prize_schedule(html, identity=identity)
-    runners = official.parse_pre_race_jockey_affiliations(html, identity=identity)
+    runners = official.parse_pre_race_jockey_affiliations(
+        html, identity=identity, source_mode=scope,
+    )
     prize_unresolved = sum(
         item["source_status"] not in {"EXPLICIT_VALUE_YEN", "EXPLICIT_NOT_PUBLISHED"}
         for item in prizes.values()
