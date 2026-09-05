@@ -2,7 +2,7 @@
 
 ## Job metadata
 - Job ID: `JOB006`
-- Status: IN_PROGRESS
+- Status: COMPLETE_JOB006_PASS
 
 ## Inputs
 - Frozen Stage2 authority supplied in JOB006.
