@@ -1,0 +1,74 @@
+{
+  "amendment_id": "WIDE_T15_SOURCE_CONTRACT_V1_AMENDMENT_001_LEGACY_CAPTURE_SET_RULE",
+  "project": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "stage": "STAGE2_INCREMENTAL_EDGE_SOURCE_PREFLIGHT",
+  "base_contract_id": "WIDE_T15_SOURCE_CONTRACT_V1",
+  "base_contract_json_sha256": "41267996673ff0a4f7053f2a49f24e41e545469d80a11b519e91f5e480c8ade5",
+  "status": "FROZEN_BEFORE_STAGE2_MARKET_BASELINE_SELECTION",
+  "trigger": {
+    "job": "JOB005",
+    "blocked_status": "JOB005_BLOCKED_DATA_CONTRACT",
+    "blocked_branch_head": "54daf61a07bb193f5343e9288680417c196d3172",
+    "observed_races": 8,
+    "observed_scope": "2026-08-28 船橋04R-11R",
+    "observed_only_violation": "STANDARD_COMPLETE_PROVENANCE_INVALID",
+    "stored_market_capture_set_rule": "EXACT_T_MARK_OFFICIAL_WIN_AND_WIDE_NOT_LATEST",
+    "original_required_market_capture_set_rule": "EXACT_T_MARK_OFFICIAL_WIN_WIDE_AND_TRIO_NOT_LATEST"
+  },
+  "scientific_decision": {
+    "decision": "ACCEPT_NARROW_LEGACY_WIDE_CAPTURE_SET_RULE",
+    "rationale": [
+      "Stage 2 primary market object is WIDE, not TRIO.",
+      "WIDE provenance is independently established by exact T-mark source linkage, official host, T15 timing, complete C(n,2) pair universe, source/raw hash consistency, and same-T-mark WIN linkage.",
+      "TRIO collection is additive provenance for another ticket family and is not required to establish WIDE source identity.",
+      "Requiring the newer TRIO-inclusive capture-set label would reject otherwise valid earlier WIDE T15 captures solely because the collector later gained TRIO capture support."
+    ],
+    "no_performance_information_used": true,
+    "no_outcome_information_used": true
+  },
+  "replacement_rule": {
+    "field": "current_info_snapshots.notes.market_capture_set_rule",
+    "accepted_exact_values": [
+      "EXACT_T_MARK_OFFICIAL_WIN_AND_WIDE_NOT_LATEST",
+      "EXACT_T_MARK_OFFICIAL_WIN_WIDE_AND_TRIO_NOT_LATEST"
+    ],
+    "semantic_minimum": "EXACT_T_MARK_OFFICIAL_WIN_AND_WIDE_NOT_LATEST",
+    "trio_requirement_for_wide_stage2": false,
+    "unknown_values": "HARD_PROVENANCE_VIOLATION_IF_ROW_OTHERWISE_CLAIMS_STANDARD_COMPLETE"
+  },
+  "unchanged_wide_invariants": [
+    "snapshot_mark=T15",
+    "target_decision_label=T-15_ENGINEERING_CANDIDATE",
+    "t15_timing_status=PREDECISION_VALID",
+    "CURRENT capture_status=COMPLETE",
+    "notes.market_wide_status=COMPLETE",
+    "notes.market_wide_capture_id non-null",
+    "WIDE source capture source_type=MARKET",
+    "WIDE source capture source_name=NANKANKEIBA_OFFICIAL",
+    "WIDE source capture capture_status=COLLECTED_OK",
+    "WIDE source capture notes.mark=T15",
+    "WIDE source capture notes.namespace=P2_MKT_ONLY",
+    "WIDE source_reference official Nankan host",
+    "WIDE raw_archive_path and raw_sha256 present",
+    "same_t_mark_win_capture_id matches CURRENT market_win_capture_id when both present",
+    "WIDE captured_at within [decision_time-60s, decision_time]",
+    "WIDE complete exact C(n,2) active-roster pair universe",
+    "WIDE odds interval finite, positive, upper>=lower",
+    "market_snapshots response_sha256 exactly equals WIDE source raw_sha256",
+    "snapshot_role=PRIMARY_CANDIDATE",
+    "quality_status=COMPLETE",
+    "availability_status=PROSPECTIVE_TIMESTAMPED_STABILIZATION"
+  ],
+  "data_handling": {
+    "rewrite_existing_database_rows": false,
+    "backfill_trio": false,
+    "relabel_existing_capture_notes": false,
+    "use_t10_t05_recovery_as_t15": false
+  },
+  "job005_effect": {
+    "rerun_required": true,
+    "prior_blocked_run_preserved_in_git_history": true,
+    "acceptance_gate_unchanged_except_for_capture_set_rule_enum": true,
+    "hard_contract_violations_required_for_pass": 0
+  }
+}

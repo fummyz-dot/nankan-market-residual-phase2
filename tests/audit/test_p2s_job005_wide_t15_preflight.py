@@ -178,6 +178,19 @@ class WideT15PreflightTest(unittest.TestCase):
         connection.commit()
         connection.close()
 
+    def _set_capture_rule(self, value: str) -> None:
+        connection = self._connection()
+        notes = json.loads(
+            connection.execute("SELECT notes FROM current_info_snapshots").fetchone()[0]
+        )
+        notes["market_capture_set_rule"] = value
+        connection.execute(
+            "UPDATE current_info_snapshots SET notes=?",
+            (json.dumps(notes, sort_keys=True),),
+        )
+        connection.commit()
+        connection.close()
+
     def _result(self) -> tuple[dict[str, object], dict[str, object]]:
         result = audit_prospective_db(self.db_path)
         return result, result["inventory"][0]
@@ -204,6 +217,17 @@ class WideT15PreflightTest(unittest.TestCase):
             },
             result["query_audit"].tables["prospective"],
         )
+
+    def test_legacy_exact_capture_set_rule_is_eligible(self) -> None:
+        self._set_capture_rule("EXACT_T_MARK_OFFICIAL_WIN_AND_WIDE_NOT_LATEST")
+        result, row = self._result()
+        self.assertEqual("T15_STANDARD_ELIGIBLE", row["classification"])
+        self.assertEqual(1, result["eligible_count"])
+        self.assertEqual(0, result["hard_contract_violation_count"])
+
+    def test_unknown_capture_set_rule_is_hard_provenance_violation(self) -> None:
+        self._set_capture_rule("EXACT_T_MARK_OFFICIAL_WIDE_NOT_LATEST")
+        self._assert_hard("STANDARD_COMPLETE_PROVENANCE_INVALID")
 
     def test_capture_later_than_decision_is_ordinary_ineligible(self) -> None:
         self._execute(

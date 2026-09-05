@@ -27,13 +27,32 @@ OUTPUT_DIR = ROOT / "audit" / "successor_v1" / "job005"
 EVIDENCE_DIR = ROOT / "docs" / "evidence" / "successor_v1" / "job005"
 AUTHORITY_JSON = ROOT / "data" / "manifests" / "successor_v1" / "WIDE_T15_SOURCE_CONTRACT_V1.json"
 AUTHORITY_MD = ROOT / "docs" / "successor_v1" / "WIDE_T15_SOURCE_CONTRACT_V1.md"
+AMENDMENT_JSON = (
+    ROOT
+    / "data"
+    / "manifests"
+    / "successor_v1"
+    / "WIDE_T15_SOURCE_CONTRACT_V1_AMENDMENT_001_LEGACY_CAPTURE_SET_RULE.json"
+)
+AMENDMENT_MD = (
+    ROOT
+    / "docs"
+    / "successor_v1"
+    / "WIDE_T15_SOURCE_CONTRACT_V1_AMENDMENT_001_LEGACY_CAPTURE_SET_RULE.md"
+)
 
 START_MAIN_COMMIT = "a11f507b8b14d1d812052188f93689c1b6db03c5"
 AUTHORITY_JSON_SHA256 = "41267996673ff0a4f7053f2a49f24e41e545469d80a11b519e91f5e480c8ade5"
 AUTHORITY_MD_SHA256 = "676e930d0bd723d42a369af6dc620338f375939f610eee60faef4ae462ee5087"
+AMENDMENT_JSON_SHA256 = "eff73f9438aefe943ddd98b158e4bf0c9d0c36b3b58d2dc95d4ce17c94f71fbc"
+AMENDMENT_MD_SHA256 = "5bbd34422b4e747729adb7fff8d6e700d82c07c0063cdc1af630e388b75e0d53"
 HISTORICAL_DB_SHA256 = "62450b078badcf2fc675416a068c83548a620ae5aa02d22bd91d8fedca0001ad"
 TOLERANCE = 1e-9
 OFFICIAL_HOSTS = {"www.nankankeiba.com", "nankankeiba.com"}
+ACCEPTED_WIDE_CAPTURE_SET_RULES = {
+    "EXACT_T_MARK_OFFICIAL_WIN_AND_WIDE_NOT_LATEST",
+    "EXACT_T_MARK_OFFICIAL_WIN_WIDE_AND_TRIO_NOT_LATEST",
+}
 
 PROSPECTIVE_TABLES = {
     "race_registry",
@@ -391,8 +410,7 @@ def classify_complete_t15(
         or host not in OFFICIAL_HOSTS
         or not capture.get("raw_archive_path")
         or not capture.get("raw_sha256")
-        or current_notes.get("market_capture_set_rule")
-        != "EXACT_T_MARK_OFFICIAL_WIN_WIDE_AND_TRIO_NOT_LATEST"
+        or current_notes.get("market_capture_set_rule") not in ACCEPTED_WIDE_CAPTURE_SET_RULES
     ):
         provenance_issues += 1
     same_mark_win = capture_notes.get("same_t_mark_win_capture_id")
@@ -711,6 +729,10 @@ def run_audit(
         raise Job005Error("JOB005_BLOCKED_AUTHORITY_JSON_HASH")
     if sha256_file(AUTHORITY_MD) != AUTHORITY_MD_SHA256:
         raise Job005Error("JOB005_BLOCKED_AUTHORITY_MD_HASH")
+    if sha256_file(AMENDMENT_JSON) != AMENDMENT_JSON_SHA256:
+        raise Job005Error("JOB005A_BLOCKED_AMENDMENT_JSON_HASH")
+    if sha256_file(AMENDMENT_MD) != AMENDMENT_MD_SHA256:
+        raise Job005Error("JOB005A_BLOCKED_AMENDMENT_MD_HASH")
     query_audit = QueryAudit()
     prospective = audit_prospective_db(prospective_db, query_audit)
     historical = audit_historical_db(historical_db, query_audit)
@@ -790,6 +812,8 @@ def run_audit(
         "historical_db_sha256": historical["sha256"],
         "authority_json_sha256": AUTHORITY_JSON_SHA256,
         "authority_md_sha256": AUTHORITY_MD_SHA256,
+        "amendment_json_sha256": AMENDMENT_JSON_SHA256,
+        "amendment_md_sha256": AMENDMENT_MD_SHA256,
         "queried_tables": query_payload["queried_tables"],
         "prohibited_table_reads": 0,
         "network_access": False,
@@ -797,6 +821,8 @@ def run_audit(
         "payout_access": False,
         "performance_evaluated": False,
         "model_fit_performed": False,
+        "database_rows_rewritten": 0,
+        "trio_rows_backfilled": 0,
         "python_version": sys.version,
         "platform": platform.platform(),
         "library_versions": {"sqlite3": sqlite3.sqlite_version},
