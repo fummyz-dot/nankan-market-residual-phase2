@@ -1,0 +1,26 @@
+version: P2_SPEED_STANDARD_GRID_V1
+family: hierarchical_robust_standard_time
+course_hierarchy: [venue_distance_surface_direction, venue_distance_surface, distance_surface, surface, global]
+going_hierarchy: [venue_going, going, zero]
+location_estimator: median
+shrinkage_lambda: 20
+race_clock_target: median_valid_finisher_time
+selection:
+  burn_in: 2020-01-01/2020-12-31
+  selection_period: 2021-01-01/2024-12-31
+  validation_period: 2025-01-01/2025-12-31
+  development_diagnostic_period: 2026-01-01/2026-07-31
+  primary_metric: race_equal_mean_absolute_error_seconds
+  tie_tolerance_seconds: 0.01
+  tie_break: longer_lookback
+configs:
+  - config_id: S1
+    lookback_days: 365
+  - config_id: S2
+    lookback_days: 730
+  - config_id: S3
+    lookback_days: ALL_AVAILABLE_HISTORY
+reference:
+  config_id: COURSE_ONLY_ALL_HISTORY
+  going_correction: NONE
+  lookback_days: ALL_AVAILABLE_HISTORY

@@ -1,0 +1,91 @@
+{
+  "authority_id": "JOB004_RUNTIME_PROVISIONING_FREEZE_V1",
+  "status": "FROZEN_BEFORE_JOB004_FIRST_FIT",
+  "project_id": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "platform_expected": {
+    "os": "Linux",
+    "arch": "x86_64",
+    "glibc": "2.39",
+    "python_executable": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/bin/python",
+    "python_version": "3.12.3",
+    "pip_version": "24.0"
+  },
+  "top_level_runtime": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0",
+    "pandas": "3.0.5",
+    "catboost": "1.2.10"
+  },
+  "existing_packages_must_not_change": {
+    "numpy": "2.5.2",
+    "scipy": "1.18.0"
+  },
+  "installation_policy": {
+    "network_authorized_for_package_provisioning_only": true,
+    "allowed_index_hosts": [
+      "pypi.org",
+      "files.pythonhosted.org"
+    ],
+    "no_pip_upgrade": true,
+    "no_python_upgrade": true,
+    "no_system_package_install": true,
+    "binary_only": true,
+    "source_builds_prohibited": true,
+    "two_phase": [
+      "resolve/download exact wheel closure to isolated wheelhouse",
+      "compute wheel SHA-256 and persist resolver report",
+      "install from local wheelhouse with --no-index",
+      "freeze final versions and package paths"
+    ]
+  },
+  "constraints": [
+    "numpy==2.5.2",
+    "scipy==1.18.0",
+    "pandas==3.0.5",
+    "catboost==1.2.10"
+  ],
+  "smoke_tests": {
+    "imports": [
+      "numpy",
+      "scipy",
+      "pandas",
+      "catboost"
+    ],
+    "pip_check": true,
+    "catboost_synthetic_fit": {
+      "allowed": true,
+      "project_data_use": false,
+      "task_type": "CPU",
+      "loss_function": "RMSE",
+      "iterations": 20,
+      "depth": 3,
+      "learning_rate": 0.05,
+      "random_seed": 260904,
+      "random_strength": 0.0,
+      "bootstrap_type": "No",
+      "thread_count": 1,
+      "allow_writing_files": false,
+      "repeat_count": 2,
+      "determinism_requirement": "predictions must match exactly within absolute tolerance 1e-12"
+    },
+    "scipy_optimizers": [
+      "minimize_scalar(method='bounded')",
+      "minimize(method='L-BFGS-B')"
+    ]
+  },
+  "thread_env": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "prohibitions": [
+    "project-data model fit",
+    "Job004 training",
+    "EB/PL on project data",
+    "bootstrap on project data",
+    "market/payout/ROI access",
+    "collector/network data acquisition",
+    "package version substitution",
+    "unreviewed dependency downgrade"
+  ]
+}

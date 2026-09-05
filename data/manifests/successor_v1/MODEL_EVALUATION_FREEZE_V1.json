@@ -1,0 +1,621 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1",
+  "project_id": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "status": "FROZEN_BEFORE_JOB004_TRAINING",
+  "development_cutoff": "2026-07-31",
+  "expected_universe": {
+    "races": 21560,
+    "runners": 246709,
+    "dates": 1767
+  },
+  "input_contract": {
+    "b0_feature_count": 55,
+    "b0_ordered_feature_name_sha256": "0108ffaf8239a0522e5b5157c0ca388bca359866375f704a0d4b42937569b5f6",
+    "primary_job003_feature_count": 130,
+    "primary_exclude_before_training": [
+      "class_group_no"
+    ],
+    "primary_model_feature_count": 129,
+    "primary_ordered_feature_name_sha256": "TO_BE_COMPUTED_AND_FROZEN_BEFORE_FIRST_FIT",
+    "forbidden_model_inputs": [
+      "race_key",
+      "horse_key",
+      "raw_jockey_identity",
+      "raw_trainer_identity",
+      "class_group_no",
+      "EB effects as GBDT inputs",
+      "upset_score",
+      "market",
+      "odds",
+      "popularity",
+      "payout",
+      "current outcome",
+      "first_seen_date",
+      "last_seen_date"
+    ],
+    "missing_numeric": "NaN, no global imputation",
+    "missing_categorical": "__MISSING__",
+    "row_sort_before_catboost": [
+      "race_date",
+      "race_key",
+      "horse_number"
+    ]
+  },
+  "target": {
+    "formula": "z_ri = Phi^-1((n_r - finish_rank_ri + 0.5)/(n_r + 1))",
+    "clip": [
+      -2.5,
+      2.5
+    ],
+    "runner_weight": "1/n_r",
+    "preflight": "Every eligible starter must have one valid unique numeric finish rank 1..n_r. Any violation => JOB004_BLOCKED_TARGET_INTEGRITY; no imputation."
+  },
+  "outer_folds": {
+    "Fold1": {
+      "train": [
+        "2020-01-01",
+        "2022-12-31"
+      ],
+      "valid": [
+        "2023-01-01",
+        "2023-12-31"
+      ],
+      "inner_oof": [
+        {
+          "id": "F1_I1",
+          "train": [
+            "2020-01-01",
+            "2020-12-31"
+          ],
+          "valid": [
+            "2021-01-01",
+            "2021-12-31"
+          ]
+        },
+        {
+          "id": "F1_I2",
+          "train": [
+            "2020-01-01",
+            "2021-12-31"
+          ],
+          "valid": [
+            "2022-01-01",
+            "2022-12-31"
+          ]
+        }
+      ]
+    },
+    "Fold2": {
+      "train": [
+        "2020-01-01",
+        "2023-12-31"
+      ],
+      "valid": [
+        "2024-01-01",
+        "2024-12-31"
+      ],
+      "inner_oof": [
+        {
+          "id": "F2_I1",
+          "train": [
+            "2020-01-01",
+            "2020-12-31"
+          ],
+          "valid": [
+            "2021-01-01",
+            "2021-12-31"
+          ]
+        },
+        {
+          "id": "F2_I2",
+          "train": [
+            "2020-01-01",
+            "2021-12-31"
+          ],
+          "valid": [
+            "2022-01-01",
+            "2022-12-31"
+          ]
+        },
+        {
+          "id": "F2_I3",
+          "train": [
+            "2020-01-01",
+            "2022-12-31"
+          ],
+          "valid": [
+            "2023-01-01",
+            "2023-12-31"
+          ]
+        }
+      ]
+    },
+    "Fold3": {
+      "train": [
+        "2020-01-01",
+        "2024-12-31"
+      ],
+      "valid": [
+        "2025-01-01",
+        "2025-12-31"
+      ],
+      "inner_oof": [
+        {
+          "id": "F3_I1",
+          "train": [
+            "2020-01-01",
+            "2020-12-31"
+          ],
+          "valid": [
+            "2021-01-01",
+            "2021-12-31"
+          ]
+        },
+        {
+          "id": "F3_I2",
+          "train": [
+            "2020-01-01",
+            "2021-12-31"
+          ],
+          "valid": [
+            "2022-01-01",
+            "2022-12-31"
+          ]
+        },
+        {
+          "id": "F3_I3",
+          "train": [
+            "2020-01-01",
+            "2022-12-31"
+          ],
+          "valid": [
+            "2023-01-01",
+            "2023-12-31"
+          ]
+        },
+        {
+          "id": "F3_I4",
+          "train": [
+            "2020-01-01",
+            "2023-12-31"
+          ],
+          "valid": [
+            "2024-01-01",
+            "2024-12-31"
+          ]
+        }
+      ]
+    },
+    "Fold4": {
+      "train": [
+        "2020-01-01",
+        "2025-12-31"
+      ],
+      "valid": [
+        "2026-01-01",
+        "2026-07-31"
+      ],
+      "inner_oof": [
+        {
+          "id": "F4_I1",
+          "train": [
+            "2020-01-01",
+            "2020-12-31"
+          ],
+          "valid": [
+            "2021-01-01",
+            "2021-12-31"
+          ]
+        },
+        {
+          "id": "F4_I2",
+          "train": [
+            "2020-01-01",
+            "2021-12-31"
+          ],
+          "valid": [
+            "2022-01-01",
+            "2022-12-31"
+          ]
+        },
+        {
+          "id": "F4_I3",
+          "train": [
+            "2020-01-01",
+            "2022-12-31"
+          ],
+          "valid": [
+            "2023-01-01",
+            "2023-12-31"
+          ]
+        },
+        {
+          "id": "F4_I4",
+          "train": [
+            "2020-01-01",
+            "2023-12-31"
+          ],
+          "valid": [
+            "2024-01-01",
+            "2024-12-31"
+          ]
+        },
+        {
+          "id": "F4_I5",
+          "train": [
+            "2020-01-01",
+            "2024-12-31"
+          ],
+          "valid": [
+            "2025-01-01",
+            "2025-12-31"
+          ]
+        }
+      ]
+    }
+  },
+  "inner_oof_rules": {
+    "initial_history_year": 2020,
+    "first_oof_year": 2021,
+    "same_day_results_prohibited": true,
+    "source_rule": "source_race_date < target_race_date",
+    "no_in_sample_oof_for_2020": true,
+    "model_selection_rows": "all inner validation races available in the outer TRAIN",
+    "race_head_crossfit": {
+      "structural_label_2021_temperature": "T0=1.0 prespecified bootstrap default because no earlier OOF year exists",
+      "structural_label_year_y_ge_2022": "fit B0 T0 using only inner-OOF years < y, then score year y",
+      "race_head_oof_2021": "NOT_AVAILABLE",
+      "race_head_oof_year_y_ge_2022": "fit race head only on structural-label years < y, predict year y",
+      "outer_valid_race_head_fit": "fit on all available outer-TRAIN structural labels from 2021 through outer TRAIN end"
+    }
+  },
+  "catboost": {
+    "b0": {
+      "task_type": "CPU",
+      "loss_function": "RMSE",
+      "random_seed": 260904,
+      "random_strength": 0.0,
+      "bootstrap_type": "No",
+      "grow_policy": "SymmetricTree",
+      "boosting_type": "Plain",
+      "has_time": true,
+      "allow_writing_files": false,
+      "thread_count": 1,
+      "verbose": false,
+      "use_best_model": false,
+      "iterations": 600,
+      "depth": 5,
+      "learning_rate": 0.03,
+      "l2_leaf_reg": 20.0
+    },
+    "primary_grid": {
+      "M1": {
+        "task_type": "CPU",
+        "loss_function": "RMSE",
+        "random_seed": 260904,
+        "random_strength": 0.0,
+        "bootstrap_type": "No",
+        "grow_policy": "SymmetricTree",
+        "boosting_type": "Plain",
+        "has_time": true,
+        "allow_writing_files": false,
+        "thread_count": 1,
+        "verbose": false,
+        "use_best_model": false,
+        "iterations": 800,
+        "depth": 6,
+        "learning_rate": 0.03,
+        "l2_leaf_reg": 10.0
+      },
+      "M2": {
+        "task_type": "CPU",
+        "loss_function": "RMSE",
+        "random_seed": 260904,
+        "random_strength": 0.0,
+        "bootstrap_type": "No",
+        "grow_policy": "SymmetricTree",
+        "boosting_type": "Plain",
+        "has_time": true,
+        "allow_writing_files": false,
+        "thread_count": 1,
+        "verbose": false,
+        "use_best_model": false,
+        "iterations": 800,
+        "depth": 7,
+        "learning_rate": 0.03,
+        "l2_leaf_reg": 10.0
+      },
+      "M3": {
+        "task_type": "CPU",
+        "loss_function": "RMSE",
+        "random_seed": 260904,
+        "random_strength": 0.0,
+        "bootstrap_type": "No",
+        "grow_policy": "SymmetricTree",
+        "boosting_type": "Plain",
+        "has_time": true,
+        "allow_writing_files": false,
+        "thread_count": 1,
+        "verbose": false,
+        "use_best_model": false,
+        "iterations": 800,
+        "depth": 6,
+        "learning_rate": 0.03,
+        "l2_leaf_reg": 30.0
+      },
+      "M4": {
+        "task_type": "CPU",
+        "loss_function": "RMSE",
+        "random_seed": 260904,
+        "random_strength": 0.0,
+        "bootstrap_type": "No",
+        "grow_policy": "SymmetricTree",
+        "boosting_type": "Plain",
+        "has_time": true,
+        "allow_writing_files": false,
+        "thread_count": 1,
+        "verbose": false,
+        "use_best_model": false,
+        "iterations": 800,
+        "depth": 7,
+        "learning_rate": 0.03,
+        "l2_leaf_reg": 30.0
+      }
+    },
+    "primary_selection": {
+      "metric": "mean unordered Top3 set NLL across all inner-OOF validation races",
+      "pl_temperature_for_selection": "For each candidate, fit one M0 T0 on all of that candidate's inner-OOF scores/outcomes within the outer TRAIN, then compute mean NLL on those same inner-OOF races. Outer VALID is never used.",
+      "tie_tolerance_absolute_nll": 0.0001,
+      "complexity_preference_if_within_tolerance": [
+        "M3",
+        "M1",
+        "M4",
+        "M2"
+      ],
+      "no_additional_configs": true
+    },
+    "race_head": {
+      "task_type": "CPU",
+      "random_seed": 260904,
+      "random_strength": 0.0,
+      "bootstrap_type": "No",
+      "grow_policy": "SymmetricTree",
+      "boosting_type": "Plain",
+      "has_time": true,
+      "allow_writing_files": false,
+      "thread_count": 1,
+      "verbose": false,
+      "use_best_model": false,
+      "loss_function": "Huber:delta=1.0",
+      "iterations": 400,
+      "depth": 4,
+      "learning_rate": 0.03,
+      "l2_leaf_reg": 20.0
+    }
+  },
+  "structural_surprisal": {
+    "formula": "U_r = -log(max(P0(actual_unordered_top3_set), 1e-12)) / log(C(n_r,3))",
+    "epsilon": 1e-12,
+    "field_size_as_predictor": false
+  },
+  "eb": {
+    "layers_in_backfit_order": [
+      "horse",
+      "jockey",
+      "horse_x_venue",
+      "jockey_x_venue"
+    ],
+    "residual_source": "selected primary GBDT inner-OOF residuals only",
+    "sigma2": "mean squared current residual across observations (ddof=0)",
+    "group_weights": "w_g = n_g / sum_g n_g",
+    "weighted_group_mean": "mu = sum_g w_g*m_g",
+    "weighted_between_variance": "Var_w = sum_g w_g*(m_g-mu)^2",
+    "weighted_E_inv_n": "E_w(1/n_g) = sum_g w_g*(1/n_g)",
+    "tau2": "max(0, Var_w - sigma2*E_w(1/n_g))",
+    "effect": "e_g = tau2/(tau2 + sigma2/n_g) * m_g; if tau2=0 then 0",
+    "max_backfit_iterations": 20,
+    "convergence_max_abs_effect_change": 1e-05,
+    "interaction_centering": "count-weighted within horse/jockey parent",
+    "interaction_identifiability": "if parent has observations in fewer than 2 venues, interaction effect = 0",
+    "outer_valid_updates": "All races on date d use state frozen before date d. After all date-d results are known, update sufficient statistics for dates > d only."
+  },
+  "pl": {
+    "score": "S_ri = GBDT(x_ri) + b_h + c_j + d_hv + g_jv",
+    "pure_venue_intercept": false,
+    "ordered_top3_probability": "P(i,j,k)=softmax_i * softmax_j(excluding i) * softmax_k(excluding i,j)",
+    "unordered_top3_probability": "sum of the 6 ordered permutations of the set",
+    "wide_pair_probability": "exact sum of all ordered Top3 triples containing both members of the pair",
+    "integrity_tolerance": 1e-10,
+    "m0": {
+      "eta": "S/T0",
+      "T0_bounds": [
+        0.25,
+        4.0
+      ],
+      "optimizer": {
+        "parameter": "log(T0)",
+        "method": "scipy.optimize.minimize_scalar(method='bounded')",
+        "bounds": [
+          "log(0.25)",
+          "log(4.0)"
+        ],
+        "xatol": 1e-08,
+        "objective": "mean unordered Top3 set NLL",
+        "optimizer_failure": "BLOCK"
+      }
+    },
+    "m1": {
+      "z_upset": "clip((upset_score - train_mean)/train_sd, -3, 3)",
+      "zero_sd_rule": "if train_sd < 1e-12, M1 unavailable and gamma=0",
+      "temperature": "T_r = T0 * exp(gamma*z_upset)",
+      "T0_bounds": [
+        0.25,
+        4.0
+      ],
+      "gamma_bounds": [
+        0.0,
+        0.5
+      ],
+      "fit_rows": "inner years with race-head cross-fitted predictions available, i.e. 2022..outer TRAIN end",
+      "optimizer": {
+        "parameters": [
+          "log(T0)",
+          "gamma"
+        ],
+        "method": "scipy.optimize.minimize(method='L-BFGS-B')",
+        "start": [
+          "log(M0_T0_fit_on_same_M1_fit_rows)",
+          0.0
+        ],
+        "bounds": [
+          [
+            "log(0.25)",
+            "log(4.0)"
+          ],
+          [
+            0.0,
+            0.5
+          ]
+        ],
+        "ftol": 1e-12,
+        "gtol": 1e-08,
+        "maxiter": 1000,
+        "objective": "mean unordered Top3 set NLL",
+        "optimizer_failure": "BLOCK"
+      }
+    }
+  },
+  "metrics": {
+    "primary_joint": "unordered Top3 set NLL, equal weight per race",
+    "wide_logloss": "race-normalized Bernoulli log loss, each pair weight 1/C(n,2) within race, equal race weight",
+    "wide_brier": "race-normalized Brier, each pair weight 1/C(n,2) within race, equal race weight",
+    "calibration_bins": [
+      [
+        0.0,
+        0.05
+      ],
+      [
+        0.05,
+        0.1
+      ],
+      [
+        0.1,
+        0.15
+      ],
+      [
+        0.15,
+        0.2
+      ],
+      [
+        0.2,
+        0.3
+      ],
+      [
+        0.3,
+        0.5
+      ],
+      [
+        0.5,
+        1.0000000001
+      ]
+    ]
+  },
+  "bootstrap": {
+    "unit": "race_date",
+    "resamples": 10000,
+    "seed": 20260904,
+    "ci": "percentile 95%",
+    "procedure": "Pool all outer-VALID races. Resample unique race_date blocks with replacement, drawing the original number of unique dates. Include every race/pair on each sampled date.",
+    "invalid_resample_rule": "For ratio metrics, if denominator is 0 the resample is invalid; fewer than 9900 valid resamples => BLOCK that gate."
+  },
+  "gates": {
+    "S2_probability_edge": {
+      "delta": "Top3_NLL_primary_selected - Top3_NLL_B0",
+      "primary_selected": "M1 for all outer-VALID folds only if pooled R1 and pooled R2 pass; otherwise M0",
+      "pass": [
+        "pooled mean delta < 0",
+        "date-block bootstrap 95% CI upper bound of delta < 0",
+        "pooled WIDE race-normalized logloss primary_selected <= B0"
+      ],
+      "failure_status": "JOB004_PROBABILITY_EDGE_FAIL"
+    },
+    "R1_race_head_standalone": {
+      "actual_U_outer_valid": "computed from B0 outer-valid P0 using T0 fit on all B0 inner-OOF rows of that outer fold",
+      "spearman": "scipy.stats.spearmanr(upset_score, actual_U); NaN => fail",
+      "baseline": "fold-specific constant = mean structural U over available outer-TRAIN cross-fitted structural-label races",
+      "mae": "pooled outer-VALID race-weighted MAE",
+      "pass": [
+        "pooled Spearman rho > 0",
+        "at least 3 of 4 outer folds have Spearman rho > 0",
+        "pooled race-head MAE < pooled fold-specific constant-baseline MAE"
+      ],
+      "if_fail": "M1 is not selected; gamma=0 for final selected model"
+    },
+    "R2_temperature_end_to_end": {
+      "eligible_only_if": "R1 passes",
+      "delta": "Top3_NLL_M1 - Top3_NLL_M0 on pooled outer VALID",
+      "pass": [
+        "pooled mean delta < 0",
+        "date-block bootstrap 95% CI upper bound < 0"
+      ],
+      "if_fail": "select M0; gamma=0"
+    }
+  },
+  "probability_floor": {
+    "candidate_floors": [
+      0.2,
+      0.15,
+      0.1
+    ],
+    "probability_source": "p_primary_selected exact WIDE pair probability",
+    "support_gate": {
+      "pooled": {
+        "candidate_tickets_min": 500,
+        "expected_hits_sum_p_min": 100.0
+      },
+      "each_outer_fold": {
+        "candidate_tickets_min": 75,
+        "expected_hits_sum_p_min": 15.0
+      },
+      "actual_hits_not_used_for_support": true
+    },
+    "calibration_gate": {
+      "OE": "sum(wide_hit)/sum(p)",
+      "OE_LCB95": "2.5th percentile of date-block bootstrap O/E",
+      "absolute_calibration_gap": "abs(mean(wide_hit) - mean(p)) on candidate tickets",
+      "pass": [
+        "pooled OE_LCB95 >= 0.80",
+        "pooled absolute calibration gap <= 0.03",
+        "each outer fold point O/E >= 0.70"
+      ]
+    },
+    "selection_order": [
+      0.2,
+      0.15,
+      0.1
+    ],
+    "selection": "choose first/highest floor passing both support and calibration; if none => SHADOW_ONLY",
+    "do_not_lower_below": 0.1,
+    "p_safe": {
+      "multiplier_c": "min(1, pooled OE_LCB95 at selected floor)",
+      "formula": "p_safe = c * p_wide",
+      "live_candidate_condition": "p_safe >= selected_floor",
+      "if_no_floor": "undefined; SHADOW_ONLY"
+    }
+  },
+  "market_separation": {
+    "job004_market_use": "PROHIBITED",
+    "prohibited": [
+      "official_odds",
+      "runner_market",
+      "payouts",
+      "MARKET_TIME_UNKNOWN",
+      "ROI",
+      "expected_value",
+      "bet_selection"
+    ]
+  },
+  "challenger": {
+    "thurstone": "NOT_IMPLEMENTED_IN_JOB004"
+  }
+}

@@ -1,0 +1,35 @@
+version: P2_PACE_MAIN_V1
+namespace: P2_PACE
+model_use_status: PROVISIONAL_DEVELOPMENT_FEATURE
+closing_features:
+  - pace_closing_prior_obs_count
+  - pace_closing_recent3_count
+  - pace_closing_recent5_count
+  - days_since_last_closing_obs
+  - pace_closing_cold_start_flag
+  - pace_last_last3f_rank_pct
+  - pace_recent3_last3f_rank_mean
+  - pace_recent5_last3f_rank_mean
+  - pace_recent5_last3f_rank_best
+  - pace_recent5_last3f_rank_dispersion
+  - pace_recent3_last3f_rank_trend
+  - pace_last_closing_adv_sec
+  - pace_recent3_closing_adv_mean_sec
+pace_balance_features:
+  - pace_balance_prior_obs_count
+  - pace_balance_recent3_count
+  - pace_balance_recent5_count
+  - days_since_last_pace_balance
+  - pace_last_balance_z
+  - pace_recent3_balance_mean_z
+  - pace_recent5_balance_mean_z
+  - pace_recent5_balance_dispersion_z
+prohibited:
+  - runner_corner
+  - runner_first3f
+  - keibabook_pace
+  - pace_style_labels
+  - early_speed
+  - full_lap_shape
+  - speed_or_class_adjustment
+  - market_input

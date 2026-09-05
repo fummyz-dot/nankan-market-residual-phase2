@@ -1,0 +1,51 @@
+{
+  "version": "P2_MAIN_FEATURE_SET_REGISTRY_V1",
+  "sets": [
+    {
+      "feature_set_id": "FS00_LEGACY",
+      "namespaces": [
+        "V1"
+      ],
+      "status": "FROZEN_PRE_PERFORMANCE"
+    },
+    {
+      "feature_set_id": "FS01_LEGACY_SPD",
+      "namespaces": [
+        "V1",
+        "P2_SPD"
+      ],
+      "status": "FROZEN_PRE_PERFORMANCE"
+    },
+    {
+      "feature_set_id": "FS02_LEGACY_SPD_PACE",
+      "namespaces": [
+        "V1",
+        "P2_SPD",
+        "P2_PACE"
+      ],
+      "status": "FROZEN_PRE_PERFORMANCE"
+    },
+    {
+      "feature_set_id": "FS03_LEGACY_SPD_PACE_CLASS_RULE",
+      "namespaces": [
+        "V1",
+        "P2_SPD",
+        "P2_PACE",
+        "P2_CLASS_RULE"
+      ],
+      "status": "FROZEN_PRE_PERFORMANCE"
+    },
+    {
+      "feature_set_id": "FS04_LEGACY_SPD_PACE_CLASS_FULL",
+      "namespaces": [
+        "V1",
+        "P2_SPD",
+        "P2_PACE",
+        "P2_CLASS_RULE",
+        "P2_CLASS_EMPIRICAL",
+        "P2_CLASS_UNCERTAINTY"
+      ],
+      "status": "FROZEN_PRE_PERFORMANCE"
+    }
+  ]
+}

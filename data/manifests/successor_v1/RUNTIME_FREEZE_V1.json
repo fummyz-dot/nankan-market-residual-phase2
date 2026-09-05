@@ -1,0 +1,207 @@
+{
+  "runtime_id": "RUNTIME_FREEZE_V1",
+  "authority_sha256": "e6a6253e13826bbff3f915fbe635a5283758bf369886486b5686b4c254b1925a",
+  "interpreter_absolute_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/bin/python",
+  "resolved_python_executable": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/bin/python",
+  "python_version": "3.12.3",
+  "pip_version": "pip 24.0 from /home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages/pip (python 3.12)",
+  "platform": {
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+    "machine": "x86_64",
+    "os": "Linux",
+    "libc": [
+      "glibc",
+      "2.39"
+    ],
+    "sys_prefix": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model"
+  },
+  "packages": {
+    "numpy": {
+      "installed": true,
+      "version": "2.5.2",
+      "module_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages/numpy/__init__.py",
+      "distribution_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages",
+      "metadata_version": "2.5.2"
+    },
+    "scipy": {
+      "installed": true,
+      "version": "1.18.0",
+      "module_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages/scipy/__init__.py",
+      "distribution_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages",
+      "metadata_version": "1.18.0"
+    },
+    "pandas": {
+      "installed": true,
+      "version": "3.0.5",
+      "module_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages/pandas/__init__.py",
+      "distribution_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages",
+      "metadata_version": "3.0.5"
+    },
+    "catboost": {
+      "installed": true,
+      "version": "1.2.10",
+      "module_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages/catboost/__init__.py",
+      "distribution_path": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/lib/python3.12/site-packages",
+      "metadata_version": "1.2.10"
+    }
+  },
+  "resolver_report_sha256": "f5fe68889a8ee632613f48c7a78719e502dcb39ee7f59c65f6528c6094a29dc1",
+  "constraints_sha256": "4dd28c3bbea8c4260be438fe4813b96d17ec4e5072181ea58ec88839534b0cb1",
+  "wheel_inventory": [
+    {
+      "filename": "catboost-1.2.10-cp312-cp312-manylinux2014_x86_64.whl",
+      "size_bytes": 97136498,
+      "sha256": "b28f763776e62f50da90dddf73b36399583295032667a7e46fc5c1f2593eb80f"
+    },
+    {
+      "filename": "contourpy-1.3.3-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "size_bytes": 362601,
+      "sha256": "4d00e655fcef08aba35ec9610536bfe90267d7ab5ba944f7032549c55a146da1"
+    },
+    {
+      "filename": "cycler-0.12.1-py3-none-any.whl",
+      "size_bytes": 8321,
+      "sha256": "85cef7cff222d8644161529808465972e51340599459b8ac3ccbac5a854e0d30"
+    },
+    {
+      "filename": "fonttools-4.64.0-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "size_bytes": 5400981,
+      "sha256": "66a83f93579fb3493e458c4449d1d566a7b2a1c7b19915cd0fa3c9b8b5a8540b"
+    },
+    {
+      "filename": "graphviz-0.21-py3-none-any.whl",
+      "size_bytes": 47300,
+      "sha256": "54f33de9f4f911d7e84e4191749cac8cc5653f815b06738c54db9a15ab8b1e42"
+    },
+    {
+      "filename": "kiwisolver-1.5.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "size_bytes": 1477929,
+      "sha256": "34633ecf50d16187ab8e5528b7a2530f2feb4e23f300db4672538b51cfc5cd38"
+    },
+    {
+      "filename": "matplotlib-3.11.1-cp312-cp312-manylinux2014_x86_64.manylinux_2_17_x86_64.whl",
+      "size_bytes": 10035615,
+      "sha256": "ba8f811b8ddfac493734d6af0b2dff96919d0c28ca0d641858dab4262777c6ea"
+    },
+    {
+      "filename": "narwhals-2.25.0-py3-none-any.whl",
+      "size_bytes": 467373,
+      "sha256": "1f0f403e8c7e4463cde9bfe78b12fdd809e3ae3dda6d9b2f802934fb9c7a6a8f"
+    },
+    {
+      "filename": "numpy-2.5.2-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "size_bytes": 16722264,
+      "sha256": "3cdec01fa790a186d430433fdd4d4ffb70eed6f0eeb4bf05c8dbe2dce0a9bcb8"
+    },
+    {
+      "filename": "packaging-26.3-py3-none-any.whl",
+      "size_bytes": 129956,
+      "sha256": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+    },
+    {
+      "filename": "pandas-3.0.5-cp312-cp312-manylinux_2_24_x86_64.manylinux_2_28_x86_64.whl",
+      "size_bytes": 10998091,
+      "sha256": "d373ce03ffd84010ed9839fa73672a9c8256990532e158440c0085db7d914b34"
+    },
+    {
+      "filename": "pillow-12.3.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "size_bytes": 6940830,
+      "sha256": "78cb2c6865a35ab8ff8b75fd122f6033b92a62c82801110e48ddd6c936a45d91"
+    },
+    {
+      "filename": "plotly-7.0.0-py3-none-any.whl",
+      "size_bytes": 9052859,
+      "sha256": "78cbf7bd06d1b05bb3b8ec1b709864695229b55151b6f7530fbf55517ead6fdd"
+    },
+    {
+      "filename": "pyparsing-3.3.2-py3-none-any.whl",
+      "size_bytes": 122781,
+      "sha256": "850ba148bd908d7e2411587e247a1e4f0327839c40e2e5e6d05a007ecc69911d"
+    },
+    {
+      "filename": "python_dateutil-2.9.0.post0-py2.py3-none-any.whl",
+      "size_bytes": 229892,
+      "sha256": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+    },
+    {
+      "filename": "scipy-1.18.0-cp312-cp312-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl",
+      "size_bytes": 35287115,
+      "sha256": "1f55797419e16e7f30cf88ffb3113ce0467f00cfe3f70d5c281730b21769bfc2"
+    },
+    {
+      "filename": "six-1.17.0-py2.py3-none-any.whl",
+      "size_bytes": 11050,
+      "sha256": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"
+    }
+  ],
+  "final_pip_freeze": [
+    "WARNING: The directory '/home/nabe/.cache/pip' or its parent directory is not owned or is not writable by the current user. The cache has been disabled. Check the permissions and owner of that directory. If executing pip with sudo, you should use sudo's -H flag.",
+    "catboost==1.2.10",
+    "cloudpickle==3.1.2",
+    "contourpy==1.3.3",
+    "cycler==0.12.1",
+    "fonttools==4.64.0",
+    "graphviz==0.21",
+    "joblib==1.6.0",
+    "kiwisolver==1.5.1",
+    "lightgbm==4.7.0",
+    "matplotlib==3.11.1",
+    "narwhals==2.24.0",
+    "numpy==2.5.2",
+    "packaging==26.3",
+    "pandas==3.0.5",
+    "pillow==12.3.0",
+    "plotly==7.0.0",
+    "pyarrow==18.1.0",
+    "pyparsing==3.3.2",
+    "python-dateutil==2.9.0.post0",
+    "scikit-learn==1.9.0",
+    "scipy==1.18.0",
+    "six==1.17.0",
+    "threadpoolctl==3.6.0"
+  ],
+  "thread_environment_contract": {
+    "OPENBLAS_NUM_THREADS": "1",
+    "OMP_NUM_THREADS": "1",
+    "MKL_NUM_THREADS": "1"
+  },
+  "smoke_tests": {
+    "imports": {
+      "pass": true,
+      "versions": {
+        "numpy": "2.5.2",
+        "scipy": "1.18.0",
+        "pandas": "3.0.5",
+        "catboost": "1.2.10"
+      }
+    },
+    "catboost": {
+      "pass": true,
+      "max_abs_prediction_delta": 0.0,
+      "tolerance": 1e-12,
+      "thread_environment": {
+        "OPENBLAS_NUM_THREADS": "1",
+        "OMP_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1"
+      }
+    },
+    "scipy": {
+      "pass": true,
+      "bounded": {
+        "success": true,
+        "x": 1.25,
+        "fun": 0.5
+      },
+      "l_bfgs_b": {
+        "success": true,
+        "x": [
+          2.00000003207324,
+          -1.0000000104855047
+        ],
+        "fun": 1.1386385367273283e-15
+      }
+    }
+  },
+  "project_data_used": false,
+  "project_model_fit_performed": false
+}

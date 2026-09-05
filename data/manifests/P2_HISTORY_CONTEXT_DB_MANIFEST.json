@@ -1,0 +1,22 @@
+{
+  "built_at": "2026-08-19T08:34:38.577045+00:00",
+  "foreign_key_check": "clean",
+  "identity_version": "P2_HORSE_IDENTITY_V1",
+  "path": "db/p2_history_context.sqlite",
+  "quick_check": "ok",
+  "schema_version": "p2_history_context_v1",
+  "sha256": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+  "size_bytes": 466599936,
+  "source_cutoff": "2026-07-31",
+  "source_manifest_sha256": "3286c947fb41036b20c2c3113169180dca162c4130536363e7a56d00a38ddfd6",
+  "table_counts": {
+    "build_metadata": 6,
+    "horses": 43544,
+    "identity_audit": 43544,
+    "race_runners": 908784,
+    "races": 88617,
+    "source_archives": 79,
+    "source_members": 158,
+    "target_horses": 18965
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "configs": [
+    {
+      "path": "configs/features/P2_PACE_SOURCE_REGISTRY.yaml",
+      "sha256": "a133a69b1dbe34e6d4b108c37ff52d3e027841d39eb590e43e5b0c7ff783d0ed",
+      "size_bytes": 1399
+    },
+    {
+      "path": "configs/features/P2_PACE_FEATURE_LIST_V1.yaml",
+      "sha256": "63da18bbd67a6be35022743292a5965fb9e37f93158293789283881069f63a5e",
+      "size_bytes": 996
+    }
+  ],
+  "generated_at": "2026-08-19T10:50:21.973080+00:00"
+}

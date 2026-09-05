@@ -1,0 +1,31 @@
+{
+  "active_gate": "P2_STABILIZATION_GATE_V2",
+  "built_at": "2026-08-19T14:26:25.128783+00:00",
+  "code_hashes": {
+    "src/audit/p2_m11ar_timing_fix.py": "81f051417d061735156410ba3dfa8bf6941859483373df8a8e961a3ab7c172b2",
+    "src/operations/current_info.py": "bdc4e345af2fc8d53500fffee5f826f0bd57895197842b5191613adcd26a3c4d",
+    "src/operations/prospective_day_collector.py": "905c0d47a012eb7ca60114b5fb91042c1f2c8e04d3eef199a644257167591ecd",
+    "src/operations/stabilization_status.py": "bd94098ea5fbb9c13715c9246c255ef33d72a03ffde89563522178551533baa0"
+  },
+  "collector_config_hash": "091c2403e4106a41fb14dc2510fde63a675bf594faa2970d14eaee30cbb515be",
+  "existing_fixture_t15_predecision_proven": false,
+  "gate_v1_hash": "86776dac97b7d64db057eec7c2f30dd8c72726362f82559db1274884a5bf9322",
+  "gate_v2_hash": "179b06afd66f48ca6c725353b8c469ca075cae6614c67f65930ef2d60c40cc15",
+  "git_commit": null,
+  "h2_budget_config_hash": "0b0904b3acb0c32ed94afaac4af5a86eecbd94bf65b5c907cf34d18a879ce672",
+  "h2_c05_performance_evaluated": false,
+  "h2_c06_allocated": false,
+  "input_hashes": {
+    "configs/evaluation/P2_STABILIZATION_GATE_V1.yaml": "86776dac97b7d64db057eec7c2f30dd8c72726362f82559db1274884a5bf9322",
+    "configs/evaluation/P2_STABILIZATION_GATE_V2.yaml": "179b06afd66f48ca6c725353b8c469ca075cae6614c67f65930ef2d60c40cc15",
+    "configs/models/P2_WIN_H2_NEW_FEATURE_BUDGET_V1.yaml": "0b0904b3acb0c32ed94afaac4af5a86eecbd94bf65b5c907cf34d18a879ce672",
+    "configs/operations/P2_PROSPECTIVE_DAY_COLLECTOR_V1.yaml": "091c2403e4106a41fb14dc2510fde63a675bf594faa2970d14eaee30cbb515be"
+  },
+  "job": "P2-M11A-R",
+  "outcome_used": false,
+  "request_lead_seconds": 30,
+  "status": "READY_FOR_P2_M11_STABILIZATION_ACCUMULATION",
+  "t15_window": "[decision_time-60s, decision_time]",
+  "vcs_mode": "none",
+  "workspace_root": "/home/nabe/projects/nankan-market-residual-phase2"
+}

@@ -1,0 +1,23 @@
+collector_id: P2_PROSPECTIVE_DAY_COLLECTOR_V1
+source: NANKANKEIBA_OFFICIAL
+day_discovery_url: https://www.nankankeiba.com/program/00000000000000.do
+official_hosts: [www.nankankeiba.com, nankankeiba.com]
+marks:
+  T20: {minutes_before_post: 20, snapshot_role: INITIAL}
+  T15: {minutes_before_post: 15, snapshot_role: PRIMARY_CANDIDATE}
+  T10: {minutes_before_post: 10, snapshot_role: SECONDARY}
+  T05: {minutes_before_post: 5, snapshot_role: SECONDARY}
+preferred_t15_request_lead_seconds: 30
+maximum_operational_t15_request_lead_seconds: 45
+hard_maximum_capture_lead_seconds: 60
+t15_retry:
+  maximum_attempts: 2
+  only_before_decision_time: true
+  late_response_status: LATE_AFTER_DECISION
+request_timeout_seconds: 30
+max_initial_wait_minutes: 720
+foreground_only: true
+resume_completed_capture: SKIP_NO_RECAPTURE
+past_missing_mark: MISSED_NO_BACKFILL
+outcome_access: PROHIBITED
+market_trajectory_generation: PROHIBITED

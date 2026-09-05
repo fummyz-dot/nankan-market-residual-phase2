@@ -1,0 +1,28 @@
+{
+  "version": "P2_OUTCOME_SEMANTICS_V1",
+  "STARTER_VALID_FINISH": {
+    "raw_result_status": [
+      "FINISHED"
+    ],
+    "numeric_finish_required": true
+  },
+  "STARTER_NO_VALID_FINISH": {
+    "raw_margin_status": [
+      "競走中止"
+    ],
+    "win_target": 0.0
+  },
+  "NONSTARTER": {
+    "raw_margin_status": [
+      "出走取消",
+      "競走不成立",
+      "競走取止め",
+      "競走除外"
+    ],
+    "loss_denominator": "EXCLUDED"
+  },
+  "UNRESOLVED_OUTCOME_STATUS": {
+    "action": "WIN_TRAINING_LABEL_UNRESOLVED"
+  },
+  "dead_heat": "WIN_SOFT_TIE_TARGET_V1"
+}

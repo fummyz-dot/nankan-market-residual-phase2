@@ -1,0 +1,25 @@
+{
+  "job": "P2-M12A",
+  "vcs_mode": "none",
+  "git_commit": null,
+  "workspace_root": "/home/nabe/projects/nankan-market-residual-phase2",
+  "built_at": "2026-08-20T11:33:15.011998+00:00",
+  "python": "3.12.3",
+  "database": "db/live_development.sqlite",
+  "database_sha256": "ca1091d10c786e7c357e7417e004c27a7c9458c31a636951bca8e3234a9d7df0",
+  "collector_modified": false,
+  "outcome_written_to_market_snapshot": false,
+  "model_performance_evaluated": false,
+  "roi_evaluated": false,
+  "result_smoke_date": "2026-08-20",
+  "official_final_races": 6,
+  "no_pre_race_decision_races": 6,
+  "raw_provenance_required": true,
+  "payout_types": [
+    "WIN",
+    "WIDE",
+    "TRIO"
+  ],
+  "payout_unit_status": "PAYOUT_UNIT_UNRESOLVED",
+  "profit_calculation": "PROHIBITED"
+}

@@ -1,0 +1,28 @@
+{
+  "backend_config_hash": "54f88883b329609e6cb7dfc8431e4b89f72190440f40df1bea5f741f12f82e7e",
+  "backend_family": "LIGHTGBM_GBDT",
+  "backend_version": "4.7.0",
+  "calibration_method_hash": "697e4b77c87102fd67a2fe76115ad2647f78eef8d2acec9ba2584611921181b3",
+  "deterministic_fixture_hash": "d9cfd9692c22062c9742b58e6b11e7d59e7bae7694c072b812925eddad70b3a0",
+  "fs00_feature_list_hash": "9a0155aad5dbeb449bcc99c992ac2b7ed34704c4f0cf6ee3816ea69f41c9bcdf",
+  "historical_performance_evaluated": false,
+  "legacy_grid_hash": "5d1ae8c6697c61e5c6dd7511156cedb91079639779204daa9389764a93c0bc43",
+  "market_normalization_hash": "3a2153e6b5b0e861a9a727eecdd8e61615543946a6b7f3606365e8b7427f1eeb",
+  "objective_code_hash": "c0aa26d875781d99d90b6c5511db27b350c98f3c98004c4b458ec0ce0e0842da",
+  "objective_version": "CUSTOM_MARKET_OFFSET_RACE_SOFTMAX_V1",
+  "prospective_outcomes_used": false,
+  "python_version": "3.12.3 (main, Jun 19 2026, 12:46:00) [GCC 13.3.0]",
+  "search_budget": {
+    "max": 6,
+    "performance_consumed": 0,
+    "registered": 6
+  },
+  "training_frame": {
+    "features": 119,
+    "path": "data/curated/p2_model/win/historical_reference/fs00_legacy_market_offset_training_frame_v1.csv.gz",
+    "races": 833,
+    "runners": 9522
+  },
+  "training_frame_logical_hash": "946f76dc0c5651321455c4999e9a094d20f84f426afceb4c6f65eb38fb86e8e4",
+  "walkforward_config_hash": "d7c6d5fc986567f0f73c860c8b2d97084b1aa356119671c5dec8c92196f2b8c0"
+}

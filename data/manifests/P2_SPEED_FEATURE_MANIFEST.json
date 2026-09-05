@@ -1,0 +1,20 @@
+{
+  "amendment_id": "P2-AMEND-001",
+  "built_at": "2026-08-19T10:23:20.856220+00:00",
+  "date_range": "2020-01-01/2026-07-31",
+  "exchange_history_rule": "PROHIBITED",
+  "feature_list": "version: P2_SPEED_FEATURE_LIST_V1\nnamespace: P2_SPD\nstandard_config: P2_SPEED_STANDARD_MAIN_V1\nmodel_use_status: PROVISIONAL_DEVELOPMENT_FEATURE\nfeatures:\n  - speed_prior_obs_count\n  - speed_recent3_count\n  - speed_recent5_count\n  - days_since_last_speed\n  - speed_cold_start_flag\n  - speed_last_z\n  - speed_recent3_mean_z\n  - speed_recent5_mean_z\n  - speed_recent5_best_z\n  - speed_recent5_dispersion_z\n  - speed_recent3_trend_z\n  - speed_exact_course_prior_count\n  - speed_exact_course_recent3_count\n  - speed_exact_course_last_z\n  - speed_exact_course_recent3_mean_z\nprohibited:\n  - going_conditioned_speed\n  - class_adjusted_speed\n  - field_strength_adjusted_speed\n  - rating_adjusted_speed\n  - time_decay\n  - distance_similarity_matching\n",
+  "feature_logical_hash": "b473356900a665cf8ac92959e2b14ed5faae58fdbda1d84b419fc205b4d209e1",
+  "feature_output": "data/curated/p2_speed/nankan_runner_speed_features.csv.gz",
+  "history_db_hash": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+  "model_use_status": "PROVISIONAL_DEVELOPMENT_FEATURE",
+  "observation_logical_hash": "7f2b5c9957d6867637073b9ccd098dc1c5ad2a3a9ca5d54f0b99c7b7dcfe1f04",
+  "observation_output": "data/curated/p2_speed/nankan_runner_speed_observations.csv.gz",
+  "other_flat_rule": "PROHIBITED_MAIN",
+  "row_count": {
+    "features": 250093,
+    "observations": 244367
+  },
+  "same_day_rule": "DATE_BLOCK_NO_SAME_DAY_UPDATE",
+  "standard_config_hash": "377f24c678eab799b8fd3d559faa84708ef1c307fc81ee846b7773d64b0062c9"
+}

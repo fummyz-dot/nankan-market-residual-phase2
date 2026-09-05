@@ -1,0 +1,12 @@
+{
+  "T15_equivalence_claimed": false,
+  "model_feature_used": false,
+  "normalization_config_hash": "3a2153e6b5b0e861a9a727eecdd8e61615543946a6b7f3606365e8b7427f1eeb",
+  "outcome_used": false,
+  "output_logical_hash": "a70da5ff74b4e18f03578021c6bf3b9efa59d978b54093ab4b2a645656bede4e",
+  "race_count": 4,
+  "runner_count": 44,
+  "source_db": "db/market_snapshot.sqlite",
+  "source_db_sha256": "731bc1e595d7ba308a31da54823f3c71751873032ccb510cca09adbe6bdf923c",
+  "source_evidence_class": "PROSPECTIVE_TIMESTAMPED_STABILIZATION"
+}

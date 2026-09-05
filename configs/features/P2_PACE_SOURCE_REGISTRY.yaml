@@ -1,0 +1,40 @@
+version: P2_PACE_SOURCE_REGISTRY_V1
+candidates:
+  runner_last3f:
+    source: NAR_race_runners.last_3f
+    entity: runner
+    semantic_status: VERIFIED_WITH_SAFE_RESULT_STATUS
+    namespace: P2_MAIN
+    model_use_status: READY_FOR_HISTORY_BUILD
+  runner_closing_advantage_and_rank:
+    source: NAR_runner_last3f_within_race
+    entity: runner
+    semantic_status: DETERMINISTIC_OBSERVATION
+    namespace: P2_MAIN
+    model_use_status: READY_FOR_HISTORY_BUILD
+  race_first3f:
+    source: NAR_lap_times_json
+    entity: race
+    semantic_status: CONDITIONAL_EXACT_NO_INTERPOLATION
+    namespace: P2_MAIN
+    model_use_status: READY_FOR_HISTORY_BUILD_WHERE_EXACT
+  race_final3f_and_pace_balance:
+    source: NAR_races.final_3f_and_lap_times_json_QA
+    entity: race
+    semantic_status: VERIFIED_RACE_LEVEL
+    namespace: P2_MAIN
+    model_use_status: READY_FOR_HISTORY_BUILD_WHERE_AVAILABLE
+  runner_corner:
+    source: NAR_corners_json
+    entity: runner
+    semantic_status: RAW_GROUP_ORDER_ONLY
+    namespace: P2_MAIN
+    model_use_status: NOT_MODEL_READY
+    reason: Group semantics and external exact QA are unresolved; raw group order is preserved only.
+  runner_first3f:
+    source: Keibabook_ability_only
+    entity: runner
+    semantic_status: VERIFIED_EXTERNAL
+    namespace: P2X_O
+    model_use_status: NOT_P2_MAIN
+    reason: Race-level NAR laps cannot identify individual runner first-3F.

@@ -1,0 +1,49 @@
+{
+  "all_nankan_pooled": true,
+  "evidence_class": "HISTORICAL_MARKET_TIME_UNKNOWN_DEVELOPMENT_REFERENCE_ONLY",
+  "folds": [
+    {
+      "fold_id": "WF1",
+      "inner_train_end": "2026-03-31",
+      "inner_train_start": "2026-03-01",
+      "inner_valid_end": "2026-04-30",
+      "inner_valid_start": "2026-04-01",
+      "outer_train_end": "2026-04-30",
+      "outer_train_start": "2026-03-01",
+      "outer_valid_end": "2026-05-31",
+      "outer_valid_start": "2026-05-01"
+    },
+    {
+      "fold_id": "WF2",
+      "inner_train_end": "2026-04-30",
+      "inner_train_start": "2026-03-01",
+      "inner_valid_end": "2026-05-31",
+      "inner_valid_start": "2026-05-01",
+      "outer_train_end": "2026-05-31",
+      "outer_train_start": "2026-03-01",
+      "outer_valid_end": "2026-06-30",
+      "outer_valid_start": "2026-06-01"
+    },
+    {
+      "fold_id": "WF3",
+      "inner_train_end": "2026-05-31",
+      "inner_train_start": "2026-03-01",
+      "inner_valid_end": "2026-06-30",
+      "inner_valid_start": "2026-06-01",
+      "outer_train_end": "2026-06-30",
+      "outer_train_start": "2026-03-01",
+      "outer_valid_end": "2026-07-31",
+      "outer_valid_start": "2026-07-01"
+    }
+  ],
+  "nested_early_stopping": {
+    "early_stopping_rounds": 50,
+    "final_retrain": "OUTER_TRAIN_FOR_INNER_BEST_ITERATION",
+    "gamma_fit": "INNER_OR_OUTER_TRAINING_DATES_ONLY",
+    "max_boost_round": 1000,
+    "maximize": false,
+    "metric": "RACE_EQUAL_WEIGHT_MULTINOMIAL_LOGLOSS"
+  },
+  "venue_folds": "PROHIBITED",
+  "version": "P2_WIN_HISTORICAL_WALKFORWARD_V1"
+}

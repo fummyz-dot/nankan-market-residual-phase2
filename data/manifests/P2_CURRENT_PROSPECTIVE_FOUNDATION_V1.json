@@ -1,0 +1,21 @@
+{
+  "H2_budget": {
+    "H2_C05_status": "REGISTERED_NOT_EVALUATED",
+    "H2_C06_status": "UNALLOCATED",
+    "already_evaluated": 4,
+    "current_performance_consumed": 0,
+    "maximum": 6
+  },
+  "T15_status": "ENGINEERING_CANDIDATE_NOT_FROZEN",
+  "built_at": "2026-08-19T14:07:33.655583+00:00",
+  "candidate_registry_hash": "e16a1ed7a95f6328e240a38581838c13ba7781235b794602fa11f7ff02ad466b",
+  "collector_config_hash": "96135e093d0778dfd31d42458d8fb844cc5c295db75ba8a752f56c97b4cc1d80",
+  "current_info_schema_version": "P2_CURRENT_SCHEMA_V1",
+  "existing_fixture_reference": "2026-08-19_川崎_05",
+  "git_commit": null,
+  "market_snapshot_db_schema_version": "P2_MARKET_SNAPSHOT_V2_PLUS_CURRENT_V1",
+  "outcome_used": false,
+  "stabilization_gate_hash": "86776dac97b7d64db057eec7c2f30dd8c72726362f82559db1274884a5bf9322",
+  "stabilization_ready": false,
+  "vcs_mode": "none"
+}

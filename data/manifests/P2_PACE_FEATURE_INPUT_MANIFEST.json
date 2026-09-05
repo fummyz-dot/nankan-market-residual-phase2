@@ -1,0 +1,20 @@
+{
+  "generated_at": "2026-08-19T10:50:21.972775+00:00",
+  "inputs": [
+    {
+      "path": "db/p2_history_context.sqlite",
+      "sha256": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+      "size_bytes": 466599936
+    },
+    {
+      "path": "data/curated/p2_pace/prototype/nankan_runner_pace_observations.csv.gz",
+      "sha256": "cb2502aeb30d0eca4e6e1517efc835aa46b95d9b54f775c8e34ebdb36e329764",
+      "size_bytes": 12665144
+    },
+    {
+      "path": "data/curated/p2_pace/prototype/nankan_race_pace_observations.csv.gz",
+      "sha256": "afb96b27c416470a9788510c1a6c4f83ab19d9fbca6045f50a8de9f5cbd2fd6f",
+      "size_bytes": 436031
+    }
+  ]
+}

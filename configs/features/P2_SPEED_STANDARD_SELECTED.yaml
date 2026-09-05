@@ -1,0 +1,16 @@
+version: P2_SPEED_STANDARD_SELECTED_V1
+family: hierarchical_robust_standard_time
+selected_config: S3
+lookback_days: ALL_AVAILABLE_HISTORY
+course_hierarchy: [venue_distance_surface_direction, venue_distance_surface, distance_surface, surface, global]
+going_hierarchy: [venue_going, going, zero]
+shrinkage_lambda: 20
+race_clock_target: median_valid_finisher_time
+same_day_rule: DATE_BLOCK_NO_SAME_DAY_UPDATE
+exchange_standard_update: PROHIBITED
+other_flat_results: PROHIBITED_MAIN
+class_adjustment: NONE_IN_SPEED_STANDARD_V1
+selection_period: 2021-01-01/2024-12-31
+validation_period: 2025
+selected_at: 2026-08-19T10:05:09.537744+00:00
+grid_config_sha256: 04544c3fa6c287f46f703ebbb518b38064b4db0a37155dbefa9f896d8d192e73

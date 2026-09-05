@@ -1,0 +1,17 @@
+{
+  "built_at": "2026-08-19T09:28:06.390116+00:00",
+  "class_rule_dataset_hash": "fa1fb658e5ba39cebd2b6475ff1663d29c6dcf797e26b7f1c187ce2b42463cce",
+  "date_range": "2020-01-01/2026-07-31",
+  "history_db_hash": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+  "path": "data/manifests/P2_CLASS_EMPIRICAL_FEATURE_MANIFEST.json",
+  "race_output_logical_hash": "379506f883c94bd07f85622c121a50d48abd612bd8d883f68d766a4977b4dcd4",
+  "race_output_path": "data/curated/p2_class_empirical/nankan_race_empirical_strength.csv.gz",
+  "rating_config_hash": "c50999274b823d0939c85ab1b0f17cc8e7d89dc8e4887ac58bbb8fade3227318",
+  "row_counts": {
+    "race": 21849,
+    "runner": 250093
+  },
+  "runner_output_logical_hash": "2aa12659883465c50e9682f9d2108dcfe9be50f70f574da917e3d4708230375d",
+  "runner_output_path": "data/curated/p2_class_empirical/nankan_runner_empirical_class.csv.gz",
+  "schema_version": "P2_CLASS_EMPIRICAL_FEATURE_V1"
+}

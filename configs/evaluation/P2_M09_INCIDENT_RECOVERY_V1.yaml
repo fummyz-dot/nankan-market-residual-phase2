@@ -1,0 +1,19 @@
+{
+  "incident_id": "P2-INC-001",
+  "incident_title": "UNREGISTERED_INNER_VALIDATION_TWO_TREE_PROBE",
+  "incident_scope": "INNER_VALIDATION_ONLY",
+  "incident_class": "PRE_FORMAL_EVALUATION_PROTOCOL_DEVIATION",
+  "incident_severity": "DEVELOPMENT_PROTOCOL_INTEGRITY_INCIDENT",
+  "incidental_peek_count": 1,
+  "formal_search_budget_configured": 6,
+  "formal_search_budget_consumed": 0,
+  "formal_search_budget_remaining": 6,
+  "outer_validation_contaminated": false,
+  "adaptive_model_change_detected": false,
+  "new_unseen_development_data_required": false,
+  "resume_original_m09": true,
+  "resume_requires_no_protocol_change": true,
+  "evidence_label_after_resume": "DEVELOPMENT_EVALUATION_WITH_RECORDED_PROTOCOL_INCIDENT",
+  "formal_execution_guard": "P2_FORMAL_M09_EVALUATION=1",
+  "vcs_mode": "none"
+}

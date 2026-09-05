@@ -1,0 +1,35 @@
+gate_id: P2_STABILIZATION_GATE_V2
+status: ACTIVE
+supersedes: P2_STABILIZATION_GATE_V1
+amendment_reason: PRE_OUTCOME_OPERATIONAL_STABILIZATION_SHORTENING_AND_PREDECISION_TIMING_FIX
+evidence_class: PROSPECTIVE_TIMESTAMPED_STABILIZATION
+outcome_use: PROHIBITED
+minimum_calendar_days: 14
+minimum_primary_eligible_races_with_t15_predecision_valid_capture: 80
+venue_requirement:
+  all_four_nankan_venues: true
+  minimum_meetings_per_venue: 1
+  minimum_primary_eligible_predecision_valid_races_per_venue: 10
+t15_predecision_window:
+  decision_time: scheduled_post_time_minus_15_minutes
+  valid_start_seconds_before_decision: 60
+  valid_end: decision_time_inclusive
+  before_window: STALE_FOR_T15
+  after_window: LATE_AFTER_DECISION
+  late_capture_can_prove_availability: false
+t15_quality:
+  overall_coverage_min: 0.97
+  venue_coverage_min: 0.95
+  race_runner_join_mismatch_required: 0
+  duplicate_primary_key_required: 0
+  raw_provenance_coverage_required: 1.0
+  fatal_parser_schema_drift_required: 0
+  capture_offset_abs_p99_seconds_lt: 30
+field_activation:
+  denominator: PREDECISION_VALID_T15_ONLY
+  overall_coverage_min: 0.97
+  venue_coverage_min: 0.95
+  duplicate_logical_primary_key_required: 0
+  race_runner_join_mismatch_required: 0
+  postdecision_fallback: PROHIBITED
+decision_time_status: T15_ENGINEERING_CANDIDATE_NOT_FROZEN

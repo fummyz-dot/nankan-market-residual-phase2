@@ -1,0 +1,10 @@
+{
+  "ticket_type": "WIN",
+  "raw_strength": "inverse_decimal_odds",
+  "normalization": "race_active_runner_sum",
+  "invalid_odds": "reject_snapshot",
+  "scratch_rule": "snapshot_time_active_roster",
+  "overround": "diagnostic_only",
+  "q_clip": "none",
+  "normalization_version": "RAW_NORMALIZED_WIN_MARKET_V1"
+}

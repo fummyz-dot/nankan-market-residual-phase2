@@ -1,0 +1,114 @@
+{
+  "authority_id": "JOB003B_PROTOCOL_AMENDMENT_001_SCHEMA_OWNERSHIP",
+  "parent_job": "P2S_JOB_003B_ACTUAL_STARTER_REMATERIALIZATION",
+  "status": "AUTHORIZED",
+  "scope": "Execution/schema correction only. No scientific feature-definition change.",
+  "reason": "Blocked attempt wrote Primary-only near-distance support-count columns toward B0 output schema.",
+  "immutable_scientific_contract": {
+    "b0_feature_count": 55,
+    "b0_ordered_feature_name_sha256": "0108ffaf8239a0522e5b5157c0ca388bca359866375f704a0d4b42937569b5f6",
+    "primary_feature_count": 130,
+    "primary_ordered_feature_name_sha256": "d4ccb75419a50d70bee7fd037f576a48be7dce7d4bb18b388df43fa8bcac0e82",
+    "race_count": 21560,
+    "actual_starter_rows": 244160
+  },
+  "schema_authorities": {
+    "b0": "data/manifests/successor_v1/B0_SAFE_CORE_FEATURE_MANIFEST_V1.csv",
+    "primary": "data/manifests/successor_v1/RUNNER_PRIMARY_DETERMINISTIC_FEATURE_MANIFEST_V1.csv",
+    "rule": "The ordered model-feature columns of each output must exactly equal its own manifest. Never add a recomputed column to a dataset whose manifest does not own that feature."
+  },
+  "starter_sensitive_feature_ownership": {
+    "B0_AND_PRIMARY_INHERITED": [
+      "prior_starts",
+      "starts_last_30d",
+      "starts_last_90d",
+      "starts_last_365d",
+      "same_venue_starts",
+      "same_distance_starts",
+      "same_venue_distance_starts",
+      "same_surface_starts",
+      "same_direction_starts",
+      "jockey_90d_starts",
+      "jockey_365d_starts",
+      "trainer_90d_starts",
+      "trainer_365d_starts"
+    ],
+    "PRIMARY_ONLY": [
+      "near_distance_200m_starts",
+      "same_venue_near_distance_200m_starts",
+      "same_direction_distance_starts"
+    ],
+    "PRIMARY_RACE_COMPOSITION_ONLY": [
+      "comp_ability_mean",
+      "comp_ability_sd",
+      "comp_ability_top3_mean",
+      "comp_ability_gap_1_2",
+      "comp_ability_gap_3_4",
+      "comp_ability_coverage",
+      "comp_speed_mean",
+      "comp_speed_sd",
+      "comp_speed_top3_mean",
+      "comp_speed_coverage",
+      "comp_front_propensity_sum",
+      "comp_front_propensity_max",
+      "comp_front_propensity_sd",
+      "comp_history_coverage_mean",
+      "comp_uncertainty_mean",
+      "comp_uncertainty_sd"
+    ]
+  },
+  "write_rules": {
+    "b0": "Write only B0 manifest-owned model features plus the already-frozen key/provenance columns. Primary-only near-distance and composition columns are forbidden.",
+    "primary": "Write all 130 Primary manifest-owned model features plus the already-frozen key/provenance columns. Corrected B0-inherited starter counts must match B0 values for the same runner key.",
+    "no_feature_addition": true,
+    "no_feature_removal": true,
+    "no_feature_reordering": true
+  },
+  "partial_artifact_handling": {
+    "blocked_attempt_id": "attempt_001_schema_blocked",
+    "quarantine_root": "audit/successor_v1/job003b/attempts/attempt_001_schema_blocked/",
+    "inventory_required": true,
+    "sha256_required": true,
+    "delete_without_quarantine": false,
+    "new_attempt_id": "attempt_002"
+  },
+  "staging_and_promotion": {
+    "staging_root": "data/processed/successor_v1/.job003b_attempt_002/",
+    "canonical_b0": "data/processed/successor_v1/b0_safe_core_features_v1_1/",
+    "canonical_primary": "data/processed/successor_v1/runner_primary_deterministic_features_v1_1/",
+    "rule": "Write only to staging. Validate complete logical datasets. Promote atomically only after every hard acceptance check passes."
+  },
+  "cross_dataset_checks": [
+    "B0 and Primary runner-key sets are identical and contain 244160 rows.",
+    "For every B0 feature inherited by Primary, values are exactly equal under frozen NaN semantics.",
+    "No PRIMARY_ONLY feature exists in B0 output.",
+    "No PRIMARY_RACE_COMPOSITION_ONLY feature exists in B0 output."
+  ],
+  "hard_acceptance": {
+    "races": 21560,
+    "rows_each_dataset": 244160,
+    "duplicate_runner_keys": 0,
+    "b0_feature_count": 55,
+    "primary_feature_count": 130,
+    "b0_hash_exact": true,
+    "primary_hash_exact": true,
+    "nonstarter_rows": 0,
+    "unresolved_statuses": 0,
+    "support_count_semantic_mismatches_after": 0,
+    "race_composition_semantic_mismatches_after": 0,
+    "future_source_violations": 0,
+    "same_day_source_violations": 0,
+    "post_cutoff_target_violations": 0,
+    "prohibited_dependency_violations": 0
+  },
+  "prohibitions": [
+    "model fit",
+    "feature selection",
+    "threshold tuning",
+    "market/payout/ROI access",
+    "network access",
+    "package installation",
+    "overwrite of Job003 v1 artifacts",
+    "unquarantined overwrite of blocked v1.1 partial artifacts"
+  ]
+}

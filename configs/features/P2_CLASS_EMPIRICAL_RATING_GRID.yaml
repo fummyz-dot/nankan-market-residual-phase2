@@ -1,0 +1,26 @@
+version: P2_CLASS_EMPIRICAL_RATING_GRID_V1
+rating_family: online_pairwise_bradley_terry
+score_scale: logit_relative_latent_score
+selection:
+  burn_in: 2020-01-01/2020-12-31
+  selection_period: 2021-01-01/2024-12-31
+  validation_period: 2025-01-01/2025-12-31
+  development_diagnostic_period: 2026-01-01/2026-07-31
+  primary_metric: race_equal_weight_pairwise_log_loss
+  neutral_probability: 0.5
+  neutral_log_loss: 0.6931471805599453
+  tie_tolerance: 0.0001
+  tie_break: smaller_k
+configs:
+  - config_id: R1
+    k: 0.25
+  - config_id: R2
+    k: 0.50
+  - config_id: R3
+    k: 1.00
+prohibited_extensions:
+  - additional_k_search
+  - alternate_rating_family
+  - decay
+  - margin_weighting
+  - class_weighting

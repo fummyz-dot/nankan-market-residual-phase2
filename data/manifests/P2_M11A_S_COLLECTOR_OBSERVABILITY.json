@@ -1,0 +1,25 @@
+{
+  "built_at": "2026-08-20T01:52:25.283009+00:00",
+  "commands": [
+    "python3 -m src.operations.prospective_day_collector --date 2026-08-20 --preflight",
+    "python3 -m src.operations.prospective_collection_status --date 2026-08-19"
+  ],
+  "git_commit": null,
+  "input_hashes": {
+    "src/operations/prospective_collection_status.py": "f8555c4ca036d13b157aca4f1662ed661fae0a12a14762d701e330d7d5fd7864",
+    "src/operations/prospective_day_collector.py": "f18879f04b4f7a05fc6151694c7c39d46bb6e30b2152f8c5fba6a48e5879a7d3",
+    "src/operations/prospective_observability.py": "b8aa9e754e8328de93ef1177a522d1763e4979f6ff70dddb13a1d2a8ba39d7bc",
+    "tests/unit/test_p2_m11a_s_observability.py": "cb7f9da886e1a3f080506bc2e9c8dc349f60c71e571c25197707142288cd0ad7"
+  },
+  "job": "P2-M11A-S",
+  "outcome_accessed": false,
+  "output_artifacts": [
+    "outputs/prospective_collection/2026-08-20/preflight.json",
+    "audit/data/p2_m11as/observability_audit.csv"
+  ],
+  "performance_evaluated": false,
+  "random_seed": null,
+  "status": "READY_FOR_2026_08_20_LIVE_COLLECTION",
+  "vcs_mode": "none",
+  "workspace_root": "/home/nabe/projects/nankan-market-residual-phase2"
+}

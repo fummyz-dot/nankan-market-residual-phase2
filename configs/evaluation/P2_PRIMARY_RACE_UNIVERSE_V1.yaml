@@ -1,0 +1,17 @@
+{
+  "version": "P2_PRIMARY_RACE_UNIVERSE_V1",
+  "status": "DEVELOPMENT_FROZEN",
+  "pre_race_semantics_only": true,
+  "rule_precedence": [
+    "JRA_EXCHANGE",
+    "NEWCOMER",
+    "UNRESOLVED_EXCHANGE_TYPE",
+    "EXPLICIT_CLASS",
+    "HIGH_LEVEL",
+    "LOCAL_EXCHANGE",
+    "AGE_UNGRADED",
+    "OTHER_SPECIAL"
+  ],
+  "amendment_required_after_m07": true,
+  "final_holdout_frozen": false
+}

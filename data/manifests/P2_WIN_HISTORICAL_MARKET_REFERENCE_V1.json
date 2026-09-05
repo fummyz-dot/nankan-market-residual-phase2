@@ -1,0 +1,17 @@
+{
+  "T15_equivalence_claimed": false,
+  "calibration_method_hash": "697e4b77c87102fd67a2fe76115ad2647f78eef8d2acec9ba2584611921181b3",
+  "date_range": [
+    "2026-03-02",
+    "2026-07-31"
+  ],
+  "model_feature_used": false,
+  "normalization_config_hash": "3a2153e6b5b0e861a9a727eecdd8e61615543946a6b7f3606365e8b7427f1eeb",
+  "outcome_used": true,
+  "output_logical_hash": "29ae57fa9b12ce64d56cee473cab06ab9f27ac78aa9b2fd305259763b6e5ed5e",
+  "race_count": 1437,
+  "runner_count": 15825,
+  "source_db": "reference/v1/db/nankan_market.sqlite",
+  "source_db_sha256": "62450b078badcf2fc675416a068c83548a620ae5aa02d22bd91d8fedca0001ad",
+  "source_evidence_class": "HISTORICAL_MARKET_TIME_UNKNOWN"
+}

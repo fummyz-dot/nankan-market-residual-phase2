@@ -1,0 +1,32 @@
+{
+  "policy_id": "P2_OPS_BET_POLICY_V1",
+  "version": "1.0.0",
+  "status": "EXPERIMENTAL_LOW_STAKE",
+  "stake_yen_per_ticket": 100,
+  "max_tickets_per_race": 10,
+  "max_total_stake_yen": 1000,
+  "ticket_types": {
+    "WIN": {
+      "enabled": true,
+      "min_model_probability": 0.015,
+      "min_probability_ratio": 1.25,
+      "min_gross_expected_return": 1.15,
+      "market_mass_source": "DEV_LIVE_V1_CALIBRATED_WIN_MARKET",
+      "execution_odds_source": "WIN_SNAPSHOT_ODDS"
+    },
+    "WIDE": {
+      "enabled": true,
+      "min_model_probability": 0.05,
+      "min_probability_ratio": 1.20,
+      "min_gross_expected_return": 1.20,
+      "market_mass_source": "WIDE_LOWER_INVERSE_NORMALIZED_TO_3",
+      "execution_odds_source": "WIDE_SNAPSHOT_LOWER"
+    }
+  },
+  "ranking": [
+    "gross_expected_return_desc",
+    "model_probability_desc",
+    "ticket_type_WIN_before_WIDE",
+    "selections_lexicographic"
+  ]
+}

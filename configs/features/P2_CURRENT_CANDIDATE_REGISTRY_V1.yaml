@@ -1,0 +1,41 @@
+registry_id: P2_CURRENT_CANDIDATE_REGISTRY_V1
+namespace: P2_CURRENT
+status: CANDIDATES_REGISTERED_PRE_PERFORMANCE
+activation_rule: SOURCE_SEMANTICS_TIMESTAMP_AND_QUALITY_ONLY
+prohibited_selection_inputs: [outcome, market_ll, residual_score, roi, feature_importance]
+candidates:
+  CUR01:
+    feature_name: current_body_weight_kg
+    entity: runner
+    source: NANKAN_OFFICIAL_PRE_RACE_CURRENT_INFO
+    availability_required: [PUBLISHED_AT_CONFIRMED, OBSERVED_IN_PREDECISION_RAW_CAPTURE]
+    status: REGISTERED_NOT_ACTIVATED
+  CUR02:
+    feature_name: current_body_weight_change_kg
+    entity: runner
+    source: NANKAN_OFFICIAL_PRE_RACE_CURRENT_INFO
+    availability_required: [PUBLISHED_AT_CONFIRMED, OBSERVED_IN_PREDECISION_RAW_CAPTURE]
+    status: REGISTERED_NOT_ACTIVATED
+  CUR03:
+    feature_name: current_jockey_change_from_last_nankan_flag
+    entity: runner
+    source: NANKAN_OFFICIAL_CURRENT_JOCKEY_PLUS_STRICT_PRIOR_NANKAN_JOCKEY
+    same_day_rule: PROHIBITED
+    other_flat_rule: PROHIBITED
+    status: REGISTERED_NOT_ACTIVATED
+  CUR04:
+    feature_name: current_weather_code
+    entity: race
+    source: NANKAN_OFFICIAL_PRE_RACE_CURRENT_INFO
+    status: REGISTERED_NOT_ACTIVATED
+  CUR05:
+    feature_name: current_track_condition_code
+    entity: race
+    source: NANKAN_OFFICIAL_PRE_RACE_CURRENT_INFO
+    status: REGISTERED_NOT_ACTIVATED
+  CUR06:
+    feature_name: current_active_field_size
+    entity: race
+    source: SNAPSHOT_TIME_ACTIVE_RUNNER_ROSTER
+    final_starter_substitution: PROHIBITED
+    status: REGISTERED_NOT_ACTIVATED

@@ -1,0 +1,16 @@
+version: P2_CLASS_ABLATION_REGISTRY_v3
+status: REGISTERED_NOT_EXECUTED
+last_verified_by: P2-M03B
+performance_comparison_executed: false
+candidates:
+  - candidate_id: P2_CLASS_RULE_ONLY
+    status: DRAFT_ONLY
+    uses: [P2_CLASS_RULE]
+    excludes: [empirical_class_strength, class_delta, same_day_bias]
+  - candidate_id: P2_CLASS_RULE_PLUS_EMPIRICAL
+    status: FUTURE_DESIGN_ONLY
+    uses: [P2_CLASS_RULE, future_empirical_strength]
+    prerequisites: [approved_strength_protocol, strict_asof_timestamp_contract, cold_start_policy, uncertainty_policy, untouched_holdout_freeze]
+    excludes: [same_day_bias]
+notes:
+  - P2-M03A selects one internal K configuration for RulePlusEmpirical; K values do not create additional ablation candidates.

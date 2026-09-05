@@ -1,0 +1,7 @@
+layer,key_component,source_db,source_table,source_column,missing_policy
+horse,horse_key,/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite,race_runners,horse_key,HARD_BLOCK
+jockey,jockey_key,/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite,race_runners,jockey,MISSING_JOCKEY_ZERO_EFFECT_EXCLUDED_FROM_JOCKEY_STATS
+horse_x_venue,horse_key,/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite,race_runners,horse_key,HARD_BLOCK
+horse_x_venue,venue_key,/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite,races,venue_code,HARD_BLOCK
+jockey_x_venue,jockey_key,/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite,race_runners,jockey,MISSING_JOCKEY_ZERO_INTERACTION
+jockey_x_venue,venue_key,/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite,races,venue_code,HARD_BLOCK

@@ -1,0 +1,11 @@
+version: P2_PACE_LAST3F_STATUS_V1
+safe_result_statuses:
+  - FINISHED
+observation_eligibility:
+  - last_3f is finite
+  - last_3f is positive
+  - result_status is safe
+unsafe_status_policy: EXCLUDE_FROM_LAST3F_RELATIVE_OBSERVATION
+rank_rule: ascending_last3f_average_tie_rank
+rank_pct_rule: 1 - (rank - 1) / (valid_count - 1)
+minimum_field_valid_count: 2

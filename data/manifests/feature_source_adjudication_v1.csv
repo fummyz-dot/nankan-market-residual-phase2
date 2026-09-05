@@ -1,0 +1,107 @@
+adjudication_id,contract_id,source_db,table,column,use_case,decision,current_model_input,lagged_history_source,grouping_allowed,asof_rule,same_day_allowed,evidence,notes
+FAC_A001_001,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_key,GROUPING,GROUPING_ONLY,false,false,true,N/A,false,FAC_A001 §5,Join/grouping only.
+FAC_A001_002,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_date,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Calendar/date features only; not outcome-derived.
+FAC_A001_003,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_date,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Historical grouping/derivation.
+FAC_A001_004,FEATURE_SOURCE_ADJUDICATION_V1,history,races,venue,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed structural value.
+FAC_A001_005,FEATURE_SOURCE_ADJUDICATION_V1,history,races,venue,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,true,source_race_date < target_race_date,false,FAC_A001 §5,Past context/grouping.
+FAC_A001_006,FEATURE_SOURCE_ADJUDICATION_V1,history,races,venue_code,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed structural value.
+FAC_A001_007,FEATURE_SOURCE_ADJUDICATION_V1,history,races,venue_code,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,true,source_race_date < target_race_date,false,FAC_A001 §5,Past context/grouping.
+FAC_A001_008,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_number,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed structural value.
+FAC_A001_009,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_number,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical context only.
+FAC_A001_010,FEATURE_SOURCE_ADJUDICATION_V1,history,races,post_time,ALL,NOT_USED_V1,false,false,false,semantics pending,false,FAC_A001 §5,Blocked pending post-time semantics.
+FAC_A001_011,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_type,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed basic race information.
+FAC_A001_012,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_type,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical context.
+FAC_A001_013,FEATURE_SOURCE_ADJUDICATION_V1,history,races,race_name,ALL,NOT_USED_V1,false,false,false,N/A,false,FAC_A001 §5,Semantic-safe but not model input.
+FAC_A001_014,FEATURE_SOURCE_ADJUDICATION_V1,history,races,surface,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed structural value.
+FAC_A001_015,FEATURE_SOURCE_ADJUDICATION_V1,history,races,surface,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical context.
+FAC_A001_016,FEATURE_SOURCE_ADJUDICATION_V1,history,races,direction,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed structural value.
+FAC_A001_017,FEATURE_SOURCE_ADJUDICATION_V1,history,races,direction,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical context.
+FAC_A001_018,FEATURE_SOURCE_ADJUDICATION_V1,history,races,distance_m,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed structural value.
+FAC_A001_019,FEATURE_SOURCE_ADJUDICATION_V1,history,races,distance_m,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical context.
+FAC_A001_020,FEATURE_SOURCE_ADJUDICATION_V1,history,races,weather,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,historical current availability unproven,false,FAC_A001 §§3–4,Current weather blocked.
+FAC_A001_021,FEATURE_SOURCE_ADJUDICATION_V1,history,races,weather,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Past weather allowed only as historical context.
+FAC_A001_022,FEATURE_SOURCE_ADJUDICATION_V1,history,races,going,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,historical current availability unproven,false,FAC_A001 §§3–4,Current going blocked.
+FAC_A001_023,FEATURE_SOURCE_ADJUDICATION_V1,history,races,going,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Past going allowed only as historical context.
+FAC_A001_024,FEATURE_SOURCE_ADJUDICATION_V1,history,races,field_size,CURRENT_PREDICTIVE,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,late scratch timing unproven,false,FAC_A001 §5 field-size special rule,Not a B0/upset-head predictive feature.
+FAC_A001_025,FEATURE_SOURCE_ADJUDICATION_V1,history,races,field_size,PL_UNIVERSE,GROUPING_ONLY,false,false,true,starter universe only,false,FAC_A001 §5 field-size special rule,Allowed for PL probability universe definition.
+FAC_A001_026,FEATURE_SOURCE_ADJUDICATION_V1,history,races,field_size,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Past field-size history only.
+FAC_A001_027,FEATURE_SOURCE_ADJUDICATION_V1,history,races,conditions_raw,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Allowed race-condition/eligibility source.
+FAC_A001_028,FEATURE_SOURCE_ADJUDICATION_V1,history,races,conditions_raw,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical condition context.
+FAC_A001_029,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_1,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Prize structure.
+FAC_A001_030,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_2,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Prize structure.
+FAC_A001_031,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_3,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Prize structure.
+FAC_A001_032,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_4,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Prize structure.
+FAC_A001_033,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_5,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current race structural,false,FAC_A001 §5,Prize structure.
+FAC_A001_034,FEATURE_SOURCE_ADJUDICATION_V1,history,races,final_4f,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4–5,Current outcome prohibited.
+FAC_A001_035,FEATURE_SOURCE_ADJUDICATION_V1,history,races,final_4f,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Past result-derived history allowed.
+FAC_A001_036,FEATURE_SOURCE_ADJUDICATION_V1,history,races,final_3f,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4–5,Current outcome prohibited.
+FAC_A001_037,FEATURE_SOURCE_ADJUDICATION_V1,history,races,final_3f,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Past result-derived history allowed.
+FAC_A001_038,FEATURE_SOURCE_ADJUDICATION_V1,history,races,lap_times_json,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4–5,Current outcome prohibited.
+FAC_A001_039,FEATURE_SOURCE_ADJUDICATION_V1,history,races,lap_times_json,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Past result-derived history allowed.
+FAC_A001_040,FEATURE_SOURCE_ADJUDICATION_V1,history,races,corners_json,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4–5,Current outcome prohibited.
+FAC_A001_041,FEATURE_SOURCE_ADJUDICATION_V1,history,races,corners_json,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §4,Past result-derived history allowed.
+FAC_A001_042,FEATURE_SOURCE_ADJUDICATION_V1,history,races,source_month,ALL,NOT_USED_V1,false,false,false,provenance only,false,FAC_A001 §5,No model input.
+FAC_A001_043,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,race_key,GROUPING,GROUPING_ONLY,false,false,true,N/A,false,FAC_A001 §6,Join/grouping only.
+FAC_A001_044,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,horse_key,GROUPING,GROUPING_ONLY,false,false,true,N/A,false,FAC_A001 §§6–7,Hierarchical grouping only.
+FAC_A001_045,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,frame_number,CURRENT_ENTRY,CURRENT_ENTRY_ALLOWED,true,false,false,current entry,false,FAC_A001 §6,Allowed numeric frame information.
+FAC_A001_046,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,horse_number,CURRENT_ENTRY,CURRENT_ENTRY_ALLOWED,true,false,false,current entry,false,FAC_A001 §6,Allowed numeric structural information.
+FAC_A001_047,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,jockey,CURRENT_ENTRY,CURRENT_ENTRY_ALLOWED,false,false,true,listed rider identity,false,FAC_A001 §6 jockey special rule,Use as identity/grouping; raw high-cardinality token is not direct GBDT input.
+FAC_A001_048,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,jockey,LAGGED_GROUPING,GROUPING_ONLY,false,true,true,source_race_date < target_race_date,false,FAC_A001 §§6–7,Historical grouping for derived aggregates/EB only.
+FAC_A001_049,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,jockey_affiliation,CURRENT_ENTRY,CURRENT_ENTRY_ALLOWED,true,false,false,current entry,false,FAC_A001 §6,Low-cardinality entry information.
+FAC_A001_050,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,assigned_weight,CURRENT_ENTRY,CURRENT_ENTRY_ALLOWED,true,false,false,current entry,false,FAC_A001 §6,Allowed entry information.
+FAC_A001_051,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,jockey_record_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_052,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,trainer,CURRENT_ENTRY,CURRENT_ENTRY_ALLOWED,false,false,true,listed trainer identity,false,FAC_A001 §6,Use as identity/grouping; raw high-cardinality token is not direct GBDT input.
+FAC_A001_053,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,trainer,LAGGED_GROUPING,GROUPING_ONLY,false,true,true,source_race_date < target_race_date,false,FAC_A001 §§6–7,Historical grouping for derived aggregates only.
+FAC_A001_054,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,trainer_affiliation,CURRENT_ENTRY,CURRENT_ENTRY_ALLOWED,true,false,false,current entry,false,FAC_A001 §6,Low-cardinality entry information.
+FAC_A001_055,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,body_weight,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,historical current availability unproven,false,FAC_A001 §6,Current body weight blocked.
+FAC_A001_056,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,body_weight,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Optional past history only.
+FAC_A001_057,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,body_weight_change,ALL,NOT_USED_V1,false,false,false,not required V1,false,FAC_A001 §6,No V1 use.
+FAC_A001_058,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,overall_record_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_059,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,dirt_left_record_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_060,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,dirt_right_record_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_061,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,course_record_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_062,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,course_distance_record_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_063,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,best_time_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_064,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,best_good_time_raw,ALL,NOT_USED_V1,false,false,false,recompute from history,false,FAC_A001 §6,Do not use directly.
+FAC_A001_065,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,finish_position,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4 and 6,Current outcome prohibited.
+FAC_A001_066,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,finish_position,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §§4 and 6,Past outcome source allowed.
+FAC_A001_067,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,result_status,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4 and 6,Current outcome prohibited.
+FAC_A001_068,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,result_status,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Past-history validity only.
+FAC_A001_069,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,finish_time_raw,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §6,Current outcome prohibited.
+FAC_A001_070,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,finish_time_raw,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Parse fallback only.
+FAC_A001_071,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,finish_time_seconds,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4 and 6,Current outcome prohibited.
+FAC_A001_072,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,finish_time_seconds,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §§4 and 6,Past outcome source allowed.
+FAC_A001_073,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,margin_raw,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §6,Current outcome prohibited.
+FAC_A001_074,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,margin_raw,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Optional past-only source.
+FAC_A001_075,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,last_3f,CURRENT,CURRENT_BLOCKED_LAGGED_ALLOWED,false,false,false,current outcome,false,FAC_A001 §§4 and 6,Current outcome prohibited.
+FAC_A001_076,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,last_3f,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §§4 and 6,Past outcome source allowed.
+FAC_A001_077,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,source_month,ALL,NOT_USED_V1,false,false,false,provenance only,false,FAC_A001 §6,No model input.
+FAC_A001_078,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,horse_key,GROUPING,GROUPING_ONLY,false,false,true,N/A,false,FAC_A001 §7,Hierarchical grouping only.
+FAC_A001_079,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,horse_name,ALL,NOT_USED_V1,false,false,false,display/QA only,false,FAC_A001 §7,No V1 input.
+FAC_A001_080,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,birth_date,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current age derivation,false,FAC_A001 §7,Use only to derive age.
+FAC_A001_081,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,sex,CURRENT_STATIC,CURRENT_STATIC_ALLOWED,true,false,false,current static,false,FAC_A001 §7,Allowed static feature.
+FAC_A001_082,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,color,ALL,NOT_USED_V1,false,false,false,unused,false,FAC_A001 §7,Semantic-safe but unused.
+FAC_A001_083,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,sire,ALL,NOT_USED_V1,false,false,false,unused,false,FAC_A001 §7,High-cardinality pedigree excluded.
+FAC_A001_084,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,dam,ALL,NOT_USED_V1,false,false,false,unused,false,FAC_A001 §7,High-cardinality pedigree excluded.
+FAC_A001_085,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,damsire,ALL,NOT_USED_V1,false,false,false,unused,false,FAC_A001 §7,High-cardinality pedigree excluded.
+FAC_A001_086,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,first_seen_date,ALL,BLOCK_ALL,false,false,false,full-corpus metadata,false,FAC_A001 §7,Direct and derived use prohibited.
+FAC_A001_087,FEATURE_SOURCE_ADJUDICATION_V1,history,horses,last_seen_date,ALL,BLOCK_ALL,false,false,false,full-corpus metadata,false,FAC_A001 §7,Direct and derived use prohibited.
+FAC_A001_088,FEATURE_SOURCE_ADJUDICATION_V1,market,official_odds,*,DIAGNOSTIC,DIAGNOSTIC_ONLY,false,false,false,MARKET_TIME_UNKNOWN,false,FAC_A001 §8,Primary model prohibited.
+FAC_A001_089,FEATURE_SOURCE_ADJUDICATION_V1,market,runner_market,*,DIAGNOSTIC,DIAGNOSTIC_ONLY,false,false,false,market data,false,FAC_A001 §8,Primary model prohibited.
+FAC_A001_090,FEATURE_SOURCE_ADJUDICATION_V1,market,payouts,*,DIAGNOSTIC,DIAGNOSTIC_ONLY,false,false,false,outcome/market data,false,FAC_A001 §§8 and 10,Primary model prohibited.
+FAC_A001_091,FEATURE_SOURCE_ADJUDICATION_V1,market,odds_snapshots,*,ALL,NOT_USED_V1,false,false,false,historical unavailable,false,FAC_A001 §8,Unavailable historical authority.
+FAC_A001_092,FEATURE_SOURCE_ADJUDICATION_V1,history,imports,*,ALL,NOT_USED_V1,false,false,false,provenance only,false,FAC_A001 §9,Audit/provenance only.
+FAC_A001_093,FEATURE_SOURCE_ADJUDICATION_V1,market,source_archives,*,ALL,NOT_USED_V1,false,false,false,provenance only,false,FAC_A001 §9,Audit/provenance only.
+FAC_A001_094,FEATURE_SOURCE_ADJUDICATION_V1,market,source_members,*,ALL,NOT_USED_V1,false,false,false,provenance only,false,FAC_A001 §9,Audit/provenance only.
+FAC_A001_095,FEATURE_SOURCE_ADJUDICATION_V1,market,ingest_issues,*,ALL,NOT_USED_V1,false,false,false,provenance only,false,FAC_A001 §9,Audit/provenance only.
+FAC_A001_096,FEATURE_SOURCE_ADJUDICATION_V1,market,build_metadata,*,ALL,NOT_USED_V1,false,false,false,provenance only,false,FAC_A001 §9,Audit/provenance only.
+FAC_A001_097,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_1,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical prize context.
+FAC_A001_098,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_2,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical prize context.
+FAC_A001_099,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_3,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical prize context.
+FAC_A001_100,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_4,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical prize context.
+FAC_A001_101,FEATURE_SOURCE_ADJUDICATION_V1,history,races,prize_5,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §5,Historical prize context.
+FAC_A001_102,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,frame_number,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Historical entry context.
+FAC_A001_103,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,horse_number,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Historical structural context.
+FAC_A001_104,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,jockey_affiliation,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Historical entry context.
+FAC_A001_105,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,assigned_weight,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Historical entry context.
+FAC_A001_106,FEATURE_SOURCE_ADJUDICATION_V1,history,race_runners,trainer_affiliation,LAGGED_HISTORY,LAGGED_HISTORY_ALLOWED,false,true,false,source_race_date < target_race_date,false,FAC_A001 §6,Historical entry context.

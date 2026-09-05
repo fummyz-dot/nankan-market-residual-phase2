@@ -1,0 +1,14 @@
+version: P2_EMPIRICAL_RATING_RESULT_STATUS_V1
+scope: P2_CLASS_EMPIRICAL_MAIN_V1
+safe_exact_statuses:
+  - FINISHED
+requirements:
+  finish_position: numeric_and_positive
+  status: safe_exact_status
+tie_policy: EXCLUDE_PAIR
+unknown_status_policy: EXCLUDE_FROM_RATING_UPDATE
+prohibited_statuses_observed:
+  - RAW_FINISH_STATUS_MISSING
+notes: >-
+  Raw status values are audited in P2-M03A artifacts. Only an explicit FINISHED
+  status with a positive numeric finishing position creates pairwise comparisons.

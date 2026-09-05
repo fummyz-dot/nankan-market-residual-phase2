@@ -1,0 +1,103 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_001",
+  "parent_authority": "MODEL_EVALUATION_FREEZE_V1",
+  "purpose": "Resolve historical starter/tie/DNF target semantics before any Job004 fit. No performance information used.",
+  "status": "FROZEN_BEFORE_FIRST_JOB004_FIT",
+  "historical_model_universe": {
+    "source_feature_rows": 246709,
+    "expected_actual_starters_from_job004_preflight": 244160,
+    "starter_classifier_authority": "reuse existing audited src.audit.p2_m07_target_universe.starter_status semantics; do not create a new result-status vocabulary",
+    "included_statuses": [
+      "STARTER_VALID_FINISH",
+      "STARTER_NO_VALID_FINISH"
+    ],
+    "nonstarter_rule": "resolved nonstarter/cancellation/exclusion rows remain in Job003 canonical feature artifacts but are excluded from Job004 target rows and all historical PL probability universes",
+    "unresolved_rule": "any UNRESOLVED_OUTCOME_STATUS => JOB004_BLOCKED_TARGET_STATUS",
+    "race_count_must_remain": 21560,
+    "starter_count_must_equal_preflight": 244160
+  },
+  "effective_rank": {
+    "n_r": "number of actual starters in the race after audited starter_status classification",
+    "valid_finisher_rule": {
+      "status": "STARTER_VALID_FINISH",
+      "rank_validation": "finish_position must be an integer in [1,n_r]",
+      "tie_validation": "competition-ranking sequence. For sorted distinct official ranks r_g with group sizes t_g: first r_1=1; next r_(g+1)=r_g+t_g. Duplicates are therefore allowed only as an official tie group.",
+      "effective_rank": "r_eff = official_finish_position + (tie_group_size - 1)/2"
+    },
+    "no_valid_finish_rule": {
+      "status": "STARTER_NO_VALID_FINISH",
+      "interpretation": "right-censored at the bottom: known to be outside every valid finisher, with no ordering asserted inside the non-finisher group",
+      "m": "number of STARTER_VALID_FINISH runners",
+      "q": "n_r - m",
+      "effective_rank": "r_eff = m + (q + 1)/2 = (m + 1 + n_r)/2",
+      "same_effective_rank_for_all_nonfinishers": true
+    },
+    "rank_mass_invariant": "sum(r_eff over actual starters) == n_r*(n_r+1)/2 within 1e-12",
+    "target_formula": "z_ri = Phi^-1((n_r - r_eff + 0.5)/(n_r + 1))",
+    "target_clip": [
+      -2.5,
+      2.5
+    ],
+    "runner_weight": "1/n_r",
+    "no_imputation_claim": "Tie midrank and bottom-censored midrank are deterministic encodings of known partial order; they do not fabricate an internal ordering."
+  },
+  "top3_integrity": {
+    "required": "exactly 3 distinct official Top3 horse numbers per accepted race",
+    "must_be_actual_starters": true,
+    "must_be_valid_finishers": true,
+    "ambiguous_top3": "BLOCK; do not resolve with horse number, time, popularity, payout, or arbitrary tie-breaking"
+  },
+  "job003_starter_semantics_audit": {
+    "required_before_fit": true,
+    "reason": "Job003 canonical artifacts contain retained nonstarter rows; support counts and race-composition aggregates must not silently treat them as starters.",
+    "start_count_features_to_recompute_and_compare": [
+      "prior_starts",
+      "starts_last_30d",
+      "starts_last_90d",
+      "starts_last_365d",
+      "same_venue_starts",
+      "same_distance_starts",
+      "same_venue_distance_starts",
+      "same_surface_starts",
+      "same_direction_starts",
+      "jockey_90d_starts",
+      "jockey_365d_starts",
+      "trainer_90d_starts",
+      "trainer_365d_starts",
+      "near_distance_200m_starts",
+      "same_venue_near_distance_200m_starts",
+      "same_direction_distance_starts"
+    ],
+    "start_definition": "count historical rows classified STARTER_VALID_FINISH or STARTER_NO_VALID_FINISH only; source_race_date < target_race_date",
+    "race_composition_rule": "recompute every P1_RACE_COMPOSITION aggregate from actual-starter rows only and compare to stored Job003 values using the frozen formula and NaN semantics",
+    "tolerance": 1e-12,
+    "if_mismatch": "JOB004_BLOCKED_JOB003_STARTER_SEMANTICS; do not fit. Report exact affected features/races and rematerialize only under a new authorized Job003 amendment."
+  },
+  "runtime_preflight": {
+    "network_install_authorized": false,
+    "preferred_existing_interpreter": "/home/nabe/projects/nankan-market-residual-phase2/.venv-p2-model/bin/python",
+    "check_modules": [
+      "catboost",
+      "scipy",
+      "numpy",
+      "pandas"
+    ],
+    "rule_if_all_present": "freeze executable path, Python version, package versions, platform, and relevant package file hashes in RUNTIME_FREEZE_V1.json before first fit",
+    "rule_if_missing": "JOB004A_RUNTIME_BLOCKED; do not pip install and do not substitute another ML/optimizer implementation",
+    "threading_for_training": {
+      "OPENBLAS_NUM_THREADS": "1",
+      "OMP_NUM_THREADS": "1",
+      "MKL_NUM_THREADS": "1"
+    }
+  },
+  "scientific_scope": {
+    "model_configs_changed": false,
+    "feature_set_changed": false,
+    "outer_folds_changed": false,
+    "inner_oof_changed": false,
+    "gates_changed": false,
+    "floor_thresholds_changed": false,
+    "market_access": "PROHIBITED",
+    "model_fit_in_job004a": false
+  }
+}

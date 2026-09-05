@@ -1,0 +1,50 @@
+{
+  "inputs": [
+    {
+      "path": "db/p2_history_context.sqlite",
+      "sha256": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+      "size_bytes": 466599936
+    },
+    {
+      "path": "data/curated/p2_class_empirical/nankan_runner_empirical_class.csv.gz",
+      "sha256": "64d7a6149e2f11a1c371fcc99a72d0d9b4a230c7b0b3f4a718856813f43ffc36",
+      "size_bytes": 21629869
+    },
+    {
+      "path": "data/curated/p2_class_empirical/nankan_race_empirical_strength.csv.gz",
+      "sha256": "ac5649490f791b84c8a1d384fab68d4e9c3c58e8df52ca290595c5a3d6bc8400",
+      "size_bytes": 1121258
+    },
+    {
+      "path": "data/curated/p2_class_rule/nankan_race_class_rule.csv.gz",
+      "sha256": "fa1fb658e5ba39cebd2b6475ff1663d29c6dcf797e26b7f1c187ce2b42463cce",
+      "size_bytes": 541022
+    },
+    {
+      "path": "data/curated/p2_speed/nankan_runner_speed_features.csv.gz",
+      "sha256": "c59b7701ec8f6476f913f1f85dda7db10f06c1aacbcf0220b5404c9770387c8a",
+      "size_bytes": 23516449
+    },
+    {
+      "path": "data/curated/p2_pace/nankan_runner_pace_features.csv.gz",
+      "sha256": "888454be521f3bf16f299d4695ee8edbeeeb28db2cd906ddbe638b0600eb6b64",
+      "size_bytes": 25097527
+    },
+    {
+      "path": "reference/v1/data/processed/win_v1/win_v1_features.csv.gz",
+      "sha256": "429c56c0645424dcd4023eefbc07b3eeb13daffe3078fdf37f6d8efae52fa459",
+      "size_bytes": 73864643
+    },
+    {
+      "path": "reference/v1/data/processed/win_v1/feature_schema.json",
+      "sha256": "9ae7a51ec51f93fa319ca1618d7b34502b60905d78b0f87e02ab5aa86b47da75",
+      "size_bytes": 8856
+    },
+    {
+      "path": "reference/v1/tools/build_win_v1_features.py",
+      "sha256": "cd78c7d42dc5e93251e6e195dab1de49a0eaeb2a18f75d1c3579c831a80c5301",
+      "size_bytes": 61114
+    }
+  ],
+  "generated_at": "2026-08-19T11:36:01.033016+00:00"
+}

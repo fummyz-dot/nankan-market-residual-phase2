@@ -1,0 +1,50 @@
+{
+  "contract_id": "TRAINING_DATA_CONTRACT_V1",
+  "development_cutoff": "2026-07-31",
+  "eligible_race_predicates": [
+    "south_kanto_venue",
+    "race_identity_valid",
+    "starter_universe_valid",
+    "official_outcome_valid",
+    "unordered_top3_set_definable"
+  ],
+  "model_training_performed": false,
+  "outer_folds": [
+    {
+      "fold_id": "Fold1",
+      "train": "2020-01-01..2022-12-31",
+      "valid": "2023-01-01..2023-12-31"
+    },
+    {
+      "fold_id": "Fold2",
+      "train": "2020-01-01..2023-12-31",
+      "valid": "2024-01-01..2024-12-31"
+    },
+    {
+      "fold_id": "Fold3",
+      "train": "2020-01-01..2024-12-31",
+      "valid": "2025-01-01..2025-12-31"
+    },
+    {
+      "fold_id": "Fold4",
+      "train": "2020-01-01..2025-12-31",
+      "valid": "2026-01-01..2026-07-31"
+    }
+  ],
+  "project_id": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "provenance_scaffold": [
+    "target_race_key",
+    "target_race_date",
+    "feature_asof_date",
+    "max_source_result_date",
+    "fold_id",
+    "feature_manifest_hash",
+    "source_db_hash",
+    "cold_start_result_history_absent"
+  ],
+  "result_history_invariant": "max_source_result_date < target_race_date",
+  "same_day_result_behavior": "FAIL",
+  "status": "FROZEN_FOR_IMPLEMENTATION",
+  "target_race_cutoff_behavior": "FAIL_IF_INCLUDED",
+  "top3_definition": "exactly one FINISHED runner at each official finish position 1, 2, and 3"
+}

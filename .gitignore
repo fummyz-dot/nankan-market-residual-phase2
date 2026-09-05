@@ -1,0 +1,125 @@
+# ============================================================
+# NANKAN Phase2 - public Git repository safety boundary
+# Track code/specs/manifests. Do NOT track data, DBs, models,
+# runtime environments, large outputs, or paid-source material.
+# ============================================================
+
+# --- Python / tooling ---
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# --- Virtual environments / package caches ---
+.venv/
+.venv-*/
+venv/
+venv-*/
+wheelhouse/
+**/wheelhouse/
+pip-wheel-metadata/
+
+# --- Local agent / editor state ---
+.codex/
+.agents/
+.vscode/
+.idea/
+.DS_Store
+*.swp
+*.swo
+
+# --- Secrets / credentials ---
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+credentials*.json
+secrets*.json
+token*.json
+
+# --- SQLite / local databases ---
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.db
+db/
+
+# --- Immutable/reference source corpora ---
+reference/v1/
+data/raw/
+data/raw_*/
+raw/
+downloads/
+
+# --- Processed / materialized datasets ---
+data/processed/
+data/staging/
+data/curated/
+data/feature_store/
+
+# Keep machine-readable scientific authority / manifests
+!data/
+data/*
+!data/manifests/
+!data/manifests/**
+# If data/processed already matched above, manifests remain separately tracked.
+
+# --- Model / binary artifacts ---
+artifacts/
+models/
+*.cbm
+*.pkl
+*.pickle
+*.joblib
+*.onnx
+*.pt
+*.pth
+*.bin
+
+# --- Prediction / experiment outputs ---
+outputs/
+runs/
+logs/
+tmp/
+temp/
+
+# --- Audit outputs: local by default ---
+# Curated evidence intended for Git should be copied to docs/evidence/
+audit/
+
+# --- Large tabular/binary data formats ---
+*.parquet
+*.feather
+*.arrow
+*.h5
+*.hdf5
+*.npz
+*.npy
+*.csv.gz
+*.jsonl.gz
+*.zip
+*.gz
+*.7z
+*.tar
+*.tgz
+
+# --- Paid / restricted-source material (explicit defense in depth) ---
+*keibabook*
+*KeibaBook*
+*競馬ブック*
+
+# --- Local handoff bundles / generated inventory packages ---
+handoff/
+handoff_*/
+*_HANDOFF_BUNDLE/

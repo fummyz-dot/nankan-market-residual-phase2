@@ -1,0 +1,39 @@
+version: P2_CLASS_CANONICAL_MAPPING_V1
+scope: NANKAN_TARGET_ONLY
+mapping_rules:
+  - rule_id: CLASS_EXACT_A1_C3
+    priority: 100
+    input_pattern: "A|B|C followed by 1|2|3 after width normalization"
+    output_fields: [class_codes_json, class_top_code, class_bottom_code, class_top_ordinal, class_bottom_ordinal, mixed_class_flag, class_span]
+    effective_from: null
+    effective_to: null
+    ruleset_scope: ALL
+    source_evidence: OFFICIAL_CLASS_VOCABULARY
+    notes: Ordinal is order-only, never continuous strength.
+  - rule_id: RACE_GRADE_SEPARATE
+    priority: 90
+    input_pattern: "Jpn/G/S grade tokens or raw 重賞/準重賞"
+    output_fields: [race_grade_code, heavy_grade_flag, semi_graded_flag, race_taxonomy_code]
+    effective_from: null
+    effective_to: null
+    ruleset_scope: ALL
+    source_evidence: RAW_TEXT_AND_OFFICIAL_POINTS_TABLE
+    notes: Grade is never coerced into A1-C3.
+  - rule_id: EXCHANGE_EXPLICIT_ONLY
+    priority: 80
+    input_pattern: "explicit JRA/中央競馬 or 地方交流 only"
+    output_fields: [jra_exchange_flag, local_exchange_flag, race_taxonomy_code]
+    effective_from: null
+    effective_to: null
+    ruleset_scope: ALL
+    source_evidence: RAW_TEXT_ONLY
+    notes: Bare 交流/指定交流 does not establish JRA or local exchange.
+  - rule_id: AGE_SEX_WEIGHT_RAW_PARSE
+    priority: 70
+    input_pattern: "raw condition/race-name age, sex, and weight tokens"
+    output_fields: [age_condition_code, min_age, max_age, sex_condition_code, weight_condition_code]
+    effective_from: null
+    effective_to: null
+    ruleset_scope: ALL
+    source_evidence: RAW_TEXT_ONLY
+    notes: Unknown stays UNKNOWN.

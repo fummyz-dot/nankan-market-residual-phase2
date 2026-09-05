@@ -1,0 +1,23 @@
+version: P2_LIVE_DEVELOPMENT_V1
+database: db/live_development.sqlite
+timezone:
+  storage: UTC
+  display: Asia/Tokyo
+decision:
+  states: [DRAFT, FROZEN, VOIDED_BEFORE_POST]
+  freeze_requirement: frozen_at_strictly_before_scheduled_post_time
+  frozen_update: prohibited
+  engineering_fixture_exception: explicit_only
+result:
+  source: nankankeiba_official_only
+  required_finality: RESULT_OFFICIAL_FINAL
+  payout_types: [WIN, WIDE, TRIO]
+  payout_unit_if_not_explicit: PAYOUT_UNIT_UNRESOLVED
+  profit_calculation_when_unit_unresolved: prohibited
+reconciliation:
+  no_frozen_pre_race_decision: NO_PRE_RACE_DECISION
+  retrospective_evaluation: prohibited
+isolation:
+  market_snapshot_db_result_write: prohibited
+  feature_store_outcome_write: prohibited
+  current_info_outcome_write: prohibited

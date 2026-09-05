@@ -1,0 +1,44 @@
+{
+  "collection_contract_id": "P2_NANKAN_SPECIALIZED_COLLECTION_CONTRACT_V1",
+  "date": "2026-09-07",
+  "venue": "川崎",
+  "day_plan_captured_at": "2026-09-07T04:00:00+00:00",
+  "passive_market_state": "PASSIVE_FUTURE_AUTHORITY_ONLY_CAPTURED",
+  "raw_authorities": [
+    {"authority_id": "program", "source_kind": "OFFICIAL_DAY_HEADER", "source_reference": "https://official.example/program", "captured_at": "2026-09-07T05:34:45+00:00", "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"},
+    {"authority_id": "win-r1", "source_kind": "OFFICIAL_WIN", "source_reference": "https://official.example/win-r1", "captured_at": "2026-09-07T05:34:45+00:00", "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"},
+    {"authority_id": "result-r1", "source_kind": "OFFICIAL_RESULT", "source_reference": "https://official.example/result-r1", "captured_at": "2026-09-07T06:10:00+00:00", "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"}
+  ],
+  "races": [
+    {
+      "race_number": 1,
+      "scheduled_post_time_as_known": "2026-09-07T05:50:00+00:00",
+      "scheduled_post_time_source": "OFFICIAL_PROGRAM",
+      "scheduled_post_time_captured_at": "2026-09-07T04:00:00+00:00",
+      "decision_time": "2026-09-07T05:35:00+00:00",
+      "cancellation_status": "ACTIVE",
+      "t15_market": {"captured_at": "2026-09-07T05:34:45+00:00", "timing_status": "PREDECISION_VALID", "status": "PREDECISION_VALID", "runner_numbers": [1, 2], "odds": {"1": 8.2, "2": 11.4}},
+      "current": {"race_fields": {"going": {"status": "VALUE", "raw_value": "良"}, "weather": {"status": "VALUE", "raw_value": "晴"}}, "runners": [
+        {"horse_number": 1, "current_fields": {"bodyweight_kg": {"status": "VALUE"}, "bodyweight_change": {"status": "VALUE"}, "current_jockey_id": {"status": "VALUE"}, "jockey_change_status": {"status": "STRUCTURAL_NA"}}},
+        {"horse_number": 2, "current_fields": {"bodyweight_kg": {"status": "VALUE"}, "bodyweight_change": {"status": "VALUE"}, "current_jockey_id": {"status": "VALUE"}, "jockey_change_status": {"status": "VALUE"}}}
+      ]},
+      "pace_evidence": {"status": "AVAILABLE", "raw_reference": "history-snapshot-r1"},
+      "same_day": {"state": "NO_PRIOR_SAME_DAY_RACE"}
+    },
+    {
+      "race_number": 2,
+      "scheduled_post_time_as_known": "2026-09-07T06:30:00+00:00",
+      "scheduled_post_time_source": "OFFICIAL_PROGRAM",
+      "scheduled_post_time_captured_at": "2026-09-07T04:00:00+00:00",
+      "decision_time": "2026-09-07T06:15:00+00:00",
+      "cancellation_status": "ACTIVE",
+      "t15_market": {"captured_at": "2026-09-07T06:14:00+00:00", "timing_status": "PREDECISION_VALID", "status": "PREDECISION_VALID", "runner_numbers": [1, 2], "odds": {"1": 9.1, "2": 14.0}},
+      "current": {"race_fields": {"going": {"status": "VALUE", "raw_value": "良"}, "weather": {"status": "VALUE", "raw_value": "晴"}}, "runners": [
+        {"horse_number": 1, "current_fields": {"bodyweight_kg": {"status": "VALUE"}, "bodyweight_change": {"status": "VALUE"}, "current_jockey_id": {"status": "VALUE"}, "jockey_change_status": {"status": "VALUE"}}},
+        {"horse_number": 2, "current_fields": {"bodyweight_kg": {"status": "VALUE"}, "bodyweight_change": {"status": "VALUE"}, "current_jockey_id": {"status": "VALUE"}, "jockey_change_status": {"status": "VALUE"}}}
+      ]},
+      "pace_evidence": {"status": "AVAILABLE", "raw_reference": "history-snapshot-r2"},
+      "same_day": {"state": "AVAILABLE_AS_OF_DECISION", "first_seen_official_at": "2026-09-07T06:10:00+00:00", "result_authority_id": "result-r1"}
+    }
+  ]
+}

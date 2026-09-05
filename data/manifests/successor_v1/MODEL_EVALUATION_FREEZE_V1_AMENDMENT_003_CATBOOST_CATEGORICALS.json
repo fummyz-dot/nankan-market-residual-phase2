@@ -1,0 +1,96 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_003_CATBOOST_CATEGORICALS",
+  "parent_authority": "MODEL_EVALUATION_FREEZE_V1",
+  "status": "FROZEN_BEFORE_FIRST_JOB004_FIT",
+  "scientific_change_class": "SPECIFICATION_COMPLETION_BEFORE_ANY_MODEL_FIT",
+  "precedence": "Overrides only B0/Primary CatBoost categorical feature-role assignment. All feature sets, feature order, hyperparameters, folds, targets, EB, PL, gates, bootstrap and floors remain unchanged.",
+  "b0": {
+    "model_feature_count": 55,
+    "ordered_feature_name_sha256": "0108ffaf8239a0522e5b5157c0ca388bca359866375f704a0d4b42937569b5f6",
+    "categorical_feature_count": 7,
+    "categorical_features_ordered": [
+      "venue",
+      "race_type",
+      "surface",
+      "direction",
+      "jockey_affiliation",
+      "trainer_affiliation",
+      "sex"
+    ],
+    "categorical_feature_name_sha256": "8b74230a010f524d681a26f8741971e408ef9a072bb98b8a9ac6335c7ec79bf2",
+    "numeric_feature_count": 48
+  },
+  "primary": {
+    "model_feature_count": 129,
+    "ordered_feature_name_sha256": "f2d11d6632c94c3826343f5ce3051ebb9d21d26b2c5754ea38a6f06c20604aa5",
+    "excluded_before_training": [
+      "class_group_no"
+    ],
+    "categorical_feature_count": 9,
+    "categorical_features_ordered": [
+      "venue",
+      "race_type",
+      "surface",
+      "direction",
+      "jockey_affiliation",
+      "trainer_affiliation",
+      "sex",
+      "class_code",
+      "age_condition_code"
+    ],
+    "categorical_feature_name_sha256": "b9ac30f3298710cb303160f0c8e016abdfbaf9b6b9b2d07d3f60535af2a6ed73",
+    "numeric_feature_count": 120
+  },
+  "categorical_preprocessing": {
+    "missing_token": "__MISSING__",
+    "rule": "For categorical columns only: replace missing/null with __MISSING__, then cast to string. Existing __MISSING__ remains __MISSING__. No category re-encoding, ordinal mapping, frequency encoding or one-hot encoding is permitted.",
+    "catboost_cat_features_argument": "Pass the exact feature names, not inferred dtype positions."
+  },
+  "numeric_preprocessing": {
+    "missing_rule": "NaN retained; no global imputation.",
+    "cast_rule": "All non-categorical model features must be numeric-compatible; do not stringify them."
+  },
+  "explicit_numeric_even_if_discrete": [
+    "calendar_month",
+    "day_of_week",
+    "race_number",
+    "distance_m",
+    "frame_number",
+    "horse_number",
+    "racing_age",
+    "class_ordinal",
+    "class_known_flag",
+    "mixed_class_flag",
+    "sex_restriction_flag",
+    "speed_cold_start_flag",
+    "pace_closing_cold_start_flag"
+  ],
+  "forbidden_role_changes": [
+    "Do not treat calendar_month or day_of_week as CatBoost categorical.",
+    "Do not treat frame_number or horse_number as CatBoost categorical.",
+    "Do not treat binary flags as CatBoost categorical.",
+    "Do not include class_group_no in Primary at all.",
+    "Do not auto-detect categorical columns from pandas dtype.",
+    "Do not add categorical columns after seeing fit/evaluation results."
+  ],
+  "preflight": {
+    "required_before_any_b0_or_primary_fit": true,
+    "b0_checks": [
+      "55 model features and frozen ordered hash match",
+      "exactly 7 categorical feature names match authority",
+      "all 7 exist in B0 model input",
+      "all 7 are non-null strings after categorical preprocessing",
+      "all other 48 model features are numeric-compatible",
+      "no extra string/object/category model feature remains outside the 7-name whitelist"
+    ],
+    "primary_checks": [
+      "129 model features and frozen ordered hash match after excluding only class_group_no",
+      "exactly 9 categorical feature names match authority",
+      "all 9 exist in Primary model input",
+      "all 9 are non-null strings after categorical preprocessing",
+      "all other 120 model features are numeric-compatible",
+      "no extra string/object/category model feature remains outside the 9-name whitelist"
+    ],
+    "on_failure": "JOB004_BLOCKED_CATBOOST_INPUT_ROLE_INCONSISTENCY"
+  }
+}

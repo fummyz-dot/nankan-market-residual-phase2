@@ -1,0 +1,21 @@
+{
+  "built_at": "2026-08-19T10:50:22.754947+00:00",
+  "config_manifest_sha256": "76da750f2aea0783b660127d38f2e38451b0a31df8ff07f627acfeaa05d40f1c",
+  "date_range": "2020-01-01/2026-07-31",
+  "exchange_rule": "PROHIBITED",
+  "feature_list": "version: P2_PACE_MAIN_V1\nnamespace: P2_PACE\nmodel_use_status: PROVISIONAL_DEVELOPMENT_FEATURE\nclosing_features:\n  - pace_closing_prior_obs_count\n  - pace_closing_recent3_count\n  - pace_closing_recent5_count\n  - days_since_last_closing_obs\n  - pace_closing_cold_start_flag\n  - pace_last_last3f_rank_pct\n  - pace_recent3_last3f_rank_mean\n  - pace_recent5_last3f_rank_mean\n  - pace_recent5_last3f_rank_best\n  - pace_recent5_last3f_rank_dispersion\n  - pace_recent3_last3f_rank_trend\n  - pace_last_closing_adv_sec\n  - pace_recent3_closing_adv_mean_sec\npace_balance_features:\n  - pace_balance_prior_obs_count\n  - pace_balance_recent3_count\n  - pace_balance_recent5_count\n  - days_since_last_pace_balance\n  - pace_last_balance_z\n  - pace_recent3_balance_mean_z\n  - pace_recent5_balance_mean_z\n  - pace_recent5_balance_dispersion_z\nprohibited:\n  - runner_corner\n  - runner_first3f\n  - keibabook_pace\n  - pace_style_labels\n  - early_speed\n  - full_lap_shape\n  - speed_or_class_adjustment\n  - market_input\n",
+  "feature_output_hash": "eae8fd93990f2746a69ff5daecd185d44de2fd4eb61a67d32457f84aa93079db",
+  "history_db_hash": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+  "input_manifest_sha256": "a2726fa94c56b008590a1e8d7e55d032607165328e9418ace777f5ef8ac073c3",
+  "keibabook_rule": "NOT_OPENED",
+  "other_flat_rule": "PROHIBITED_MAIN",
+  "pace_source_registry_hash": "a133a69b1dbe34e6d4b108c37ff52d3e027841d39eb590e43e5b0c7ff783d0ed",
+  "race_observation_hash": "39082dd248088d3006ccc9f6089ce95943b644a3bdfa1e69c37fdb53cf7d88bb",
+  "row_counts": {
+    "features": 250093,
+    "race_observations": 21849,
+    "runner_observations": 250093
+  },
+  "runner_observation_hash": "b3a58c4e9dc694fca077613f6ab0e3f331f2767a54278beca63dab64e0469ed0",
+  "same_day_rule": "DATE_BLOCK_NO_SAME_DAY_UPDATE"
+}

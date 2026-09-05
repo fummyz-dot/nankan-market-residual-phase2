@@ -1,0 +1,22 @@
+gate_id: P2_STABILIZATION_GATE_V1
+evidence_class: PROSPECTIVE_TIMESTAMPED_STABILIZATION
+outcome_use: PROHIBITED
+minimum_calendar_weeks: 4
+minimum_primary_eligible_races_with_opportunity: 200
+venue_requirement:
+  all_four_nankan_venues: true
+  minimum_meetings_per_venue: 1
+t15_quality:
+  overall_coverage_min: 0.97
+  venue_coverage_min: 0.95
+  race_runner_join_mismatch_required: 0
+  duplicate_primary_key_required: 0
+  capture_offset_abs_p99_seconds_lt: 30
+  capture_age_seconds_max: 60
+field_activation:
+  overall_coverage_min: 0.97
+  venue_coverage_min: 0.95
+  duplicate_logical_primary_key_required: 0
+  race_runner_join_mismatch_required: 0
+  postdecision_fallback: PROHIBITED
+decision_time_status: T15_ENGINEERING_CANDIDATE_NOT_FROZEN

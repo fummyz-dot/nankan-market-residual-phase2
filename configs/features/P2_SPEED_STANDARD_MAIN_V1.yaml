@@ -1,0 +1,18 @@
+version: P2_SPEED_STANDARD_MAIN_V1
+amendment_id: P2-AMEND-001
+family: COURSE_ONLY_HIERARCHICAL_ROBUST_STANDARD
+source_reference: COURSE_ONLY_ALL_HISTORY
+lookback_days: ALL_AVAILABLE_HISTORY
+course_hierarchy: [venue_distance_surface_direction, venue_distance_surface, distance_surface, surface, global]
+location_estimator: median
+shrinkage_formula: n / (n + lambda)
+shrinkage_lambda: 20
+going_adjustment: NONE
+same_day_rule: DATE_BLOCK_NO_SAME_DAY_UPDATE
+exchange_standard_update: PROHIBITED
+other_flat_results: PROHIBITED_MAIN
+class_adjustment: NONE
+model_use_status: PROVISIONAL_DEVELOPMENT_FEATURE
+confirmatory_new_data_required: true
+historical_2025_2026_reuse_for_confirmation: PROHIBITED
+new_search_added: false

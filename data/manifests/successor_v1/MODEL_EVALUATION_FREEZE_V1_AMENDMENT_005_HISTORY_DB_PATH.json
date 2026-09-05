@@ -1,0 +1,73 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_005_HISTORY_DB_PATH",
+  "parent_authority": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_004_EB_RESIDUAL_AND_KEYS",
+  "status": "FROZEN_BEFORE_FIRST_JOB004_FIT",
+  "scientific_change_class": "PATH_CORRECTION_ONLY",
+  "implementation_model": "Sol",
+  "scope": "Correct only the frozen history SQLite absolute path used by Amendment 004 EB key preflight.",
+  "supersedes_path": "/home/nabe/projects/nankan-market-residual-phase2/db/nankan_history.sqlite",
+  "canonical_history_db": {
+    "absolute_path": "/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite",
+    "access_mode": "READ_ONLY",
+    "sha256": "5fe7a9e88e25f64e51e39e27b789315ababfbe597786b26701f0e4a7f8486936",
+    "logical_v1_path": "db/nankan_history.sqlite",
+    "expected_tables": [
+      "horses",
+      "imports",
+      "race_runners",
+      "races"
+    ],
+    "expected_counts": {
+      "horses": 19086,
+      "imports": 166,
+      "race_runners": 251373,
+      "races": 21977
+    }
+  },
+  "rationale": {
+    "v1_asset_policy": "Copied V1 assets under reference/v1 are immutable read-only reference inputs in the Phase2 repository.",
+    "job003_lineage": "Job003/Job003B feature lineage is tied to the frozen V1 history DB SHA-256 above.",
+    "not_authorized": [
+      "/home/nabe/projects/nankan-market-residual-phase2/db/p2_history_context.sqlite",
+      "any live-history delta DB",
+      "original deleted predecessor repository",
+      "any DB selected by matching schema without matching frozen SHA-256"
+    ]
+  },
+  "read_policy": {
+    "sqlite_uri": "file:/home/nabe/projects/nankan-market-residual-phase2/reference/v1/db/nankan_history.sqlite?mode=ro",
+    "writes": "PROHIBITED",
+    "wal_or_sidecar_creation": "PROHIBITED; open read-only",
+    "first_seen_date": "PROHIBITED",
+    "last_seen_date": "PROHIBITED",
+    "market_tables": "PROHIBITED"
+  },
+  "preflight": {
+    "must_check_before_fit": [
+      "canonical path exists and is a regular file",
+      "SHA-256 equals frozen value",
+      "PRAGMA quick_check returns ok",
+      "expected four tables exist",
+      "table counts equal frozen counts",
+      "Job003B 244160 rows join one-to-one by (race_key, horse_number)",
+      "horse_key FK validation passes",
+      "jockey and venue key checks from Amendment 004 pass"
+    ],
+    "on_absent_or_hash_mismatch": "JOB004_BLOCKED_HISTORY_DB_AUTHORITY",
+    "fallback": "NONE"
+  },
+  "unchanged": [
+    "EB residual formula",
+    "horse/jockey/venue key definitions",
+    "EB shrinkage/backfit math",
+    "feature sets",
+    "categorical roles",
+    "race-head inputs",
+    "folds",
+    "model configs",
+    "PL",
+    "R1/R2/S2",
+    "bootstrap",
+    "probability floors"
+  ]
+}

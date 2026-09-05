@@ -1,0 +1,11 @@
+{
+  "policy_id": "P2_PRE_RACE_CAPTURE_POLICY_V1",
+  "version": "1.0.0",
+  "standard_reference": "T15",
+  "prefer_standard_t15": true,
+  "fallback_enabled": true,
+  "hard_min_seconds_to_post": 120,
+  "max_fallback_snapshot_age_seconds": 900,
+  "fallback_retry_interval_seconds": 30,
+  "fallback_max_attempts": 3
+}

@@ -1,0 +1,76 @@
+{
+  "10_races_each_venue_gate": false,
+  "14_day_gate": false,
+  "4_venue_gate": false,
+  "80_race_gate": false,
+  "calendar_days_elapsed": 1,
+  "candidate_field_availability": {
+    "CUR01_bodyweight": "INSUFFICIENT_SAMPLE",
+    "CUR02_bodyweight_change": "INSUFFICIENT_SAMPLE",
+    "CUR03_jockey_change": "INSUFFICIENT_SAMPLE",
+    "CUR04_weather": "SOURCE_NOT_READY",
+    "CUR05_track_condition": "SOURCE_NOT_READY",
+    "CUR06_active_field_size": "INSUFFICIENT_SAMPLE"
+  },
+  "candidate_field_valid_predecision_coverage": {
+    "CUR01_bodyweight": 0.0,
+    "CUR02_bodyweight_change": 0.0,
+    "CUR03_jockey_change": 0.0,
+    "CUR04_weather": 0.0,
+    "CUR05_track_condition": 0.0,
+    "CUR06_active_field_size": 0.0
+  },
+  "capture_age_met": true,
+  "capture_age_seconds_max": 4.91946,
+  "capture_offset_abs_p99_seconds": 4.91946,
+  "capture_offset_p99_met": true,
+  "duplicate_primary_key_met": true,
+  "duplicate_primary_keys": 0,
+  "eligible_races_attempted": 0,
+  "eligible_races_t15_predecision_valid": 0,
+  "evidence_class": "PROSPECTIVE_TIMESTAMPED_STABILIZATION",
+  "fatal_parser_schema_drift_count": 0,
+  "fatal_parser_schema_drift_met": true,
+  "first_collection_date": "2026-08-19",
+  "join_mismatch_met": true,
+  "late_after_decision_count": 1,
+  "latest_collection_date": "2026-08-19",
+  "meeting_identity_rule": "venue+race_date fallback; official meeting identifier is not available in current registry",
+  "missed_count": 0,
+  "outcome_access_count": 0,
+  "outcome_firewall_met": true,
+  "overall_coverage_met": false,
+  "overall_t15_coverage": 0.0,
+  "predecision_valid_count": 0,
+  "quality_gate_met": false,
+  "race_runner_join_mismatches": 0,
+  "raw_provenance_coverage": 1.0,
+  "raw_provenance_met": true,
+  "runner_snapshot_count": 44,
+  "snapshot_count": 4,
+  "stabilization_ready": false,
+  "stale_count": 0,
+  "t15_status": "ENGINEERING_CANDIDATE_NOT_FROZEN",
+  "t15_timing_counts": {
+    "LATE_AFTER_DECISION": 1
+  },
+  "venue_coverage_met": false,
+  "venue_meeting_counts": {
+    "大井": 0,
+    "川崎": 1,
+    "浦和": 0,
+    "船橋": 0
+  },
+  "venue_t15_coverage": {
+    "大井": 0.0,
+    "川崎": 0.0,
+    "浦和": 0.0,
+    "船橋": 0.0
+  },
+  "venue_valid_eligible_race_count": {
+    "大井": 0,
+    "川崎": 0,
+    "浦和": 0,
+    "船橋": 0
+  }
+}

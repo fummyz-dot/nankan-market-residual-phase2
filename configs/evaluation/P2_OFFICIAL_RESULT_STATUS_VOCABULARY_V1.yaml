@@ -1,0 +1,20 @@
+{
+  "version": "P2_OFFICIAL_RESULT_STATUS_VOCABULARY_V1",
+  "scope": "P2_M12B_R10_2026_08_01_TO_2026_08_20_OFFICIAL_FINAL_RESULTS",
+  "principles": {
+    "raw_official_display_preserved": true,
+    "unknown_finish_display_blocks": true,
+    "regex_or_substring_status_classification": false,
+    "default_status_fallback": false
+  },
+  "finish_display_mappings": {
+    "同着": {
+      "normalized_result_status": "FINISHED",
+      "finish_position_rule": "REPEAT_IMMEDIATELY_PRECEDING_NUMERIC_FINISH",
+      "required_margin_raw": "同着",
+      "required_same_finish_time": true,
+      "historical_semantic_status": "STARTER_VALID_FINISH",
+      "evidence": "Frozen historical rows preserve numeric shared finish_position with margin_raw=同着; no artificial terminal rank is assigned."
+    }
+  }
+}

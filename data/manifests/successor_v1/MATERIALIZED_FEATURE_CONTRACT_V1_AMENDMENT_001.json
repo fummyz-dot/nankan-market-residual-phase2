@@ -1,0 +1,117 @@
+{
+  "authority_id": "MATERIALIZED_FEATURE_CONTRACT_V1_AMENDMENT_001",
+  "parent_authority": "MATERIALIZED_FEATURE_CONTRACT_V1",
+  "status": "FROZEN_BEFORE_JOB003B",
+  "purpose": "Correct starter semantics discovered before first model fit. No model performance was observed.",
+  "starter_authority": "existing audited src.audit.p2_m07_target_universe.starter_status",
+  "actual_starter_statuses": [
+    "STARTER_VALID_FINISH",
+    "STARTER_NO_VALID_FINISH"
+  ],
+  "nonstarter_policy": {
+    "job003_v1_old_artifacts": "immutable, retained, SUPERSEDED_FOR_MODELING",
+    "nonstarter_rows_in_new_training_datasets": "EXCLUDED",
+    "expected_retained_nonstarter_rows": 2549
+  },
+  "new_canonical_training_datasets": {
+    "b0": {
+      "path": "data/processed/successor_v1/b0_safe_core_features_v1_1",
+      "race_count": 21560,
+      "row_count": 244160,
+      "feature_count": 55,
+      "ordered_feature_name_sha256": "0108ffaf8239a0522e5b5157c0ca388bca359866375f704a0d4b42937569b5f6"
+    },
+    "primary": {
+      "path": "data/processed/successor_v1/runner_primary_deterministic_features_v1_1",
+      "race_count": 21560,
+      "row_count": 244160,
+      "feature_count": 130,
+      "ordered_feature_name_sha256": "d4ccb75419a50d70bee7fd037f576a48be7dce7d4bb18b388df43fa8bcac0e82"
+    }
+  },
+  "semantic_rules": {
+    "historical_start_count": "A historical row counts as a start only when starter_status is STARTER_VALID_FINISH or STARTER_NO_VALID_FINISH and source_race_date < target_race_date.",
+    "race_composition": "Every P1_RACE_COMPOSITION aggregate is computed over current-race actual starters only. Retained cancellation/exclusion/nonstarter rows are not members of the aggregation set.",
+    "support_count_features": [
+      "prior_starts",
+      "starts_last_30d",
+      "starts_last_90d",
+      "starts_last_365d",
+      "same_venue_starts",
+      "same_distance_starts",
+      "same_venue_distance_starts",
+      "same_surface_starts",
+      "same_direction_starts",
+      "jockey_90d_starts",
+      "jockey_365d_starts",
+      "trainer_90d_starts",
+      "trainer_365d_starts",
+      "near_distance_200m_starts",
+      "same_venue_near_distance_200m_starts",
+      "same_direction_distance_starts"
+    ],
+    "race_composition_features": [
+      "comp_ability_mean",
+      "comp_ability_sd",
+      "comp_ability_top3_mean",
+      "comp_ability_gap_1_2",
+      "comp_ability_gap_3_4",
+      "comp_ability_coverage",
+      "comp_speed_mean",
+      "comp_speed_sd",
+      "comp_speed_top3_mean",
+      "comp_speed_coverage",
+      "comp_front_propensity_sum",
+      "comp_front_propensity_max",
+      "comp_front_propensity_sd",
+      "comp_history_coverage_mean",
+      "comp_uncertainty_mean",
+      "comp_uncertainty_sd"
+    ],
+    "reuse_unaffected_values": "Allowed only if an audit proves the feature is mathematically starter-insensitive or recomputation matches exactly under frozen NaN semantics. No blind copy of starter-sensitive features."
+  },
+  "provenance": {
+    "required_dataset_manifest_fields": [
+      "dataset_id",
+      "row_count",
+      "race_count",
+      "feature_count",
+      "ordered_feature_name_sha256",
+      "partition_count",
+      "partitions",
+      "feature_contract_hash",
+      "feature_contract_amendment_hash",
+      "source_db_hash",
+      "builder_commit",
+      "completed_at",
+      "starter_classifier_hash_or_code_hash"
+    ]
+  },
+  "acceptance": {
+    "race_count": 21560,
+    "row_count": 244160,
+    "retained_nonstarter_rows_in_new_training_dataset": 0,
+    "unresolved_starter_statuses": 0,
+    "support_count_semantic_mismatches_after_rebuild": 0,
+    "race_composition_semantic_mismatches_after_rebuild": 0,
+    "future_source_violations": 0,
+    "same_day_source_violations": 0,
+    "post_cutoff_target_violations": 0,
+    "current_outcome_dependency_violations": 0,
+    "market_dependency_violations": 0,
+    "first_seen_dependency_violations": 0,
+    "last_seen_dependency_violations": 0
+  },
+  "prohibitions": [
+    "model fitting",
+    "GBDT fitting",
+    "EB fitting",
+    "PL fitting",
+    "bootstrap",
+    "feature selection",
+    "threshold tuning",
+    "market/payout/ROI access",
+    "network access",
+    "overwrite of Job003 v1 canonical artifacts"
+  ]
+}

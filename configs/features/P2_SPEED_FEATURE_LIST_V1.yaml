@@ -1,0 +1,27 @@
+version: P2_SPEED_FEATURE_LIST_V1
+namespace: P2_SPD
+standard_config: P2_SPEED_STANDARD_MAIN_V1
+model_use_status: PROVISIONAL_DEVELOPMENT_FEATURE
+features:
+  - speed_prior_obs_count
+  - speed_recent3_count
+  - speed_recent5_count
+  - days_since_last_speed
+  - speed_cold_start_flag
+  - speed_last_z
+  - speed_recent3_mean_z
+  - speed_recent5_mean_z
+  - speed_recent5_best_z
+  - speed_recent5_dispersion_z
+  - speed_recent3_trend_z
+  - speed_exact_course_prior_count
+  - speed_exact_course_recent3_count
+  - speed_exact_course_last_z
+  - speed_exact_course_recent3_mean_z
+prohibited:
+  - going_conditioned_speed
+  - class_adjusted_speed
+  - field_strength_adjusted_speed
+  - rating_adjusted_speed
+  - time_decay
+  - distance_similarity_matching

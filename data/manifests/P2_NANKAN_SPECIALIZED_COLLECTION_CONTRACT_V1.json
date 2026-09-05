@@ -1,0 +1,28 @@
+{
+  "collection_contract_id": "P2_NANKAN_SPECIALIZED_COLLECTION_CONTRACT_V1",
+  "collection_contract_sha256": "1abe874932ee1ad373faccc0b83ac35828d3765c1f493d38846fc8e2554a8718",
+  "cohort_start_date": "2026-09-04",
+  "verified_at": "2026-09-03T22:00:52+09:00",
+  "code_sha256": "1deaccab0fcf031df2a725e3aa56968d09470e16ecce3e9ba76fadc2ec2e39a9",
+  "official_schedule_authority": {
+    "authority_type": "OFFICIAL_SCHEDULE_AUTHORITY_SUPPLIED_IN_P2_NANKAN_SPECIALIZED_PROSPECTIVE_DATA_CONTRACT_033_DESIGN_AUTHORITY_SUPPLEMENT_V1",
+    "entries": [
+      {"date": "2026-09-04", "venue": "大井", "race_number": 1, "scheduled_post_time_jst": "14:50", "decision_time_jst": "14:35"},
+      {"date": "2026-09-07", "venue": "川崎", "statement": "next Nankan meeting begins"}
+    ]
+  },
+  "contract_scope": {
+    "measurement_only": true,
+    "exact_t15_window_seconds": [-60, 0],
+    "runner_major_fields": ["bodyweight_kg", "bodyweight_change", "current_jockey_id", "jockey_change_status"],
+    "race_major_fields": ["going", "weather"],
+    "current_major_coverage": "min(runner_major_coverage,race_major_coverage)",
+    "current_major_minimum": 0.95,
+    "same_day_poll_offsets_seconds": [120, 180, 240, 300, 420, 600],
+    "same_day_request_timeout_seconds_max": 8,
+    "same_day_t15_protection_window_seconds": [-90, 30],
+    "actual_betting": "DISABLED",
+    "predictive_model_changes": 0,
+    "betting_policy_changes": 0
+  }
+}

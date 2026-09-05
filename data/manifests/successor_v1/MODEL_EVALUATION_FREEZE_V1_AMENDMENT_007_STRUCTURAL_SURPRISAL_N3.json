@@ -1,0 +1,96 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_007_STRUCTURAL_SURPRISAL_N3",
+  "parent_authority": "MODEL_EVALUATION_FREEZE_V1",
+  "status": "FROZEN_BEFORE_RACE_HEAD_FINAL_FIT",
+  "scientific_change_class": "DOMAIN_COMPLETION_BEFORE_RACE_HEAD_PL_BOOTSTRAP",
+  "implementation_model": "Sol",
+  "scope": "Define structural_top3_surprisal semantics for races with exactly 3 actual starters.",
+  "structural_target": {
+    "base_formula_for_n_ge_4": "U_r = -log(max(P0(A_r), 1e-12)) / log(C(n_r,3))",
+    "eligible_condition": "n_r >= 4",
+    "n_eq_3": {
+      "status": "STRUCTURAL_TARGET_UNDEFINED_TRIVIAL_FIELD",
+      "reason": "C(3,3)=1 and the only unordered Top3 set is the full starter set, so P0(A_r)=1 and the normalized surprisal is 0/0.",
+      "U_r": null,
+      "numeric_imputation": "PROHIBITED",
+      "exclude_from_race_head_target_fit": true,
+      "exclude_from_r1": true,
+      "exclude_from_r2": true
+    }
+  },
+  "affected_known_races": [
+    "20230505_FUNABASHI_05",
+    "20230707_KAWASAKI_05"
+  ],
+  "race_head": {
+    "training_rows": "Only races with n_r >= 4 and otherwise-valid structural labels.",
+    "crossfit_prediction_rows": "Only races with n_r >= 4 are required to receive upset_score.",
+    "n_eq_3_upset_score": "NaN / NOT_APPLICABLE",
+    "n_eq_3_z_upset": 0.0,
+    "n_eq_3_temperature_rule": "Use M0 temperature T0 exactly; do not apply gamma modulation."
+  },
+  "m1_temperature_fit": {
+    "standardization_rows": "Only race-head crossfit rows with n_r >= 4.",
+    "mu_sigma": "Compute mean and population std ddof=0 from raw upset_score on n_r >= 4 M1-fit rows only.",
+    "objective_rows": "Use only n_r >= 4 races for M1 T0/gamma fitting because the temperature head is structurally undefined at n_r=3.",
+    "n_eq_3_application": "T_r = T0 regardless of gamma."
+  },
+  "r1": {
+    "evaluation_rows": "Outer-VALID races with n_r >= 4 and defined U_r only.",
+    "fold_rho": "Compute per-fold Spearman only on defined structural rows.",
+    "pooled_rho": "Compute pooled Spearman only on defined structural rows.",
+    "mae": "Compute head MAE and constant-baseline MAE only on defined structural rows.",
+    "constant_baseline_mean": "Fold-specific mean U over available outer-TRAIN crossfitted structural-label races with n_r >= 4."
+  },
+  "r2": {
+    "evaluation_rows": "Outer-VALID races with n_r >= 4 only.",
+    "delta": "NLL_M1 - NLL_M0 on structural-eligible races only.",
+    "bootstrap": "Date-block bootstrap uses the dates/races contributing to the n_r>=4 R2 evaluation; n_r=3 races contribute no R2 statistic."
+  },
+  "probability_model_and_s2": {
+    "n_eq_3_races_remain_in_probability_universe": true,
+    "b0_primary_runner_training": "UNCHANGED",
+    "outer_valid_joint_nll": "Keep n_r=3 races in ordinary B0/Primary probability evaluation; their unordered Top3 NLL is exactly 0 when integrity holds.",
+    "wide": "Keep n_r=3 races in WIDE probability outputs/metrics/floor support. Exact WIDE probability is 1 for each of the three pairs and sum pair probability is 3.",
+    "s2": "Evaluate S2 on the full accepted probability universe, including n_r=3 races. For n_r=3, selected Primary M1 equals M0 by construction because z_upset=0.",
+    "pl_integrity": "All existing PL integrity checks remain required."
+  },
+  "audit": {
+    "required_file": "/home/nabe/projects/nankan-market-residual-phase2/audit/successor_v1/job004/structural_surprisal_domain_audit.csv",
+    "minimum_columns": [
+      "fold_id",
+      "race_key",
+      "race_date",
+      "n_actual_starters",
+      "structural_target_status",
+      "U_r",
+      "race_head_fit_eligible",
+      "r1_eligible",
+      "r2_eligible",
+      "z_upset_applied",
+      "temperature_mode"
+    ],
+    "hard_checks": [
+      "all n_r=3 races are labeled STRUCTURAL_TARGET_UNDEFINED_TRIVIAL_FIELD",
+      "U_r is null/NaN for n_r=3; never 0 or fabricated",
+      "n_r=3 race-head target-fit rows = 0",
+      "n_r=3 R1 rows = 0",
+      "n_r=3 R2 rows = 0",
+      "n_r=3 z_upset = 0",
+      "n_r=3 temperature mode = M0/T0",
+      "n_r=3 races remain present in ordinary probability and WIDE outputs"
+    ]
+  },
+  "unchanged": [
+    "actual-starter universe",
+    "effective-rank target",
+    "B0/Primary CatBoost models",
+    "categorical roles",
+    "EB residual/key/state algorithms",
+    "race-head features/hyperparameters",
+    "PL formulas and optimization for n_r>=4",
+    "S2 gate",
+    "WIDE metrics and floor thresholds",
+    "market prohibition"
+  ]
+}

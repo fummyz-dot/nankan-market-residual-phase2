@@ -1,0 +1,15 @@
+version: P2_CLASS_EMPIRICAL_SELECTED_V1
+rating_family: online_pairwise_bradley_terry
+selected_config: R3
+selected_k: 1.00
+selection_period: 2021-01-01/2024-12-31
+validation_period: 2025-01-01/2025-12-31
+burn_in: 2020-01-01/2020-12-31
+same_day_rule: DATE_BLOCK_NO_SAME_DAY_UPDATE
+other_flat_results: PROHIBITED_MAIN
+exchange_updates: PROHIBITED_MAIN
+selection_tie_tolerance: 0.0001
+selected_at: 2026-08-19T09:12:29.337751+00:00
+grid_config_sha256: 394c85f847d7f457f9c0f8ea73a852abda41cb75fb9bbce5ab9f3c0f679dd49b
+result_status_config_sha256: 2a80294e69dbeab12c0ea5fec3ba31d51161c9a1ec127b013047b90a70251eab
+validation_status: EMPIRICAL_RATING_VALIDATED

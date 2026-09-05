@@ -1,0 +1,71 @@
+{
+  "acceptance": [
+    "source_adjudication_permits_use",
+    "strict_asof_implementation",
+    "same_day_exclusion_test_pass",
+    "future_row_exclusion_test_pass",
+    "current_outcome_scan_pass",
+    "feature_definition_frozen"
+  ],
+  "allowed_namespaces": [
+    "B0_STATIC",
+    "B0_ENTRY",
+    "B0_HISTORY",
+    "B0_JOCKEY",
+    "B0_TRAINER",
+    "B0_CONDITION",
+    "P1_CLASS_RULE",
+    "P1_CLASS_EMPIRICAL",
+    "P1_CLASS_UNCERTAINTY",
+    "P1_SPEED",
+    "P1_PACE",
+    "P1_CONDITION_SIMILARITY",
+    "P1_RACE_COMPOSITION",
+    "P1_EB_HORSE",
+    "P1_EB_JOCKEY",
+    "P1_EB_HORSE_VENUE",
+    "P1_EB_JOCKEY_VENUE"
+  ],
+  "contract_id": "FEATURE_AVAILABILITY_CONTRACT_V1",
+  "hard_dependency_blocks": [
+    "MARKET_TIME_UNKNOWN",
+    "horses.first_seen_date",
+    "horses.last_seen_date",
+    "official_odds",
+    "payouts",
+    "popularity",
+    "race_runners.body_weight",
+    "race_runners.body_weight_change",
+    "race_runners.finish_position",
+    "race_runners.finish_time_raw",
+    "race_runners.finish_time_seconds",
+    "race_runners.last_3f",
+    "race_runners.margin_raw",
+    "race_runners.result_status",
+    "races.corners_json",
+    "races.final_3f",
+    "races.final_4f",
+    "races.going",
+    "races.lap_times_json",
+    "races.weather",
+    "runner_market"
+  ],
+  "historical_development_cutoff": "2026-07-31",
+  "prohibited_namespaces": [
+    "P1_CURRENT",
+    "P1_SAME_DAY",
+    "P1_MARKET",
+    "P1_EXTERNAL",
+    "P1_PEDIGREE_HIGH_CARD",
+    "P1_SEQUENCE_NEURAL"
+  ],
+  "project_id": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "same_day_historical_results": "PROHIBITED",
+  "source_authority": {
+    "g0_status_is_machine_triage_only": true,
+    "path": "data/manifests/feature_source_adjudication_v1.csv",
+    "sha256": "4fbc40ad5eac0ad069ed1fe19088c1ba02e0fa607162b77ea5267d2f764adb18"
+  },
+  "status": "FROZEN_FOR_IMPLEMENTATION",
+  "strict_result_asof": "source_race_date < target_race_date"
+}

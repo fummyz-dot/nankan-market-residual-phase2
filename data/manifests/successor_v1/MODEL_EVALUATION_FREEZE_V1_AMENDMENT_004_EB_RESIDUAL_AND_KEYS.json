@@ -1,0 +1,104 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_004_EB_RESIDUAL_AND_KEYS",
+  "parent_authority": "MODEL_EVALUATION_FREEZE_V1",
+  "status": "FROZEN_BEFORE_FIRST_JOB004_FIT",
+  "scientific_change_class": "SPECIFICATION_COMPLETION_BEFORE_ANY_MODEL_FIT",
+  "precedence": "Overrides only EB residual-source definition and EB grouping-key authority. All previously frozen feature sets, CatBoost roles/configs, folds, target, race-head, PL, R1/R2/S2, bootstrap, and probability floors remain unchanged.",
+  "source_authority": {
+    "history_db_path": "/home/nabe/projects/nankan-market-residual-phase2/db/nankan_history.sqlite",
+    "history_db_sha256": "5fe7a9e88e25f64e51e39e27b789315ababfbe597786b26701f0e4a7f8486936",
+    "schema_tables": [
+      "race_runners",
+      "races",
+      "horses"
+    ],
+    "join_keys": {
+      "runner_to_db": [
+        "race_key",
+        "horse_number"
+      ],
+      "race_runners_to_races": [
+        "race_key"
+      ],
+      "race_runners_horse_fk": "race_runners.horse_key -> horses.horse_key"
+    }
+  },
+  "eb_residual": {
+    "target": "z_ri from MODEL_EVALUATION_FREEZE_V1_AMENDMENT_001 effective-rank target",
+    "base_prediction_symbol": "fhat_ri",
+    "formula": "e_ri = z_ri - fhat_ri",
+    "prediction_definition": "fhat_ri is the raw CatBoostRegressor prediction from the outer-fold selected Primary GBDT candidate, on the z target scale, before any EB effect, PL temperature, race-head temperature adjustment, or probability transformation.",
+    "outer_train_inner_oof": {
+      "candidate": "the single M1-M4 Primary candidate selected for that outer fold under the frozen inner-OOF NLL rule",
+      "prediction": "For each inner-OOF target year y, fit that selected candidate only on its frozen prefix years < y and predict year y. Use those predictions to compute e_ri.",
+      "eligible_years": "2021 through outer-TRAIN end; 2020 has no OOF residual",
+      "no_in_sample_residuals": true
+    },
+    "outer_valid_prediction_and_update": {
+      "gbdt_fit": "After candidate selection, fit one selected Primary GBDT on all outer-TRAIN rows. Do not refit GBDT during outer VALID.",
+      "prediction_before_date_d": "For every outer-VALID runner on date d, compute fhat_ri from that fixed outer-TRAIN GBDT and apply the EB state frozen before date d.",
+      "residual_after_date_d_results": "After all races on date d are scored and their results become available for evaluation, compute e_ri = z_ri - fhat_ri for date-d runners using the same fixed outer-TRAIN GBDT prediction. Only then update EB state; the update may affect dates > d only.",
+      "same_day_cross_race_update": "PROHIBITED"
+    },
+    "residual_centering_before_eb": "NONE",
+    "race_centering_before_eb": "NONE",
+    "clipping": "NONE beyond the already-frozen clipping of z_ri",
+    "pl_or_temperature_in_residual": "PROHIBITED",
+    "target_training_weight_note": "The Primary GBDT target/sample-weight contract remains 1/n_r exactly as already frozen. This amendment does not change or reinterpret EB aggregation weights."
+  },
+  "grouping_keys": {
+    "horse": {
+      "key_name": "horse_key",
+      "source": "nankan_history.sqlite.race_runners.horse_key",
+      "canonical_rule": "use exact stored TEXT value; no name-based reconstruction",
+      "missing_rule": "HARD_BLOCK",
+      "validation": "must match horses.horse_key through the existing FK for every modeling row"
+    },
+    "jockey": {
+      "key_name": "jockey_key",
+      "source": "nankan_history.sqlite.race_runners.jockey",
+      "canonical_rule": "Use the exact stored jockey TEXT token. Do not concatenate jockey_affiliation. Do not Unicode-normalize, alias-merge, case-fold, abbreviate, or construct a new ID.",
+      "missing_rule": "SQL NULL or empty/whitespace-only jockey => MISSING_JOCKEY. MISSING_JOCKEY receives jockey main effect 0 and jockey×venue effect 0 and is excluded from jockey variance-component/group statistics; do not pool missing rows into a learned group."
+    },
+    "venue": {
+      "key_name": "venue_key",
+      "source": "nankan_history.sqlite.races.venue_code",
+      "join": "race_runners.race_key = races.race_key",
+      "canonical_rule": "use exact stored venue_code TEXT",
+      "missing_rule": "HARD_BLOCK",
+      "validation": "Across the Job004 universe, venue_code must map one-to-one to races.venue and resolve to exactly the four South-Kanto venues represented by the accepted universe."
+    },
+    "interactions": {
+      "horse_venue": "tuple(horse_key, venue_key); do not build a delimiter-concatenated string key",
+      "jockey_venue": "tuple(jockey_key, venue_key) for non-missing jockey_key only; missing jockey gives zero interaction"
+    },
+    "key_contract_sha256": "0c5889faba2dc6dfcf762af298683b25f8195d8ccfa78d05ebed6bb131af412e"
+  },
+  "eb_fit_algorithm_bindings": {
+    "inheritance_rule": "All EB backfit order, group means, sigma2, tau2, n_g definitions, centering, convergence and shrinkage formulas are inherited unchanged from MODEL_EVALUATION_FREEZE_V1. Amendment 004 changes none of them.",
+    "residual_input_to_existing_algorithm": "Use e_ri = z_ri - fhat_ri as the residual observation.",
+    "layers_in_order": [
+      "horse",
+      "jockey",
+      "horse_x_venue",
+      "jockey_x_venue"
+    ],
+    "cross_venue_identifiability": "Retain the previously frozen rule: interaction is 0 where parent cross-venue identifiability is absent. Key membership is defined by this amendment."
+  },
+  "preflight": {
+    "required_before_any_model_fit": true,
+    "output": "/home/nabe/projects/nankan-market-residual-phase2/audit/successor_v1/job004/eb_residual_key_preflight.json",
+    "checks": [
+      "history DB SHA-256 matches frozen hash",
+      "244160 Job003B v1.1 runner rows join exactly one-to-one to race_runners by (race_key, horse_number)",
+      "horse_key nonmissing and FK-valid for every row",
+      "jockey source read only from race_runners.jockey",
+      "venue_key source read only from races.venue_code",
+      "venue_key nonmissing and four-venue mapping valid",
+      "first_seen_date and last_seen_date are never read for EB grouping",
+      "no market table is read",
+      "residual formula implementation unit test equals z - raw_primary_prediction exactly"
+    ],
+    "on_failure": "JOB004_BLOCKED_EB_RESIDUAL_KEY_INCONSISTENCY"
+  }
+}

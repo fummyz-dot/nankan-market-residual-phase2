@@ -1,0 +1,12 @@
+{
+  "bootstrap_for_selection": false,
+  "historical_decision": {
+    "negative": "H1_HISTORICAL_DEVELOPMENT_SIGNAL",
+    "nonnegative": "H1_HISTORICAL_NO_SIGNAL"
+  },
+  "performance_evaluated_in_m08b": false,
+  "primary_score": "pooled_outer_validation_race_equal_mean_candidate_minus_calibrated_market_ll",
+  "selection": "smallest_pooled_mean_delta",
+  "venue_or_best_month_selection": "PROHIBITED",
+  "version": "P2_WIN_H1_SELECTION_RULE_V1"
+}

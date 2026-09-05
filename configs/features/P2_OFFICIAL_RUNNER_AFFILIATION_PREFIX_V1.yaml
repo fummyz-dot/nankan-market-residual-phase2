@@ -1,0 +1,20 @@
+contract_id: P2_OFFICIAL_RUNNER_AFFILIATION_PREFIX_V1
+purpose: OFFICIAL_CARD_DISPLAY_NAME_TO_IDENTITY_COMPARISON_NAME
+canonical_identity: P2_HORSE_IDENTITY_V1
+raw_display_preserved: true
+approved_prefixes:
+  "[J]":
+    official_affiliation_values: [JRA]
+    evidence_status: OFFICIAL_CARD_AFFILIATION_AUDITED
+  "[兵]":
+    official_affiliation_values: [兵庫]
+    evidence_status: OFFICIAL_CARD_AFFILIATION_AUDITED
+  "[高]":
+    official_affiliation_values: [高知]
+    evidence_status: OFFICIAL_CARD_AFFILIATION_AUDITED
+prohibited:
+  - arbitrary_bracket_removal
+  - nonleading_prefix_removal
+  - fuzzy_name_normalization
+  - name_only_join
+  - unobserved_prefix_preauthorization

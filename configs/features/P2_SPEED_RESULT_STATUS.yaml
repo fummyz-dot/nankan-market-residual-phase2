@@ -1,0 +1,12 @@
+version: P2_SPEED_RESULT_STATUS_V1
+scope: P2_SPD_MAIN_V1
+safe_exact_statuses: [FINISHED]
+requirements:
+  finish_time_seconds: finite_positive
+  distance_m: positive
+  race_identity: valid
+unknown_status_policy: EXCLUDE_FROM_SPEED_OBSERVATION
+notes: >-
+  FINISHED is the only observed safe status in the audited South Kanto corpus.
+  RAW_FINISH_STATUS_MISSING has no numeric finish time and is excluded without
+  semantic reconstruction.

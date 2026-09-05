@@ -1,0 +1,38 @@
+{
+  "T15_equivalence": false,
+  "backend": "LIGHTGBM_GBDT",
+  "backend_version": "4.7.0",
+  "bootstrap_one_sided_upper": 0.008579365500509702,
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 20260818,
+  "bootstrap_two_sided_ci": [
+    -0.008643063998432404,
+    0.00992506977477533
+  ],
+  "config_grid_hash": "5d1ae8c6697c61e5c6dd7511156cedb91079639779204daa9389764a93c0bc43",
+  "development_signal_status": "H1_HISTORICAL_NO_SIGNAL",
+  "evidence_status": "DEVELOPMENT_EVALUATION_WITH_RECORDED_PROTOCOL_INCIDENT",
+  "feature_set": "FS00_LEGACY",
+  "hypothesis": "H1",
+  "market_evidence_class": "HISTORICAL_MARKET_TIME_UNKNOWN",
+  "primary_probability_edge_confirmed": false,
+  "prospective_outcomes_used": false,
+  "protocol_incident": {
+    "id": "P2-INC-001",
+    "incidental_peeks": 1,
+    "outer_validation_contaminated": false,
+    "recorded": true
+  },
+  "recovery_config_hash": "f387483ea0339dfc495de3fcbe8caed06baee4929b9d563a8fa9e6c8832f15a5",
+  "search_budget": {
+    "configured": 6,
+    "evaluated": 6,
+    "remaining": 0
+  },
+  "selected_config_id": "H1-C06",
+  "selected_pooled_candidate_ll": 1.7457589458187202,
+  "selected_pooled_delta_ll": 0.0008409107783122695,
+  "selected_pooled_market_ll": 1.7449180350404083,
+  "selection_rule_hash": "7b09db580b80eb78d6cc8862428608caaa0d85ef69e73891da1743e13c86e8bc",
+  "walkforward_hash": "d7c6d5fc986567f0f73c860c8b2d97084b1aa356119671c5dec8c92196f2b8c0"
+}

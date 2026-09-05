@@ -1,0 +1,156 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_006_EB_STATE_UPDATE",
+  "parent_authority": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_004_EB_RESIDUAL_AND_KEYS",
+  "status": "FROZEN_BEFORE_FIRST_JOB004_FIT",
+  "scientific_change_class": "SPECIFICATION_COMPLETION_BEFORE_ANY_MODEL_FIT",
+  "implementation_model": "Sol",
+  "precedence": "Overrides only the previously underspecified EB inner-OOF score replay and outer-VALID state update procedure. Residual/key authority remains Amendment 004; history DB path remains Amendment 005. All other freezes remain unchanged.",
+  "algorithm_contract_sha256": "c9aa8c3c7ccec686443f1f78c19dc5a31485461cd0caac3d6cad5d463256140b",
+  "numerics": {
+    "dtype": "float64",
+    "observation_sort": [
+      "race_date",
+      "race_key",
+      "horse_number"
+    ],
+    "single_thread_reference": true,
+    "nan_or_inf_in_residual_or_effect": "HARD_BLOCK"
+  },
+  "observations": {
+    "residual": "e_i = z_i - fhat_i, with fhat_i the raw selected Primary GBDT prediction",
+    "group_count_n_g": "integer count of contributing residual observations in group g",
+    "eb_observation_weighting": "UNWEIGHTED arithmetic observation means/counts for EB; do not use 1/n_r as EB group weight",
+    "note": "The frozen 1/n_r weight remains the GBDT target/sample-weight contract; it is not the EB group-statistic weight."
+  },
+  "layer_definitions": {
+    "order": [
+      "horse",
+      "jockey",
+      "horse_x_venue",
+      "jockey_x_venue"
+    ],
+    "horse": {
+      "contributing_rows": "all residual rows",
+      "group_key": "horse_key"
+    },
+    "jockey": {
+      "contributing_rows": "rows with nonmissing jockey_key only",
+      "group_key": "jockey_key",
+      "missing_effect": 0.0
+    },
+    "horse_x_venue": {
+      "contributing_rows": "rows whose horse_key parent is observed in at least 2 distinct venue_key values within the dataset D used to build the state",
+      "group_key": [
+        "horse_key",
+        "venue_key"
+      ],
+      "parent_key": "horse_key",
+      "ineligible_parent_effect": 0.0
+    },
+    "jockey_x_venue": {
+      "contributing_rows": "rows with nonmissing jockey_key whose jockey parent is observed in at least 2 distinct venue_key values within dataset D",
+      "group_key": [
+        "jockey_key",
+        "venue_key"
+      ],
+      "parent_key": "jockey_key",
+      "ineligible_or_missing_effect": 0.0
+    }
+  },
+  "single_layer_update": {
+    "adjusted_residual": "For layer L, r_i^(-L) = e_i - sum_{K != L} a_K(key_K(i)). Use Gauss-Seidel values: layers already updated in the current cycle use new values; layers not yet updated use previous-cycle values.",
+    "sigma2_reestimate_mode": "sigma2_L = mean((r_i^(-L))^2) over L-contributing rows, ddof=0",
+    "m_g": "arithmetic mean of r_i^(-L) within group g",
+    "n_g": "integer number of L-contributing observations in group g",
+    "w_g": "n_g / sum_g n_g",
+    "mu": "sum_g w_g*m_g",
+    "var_w": "sum_g w_g*(m_g-mu)^2",
+    "e_inv_n": "sum_g w_g*(1/n_g)",
+    "tau2_reestimate_mode": "max(0, var_w - sigma2_L*e_inv_n)",
+    "raw_effect": "if tau2_L == 0 then 0 else a_raw_g = tau2_L/(tau2_L + sigma2_L/n_g) * m_g",
+    "fixed_component_mode": "Do not recompute sigma2_L or tau2_L. Use the frozen outer-TRAIN pair for layer L, but recompute m_g and n_g from the current cumulative dataset D."
+  },
+  "interaction_centering": {
+    "when": "immediately after raw effects for that interaction layer are computed, before moving to the next layer",
+    "formula": "For each identifiable parent p: c_p = sum_g(n_g*a_raw_g)/sum_g(n_g), over venue groups g under p; set a_g = a_raw_g - c_p.",
+    "less_than_two_venues": "all interaction effects under that parent are exactly 0",
+    "main_effects": "not altered by interaction centering"
+  },
+  "backfit": {
+    "initial_effects": "all effect maps exactly 0 at the start of every reference backfit call",
+    "cycle_order": [
+      "horse",
+      "jockey",
+      "horse_x_venue",
+      "jockey_x_venue"
+    ],
+    "max_cycles": 20,
+    "convergence": "After each full 4-layer cycle, compute max absolute effect change over the union of all keys from previous/current cycle, treating absent keys as 0. Stop if < 1e-5.",
+    "if_not_converged_by_cycle_20": "Use cycle-20 effects deterministically and record converged=false plus final max change as a warning; do not tune iterations or thresholds.",
+    "numerical_failure": "NaN/Inf or invalid denominator => HARD_BLOCK"
+  },
+  "inner_oof_eb_score_for_pl": {
+    "mode": "DATE_CAUSAL_REPLAY",
+    "selected_candidate": "For each outer fold, first select one Primary candidate M1-M4 under the already-frozen selection rule. Then construct that candidate's strict inner-OOF raw predictions/residuals.",
+    "chronology": "Process unique race_date values ascending across eligible inner-OOF rows, starting in 2021. All races on the same date are simultaneous.",
+    "state_dataset_for_date_d": "D_<d = selected-candidate inner-OOF residual rows with race_date < d only",
+    "components_for_date_d": "Run reference backfit on D_<d in REESTIMATE mode. sigma2/tau2 are estimated only from D_<d. Future dates and date-d residuals are prohibited.",
+    "empty_history": "all four EB effects are 0",
+    "score_formula": "S_i^OOF = fhat_i^OOF + a_horse + a_jockey + a_horse_x_venue + a_jockey_x_venue, using the state built from D_<d",
+    "after_date_d": "Only after all date-d races have been scored, their historical targets may be used to form e=z-fhat and become available to dates > d.",
+    "pl_fit_input": "PL M0/M1 fitting must use these date-causal S_i^OOF scores; full-period backfit scores are prohibited."
+  },
+  "outer_train_freeze": {
+    "D_train": "all selected-candidate strict inner-OOF residual rows available in the outer-TRAIN period (2021..train end)",
+    "component_estimation": "Run reference backfit on D_train in REESTIMATE mode from zero. For each layer, save sigma2_L and tau2_L from that layer's update in the final executed cycle.",
+    "nonconverged": "If cycle 20 is reached, freeze the cycle-20 component values and emit warning.",
+    "initial_valid_effects": "After freezing the four (sigma2_L,tau2_L) pairs, run a second reference backfit on the same D_train from zero in FIXED_COMPONENT mode. These effects are the state for the first outer-VALID date.",
+    "component_freeze_scope": "The four sigma2/tau2 pairs are fixed for the entire outer-VALID fold."
+  },
+  "outer_valid_updates": {
+    "gbdt": "selected Primary GBDT is fitted once on all outer-TRAIN rows and fixed through outer VALID",
+    "before_date_d": "All races on date d use the EB effect maps frozen after processing dates < d. No result from date d may affect any date-d race.",
+    "score_formula": "S_i = fhat_i_fixed_outer_train_GBDT + a_horse + a_jockey + a_horse_x_venue + a_jockey_x_venue",
+    "date_d_residual": "After all date-d races are evaluated, compute e_i=z_i-fhat_i using the same fixed outer-TRAIN GBDT raw prediction; do not subtract EB effects from this residual.",
+    "cumulative_dataset": "D_state_after_d = D_train union all outer-VALID residual rows from dates <= d",
+    "update_algorithm": "Rebuild the entire EB effect state by running reference backfit from zero on D_state_after_d in FIXED_COMPONENT mode using the outer-TRAIN frozen sigma2/tau2 pairs.",
+    "incremental_shortcut": "An optimized/cached implementation is permitted only if it is numerically equivalent to the reference full cumulative rebackfit on a deterministic audit fixture; otherwise use the reference algorithm.",
+    "same_day_update": "PROHIBITED",
+    "variance_component_reestimation_in_valid": "PROHIBITED"
+  },
+  "audit_requirements": {
+    "state_audit_columns_minimum": [
+      "fold_id",
+      "race_date",
+      "phase",
+      "state_residual_rows",
+      "horse_groups",
+      "jockey_groups",
+      "horse_venue_groups",
+      "jockey_venue_groups",
+      "sigma2_horse",
+      "tau2_horse",
+      "sigma2_jockey",
+      "tau2_jockey",
+      "sigma2_horse_venue",
+      "tau2_horse_venue",
+      "sigma2_jockey_venue",
+      "tau2_jockey_venue",
+      "backfit_cycles",
+      "converged",
+      "final_max_abs_change"
+    ],
+    "inner_oof_causality_checks": [
+      "max residual source date used for score on d is < d",
+      "date-d residual rows used before date-d scoring = 0",
+      "full-period inner-OOF backfit used for PL score = NO"
+    ],
+    "outer_valid_checks": [
+      "sigma2/tau2 changed after outer-TRAIN freeze = 0",
+      "date-d residual used for any date-d score = 0",
+      "state residual row count is monotone nondecreasing",
+      "GBDT refit during outer VALID = 0"
+    ],
+    "on_semantic_failure": "JOB004_BLOCKED_EB_STATE_UPDATE_INCONSISTENCY"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "version": "P2_WIN_H2_NAR_CORE_HISTORICAL_V1",
+  "formal_execution_guard": "P2_FORMAL_M10_EVALUATION=1",
+  "backend_config_source": "H1-C06",
+  "backend": "LIGHTGBM_GBDT",
+  "feature_candidates": [
+    {"candidate_id": "H2-C01", "feature_set_id": "FS01_LEGACY_SPD", "role": "SPEED_ABLATION"},
+    {"candidate_id": "H2-C02", "feature_set_id": "FS02_LEGACY_SPD_PACE", "role": "PACE_CUMULATIVE_ABLATION"},
+    {"candidate_id": "H2-C03", "feature_set_id": "FS03_LEGACY_SPD_PACE_CLASS_RULE", "role": "CLASS_RULE_ABLATION"},
+    {"candidate_id": "H2-C04", "feature_set_id": "FS04_LEGACY_SPD_PACE_CLASS_FULL", "role": "NAR_CORE_PRIMARY_DEVELOPMENT_CANDIDATE"}
+  ],
+  "primary_nar_core_candidate": "H2-C04",
+  "selection_among_C01_C04": "NONE",
+  "comparison": "CALIBRATED_MARKET",
+  "incremental_ablation_order": ["FS00_LEGACY", "FS01_LEGACY_SPD", "FS02_LEGACY_SPD_PACE", "FS03_LEGACY_SPD_PACE_CLASS_RULE", "FS04_LEGACY_SPD_PACE_CLASS_FULL"],
+  "folds": "EXACT_M09",
+  "gamma": "REUSE_EXACT_M09_FOLD_VALUES",
+  "zero_tree": "ZERO_TREE_BASELINE_EARLY_STOPPING_CLARIFICATION_V1",
+  "bootstrap": {"candidate": "H2-C04", "replicates": 10000, "seed": 20260818, "block": "race_date"},
+  "market_evidence_class": "HISTORICAL_MARKET_TIME_UNKNOWN",
+  "evidence_status": "DEVELOPMENT_REFERENCE_ONLY",
+  "fresh_holdout": false,
+  "prior_h1_results_seen": true,
+  "protocol_incident_lineage": "P2-INC-001",
+  "vcs_mode": "none"
+}

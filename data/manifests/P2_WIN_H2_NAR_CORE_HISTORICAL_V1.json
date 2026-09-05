@@ -1,0 +1,58 @@
+{
+  "T15_equivalence": false,
+  "backend": "LIGHTGBM_GBDT",
+  "backend_config_source": "H1-C06",
+  "bootstrap_one_sided_upper": 0.010085598919874107,
+  "bootstrap_replicates": 10000,
+  "bootstrap_seed": 20260818,
+  "bootstrap_two_sided_ci": [
+    -0.006942379521792435,
+    0.011581868710918809
+  ],
+  "candidate_sets": [
+    "H2-C01",
+    "H2-C02",
+    "H2-C03",
+    "H2-C04"
+  ],
+  "code_manifest_sha256": "7edda27a14f694f8dd2796e4e4cea4087f69a6f45b7851fff42e079c824075e2",
+  "config_hashes": {
+    "backend": "54f88883b329609e6cb7dfc8431e4b89f72190440f40df1bea5f741f12f82e7e",
+    "h1_grid": "5d1ae8c6697c61e5c6dd7511156cedb91079639779204daa9389764a93c0bc43",
+    "h2_budget": "0b0904b3acb0c32ed94afaac4af5a86eecbd94bf65b5c907cf34d18a879ce672",
+    "m10_protocol": "f87bd9bde8ec8ad8d042eee22bcf87a2abf1ec409291569938b35d2df9373166"
+  },
+  "development_signal_status": "H2_NAR_CORE_HISTORICAL_NO_SIGNAL",
+  "evidence_status": "DEVELOPMENT_REFERENCE_ONLY",
+  "fresh_holdout": false,
+  "fs04_candidate_ll": 1.747233607345758,
+  "fs04_delta": 0.0023155723053499225,
+  "fs04_market_ll": 1.7449180350404083,
+  "fs04_vs_fs00_delta": 0.0014746615270376535,
+  "hypothesis": "H2_RACING_INFORMATION_RESIDUAL",
+  "incremental": {
+    "class_full": 0.0020818088332556868,
+    "class_rule": 0.0,
+    "pace": -0.0007956806862279623,
+    "speed": 0.00018853338000992888
+  },
+  "input_hashes": {
+    "m09_frame": "3cb7d844aa53e4b303ebb078bae096382e4482f57c121471b337db65f02e090e",
+    "m09_manifest": "717d804c8252dd01a8860b2211cfcb0685a3155174fc55b18eb2eb315052aff0",
+    "matrix": "c3e7c0bc61c9ec8972489eba06bc68f0df1dafe4a93a61830dae5fbcfde98662",
+    "metadata": "e660434cffebb49684f92cf42b5ba077602a1d2c1e2fe07d3f90bee5140a8217"
+  },
+  "market_evidence_class": "HISTORICAL_MARKET_TIME_UNKNOWN",
+  "primary_gamma_frozen": false,
+  "primary_nar_core_candidate": "H2-C04",
+  "prior_h1_results_seen": true,
+  "probability_edge_confirmed": false,
+  "protocol_incident_lineage": "P2-INC-001",
+  "search_budget": {
+    "evaluated_after_m10": 4,
+    "maximum": 6,
+    "remaining": 2
+  },
+  "selection_among_partial_sets": false,
+  "substage": "NAR_HISTORICAL_CORE"
+}

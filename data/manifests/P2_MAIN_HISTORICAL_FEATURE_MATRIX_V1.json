@@ -1,0 +1,32 @@
+{
+  "built_at": "2026-08-19T11:36:01.163561+00:00",
+  "class_manifest_hash": "215dba182b0dfc81e02614fcd8f5be1114586be6d1d76ed65dda92e63fb82a6c",
+  "date_max": "2026-07-31",
+  "date_min": "2020-01-01",
+  "development_only": true,
+  "duplicate_keys": 0,
+  "feature_set_registry_hash": "a52a5828dda0bde0a38b6d2fd484320ed44654356c380938cdee1b57c726b4bb",
+  "final_holdout_eligible": false,
+  "history_db_sha256": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+  "lineage_registry_hash": "16ff1c11181d62d28fa2bbf119910e6193f032d5929e664561cc8aedbca85eba",
+  "logical_matrix_hash": "efa7a8211100ec8dfa0550edefcdb8404e9562271bada135be674cd332123129",
+  "logical_metadata_hash": "764177cd615e36a78587d0b35ff734bcc4e6aee3fdcd2aa27ca1c5646a493bd6",
+  "matrix_path": "data/feature_store/p2_main/historical/nankan_runner_feature_matrix_v1.csv.gz",
+  "metadata_path": "data/feature_store/p2_main/historical/nankan_runner_feature_metadata_v1.csv.gz",
+  "namespace_feature_counts": {
+    "P2_CLASS_EMPIRICAL": 7,
+    "P2_CLASS_RULE": 8,
+    "P2_CLASS_UNCERTAINTY": 9,
+    "P2_PACE": 20,
+    "P2_SPD": 15,
+    "V1": 119
+  },
+  "pace_manifest_hash": "27be1aac17e7109d404683273d2395ebf3d24d23f03aaaede17aefab780141e4",
+  "post_cutoff_rows": 0,
+  "race_count": 21849,
+  "row_count": 250093,
+  "speed_manifest_hash": "aa4373594062d6c7ecfa3b516d9368e1de8265c915812adf6d95732f67262335",
+  "total_model_feature_count": 178,
+  "v1_builder_code_hash": "cd78c7d42dc5e93251e6e195dab1de49a0eaeb2a18f75d1c3579c831a80c5301",
+  "v1_feature_list_hash": "621e0c3cc69745c641aa77299cf306472800daffe70fb561d54a778c470d10c2"
+}

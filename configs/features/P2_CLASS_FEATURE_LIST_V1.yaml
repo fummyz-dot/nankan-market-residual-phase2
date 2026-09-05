@@ -1,0 +1,32 @@
+version: P2_CLASS_FEATURE_LIST_V1
+rule:
+  - ruleset_id
+  - class_top_code
+  - class_bottom_code
+  - class_top_ordinal
+  - class_bottom_ordinal
+  - mixed_class_flag
+  - race_taxonomy_code
+  - race_grade_code
+empirical:
+  - rating_pre
+  - field_strength_shrunk_mean
+  - runner_strength_delta
+  - race_strength_delta
+  - official_class_top_step
+  - official_class_bottom_step
+  - official_class_direction
+uncertainty:
+  - rating_prior_nankan_races
+  - rating_prior_valid_pairs
+  - days_since_last_nankan_rating_race
+  - cold_start_flag
+  - rating_information_depth
+  - field_rating_coverage
+  - context_prior_sample_count
+  - context_fallback_level
+  - initial_global_zero_flag
+excluded:
+  - other_flat_prior_start_count
+  - group_numbers_json
+  - program_points_status

@@ -1,0 +1,30 @@
+{
+  "authority_id": "MODEL_EVALUATION_FREEZE_V1_AMENDMENT_002_RACE_HEAD_INPUTS",
+  "parent_authority": "MODEL_EVALUATION_FREEZE_V1",
+  "status": "FROZEN_BEFORE_FIRST_JOB004_FIT",
+  "precedence": "Overrides only race-head input construction.",
+  "race_head": {
+    "row_unit": "one row per race",
+    "source_dataset": "runner_primary_deterministic_features_v1_1",
+    "source_rows": "actual starters only",
+    "feature_count": 32,
+    "ordered_features": ["calendar_month", "day_of_week", "venue", "race_number", "race_type", "surface", "direction", "distance_m", "log_prize_1", "log_prize_total", "class_code", "class_ordinal", "class_known_flag", "mixed_class_flag", "age_condition_code", "sex_restriction_flag", "comp_ability_mean", "comp_ability_sd", "comp_ability_top3_mean", "comp_ability_gap_1_2", "comp_ability_gap_3_4", "comp_ability_coverage", "comp_speed_mean", "comp_speed_sd", "comp_speed_top3_mean", "comp_speed_coverage", "comp_front_propensity_sum", "comp_front_propensity_max", "comp_front_propensity_sd", "comp_history_coverage_mean", "comp_uncertainty_mean", "comp_uncertainty_sd"],
+    "ordered_feature_name_sha256": "d65c205307ea63b58b3f284530d6daa747f04bb3411c068c3430735860a11303",
+    "categorical_features": ["venue", "race_type", "surface", "direction", "class_code", "age_condition_code"],
+    "numeric_features": ["calendar_month", "day_of_week", "race_number", "distance_m", "log_prize_1", "log_prize_total", "class_ordinal", "class_known_flag", "mixed_class_flag", "sex_restriction_flag", "comp_ability_mean", "comp_ability_sd", "comp_ability_top3_mean", "comp_ability_gap_1_2", "comp_ability_gap_3_4", "comp_ability_coverage", "comp_speed_mean", "comp_speed_sd", "comp_speed_top3_mean", "comp_speed_coverage", "comp_front_propensity_sum", "comp_front_propensity_max", "comp_front_propensity_sd", "comp_history_coverage_mean", "comp_uncertainty_mean", "comp_uncertainty_sd"],
+    "categorical_missing_value": "__MISSING__",
+    "numeric_missing_value": "NaN",
+    "no_imputation": true,
+    "no_scaling_before_catboost": true,
+    "race_row_construction": {"rule": "Each selected feature must be constant across actual-starter rows in a race; take that single value.", "numeric_nan_equality": "all-NaN valid; mixed NaN/non-NaN invalid", "floating_constancy_tolerance": 1e-12, "categorical_constancy": "exact after __MISSING__", "on_violation": "JOB004_BLOCKED_RACE_HEAD_INPUT_INCONSISTENCY"},
+    "explicitly_forbidden": ["field_size", "starter_count", "runner_count", "horse_number", "frame_number", "assigned_weight", "racing_age", "sex", "jockey_affiliation", "trainer_affiliation", "raw jockey identity", "raw trainer identity", "individual runner history beyond frozen comp_*", "upset_score input", "B0/Primary predictions", "EB effects", "PL probability", "market", "odds", "popularity", "payout", "current outcome", "same-day result", "first_seen_date", "last_seen_date"],
+    "target": {"name": "structural_top3_surprisal", "formula": "U_r=-log(max(P0(actual_unordered_top3_set),1e-12))/log(C(n_r,3))", "P0_authority": "strict OOF B0 PL under frozen temporal rules", "target_is_never_input": true},
+    "crossfit": {"structural_label_2021": "T0=1.0", "structural_label_y_ge_2022": "B0 T0 fitted only from earlier inner-OOF years", "race_head_prediction_2021": "NOT_AVAILABLE", "race_head_prediction_y_ge_2022": "train only on prior structural-label years; predict y", "outer_valid_prediction": "train on all outer-TRAIN structural-label races 2021..train end; predict outer VALID", "same_day_update": "PROHIBITED"},
+    "catboost_config": {"task_type": "CPU", "loss_function": "Huber:delta=1.0", "iterations": 400, "depth": 4, "learning_rate": 0.03, "l2_leaf_reg": 20.0, "random_seed": 260904, "random_strength": 0.0, "bootstrap_type": "No", "grow_policy": "SymmetricTree", "boosting_type": "Plain", "has_time": true, "allow_writing_files": false, "thread_count": 1, "verbose": false, "use_best_model": false},
+    "row_sort_before_fit_predict": ["race_date", "race_key"],
+    "sample_weight": "1.0 per race",
+    "hyperparameter_search": "PROHIBITED"
+  },
+  "m1_upset_standardization": {"fit_rows": "inner-OOF race-head predictions eligible for M1 fitting, years 2022..outer TRAIN end", "mu": "arithmetic mean of raw upset_score, equal race weight", "sigma": "population std ddof=0 of raw upset_score, equal race weight", "z_formula": "clip((upset_score-mu)/sigma,-3,3)", "zero_sigma": "sigma<1e-12 => M1 unavailable, gamma=0", "outer_valid_application": "use outer-TRAIN frozen mu/sigma", "r1_uses": "raw upset_score"},
+  "preflight": {"required_before_any_race_head_fit": true, "checks": ["all 32 features exist in v1.1 Primary", "feature count/hash match", "race-constant violations=0", "forbidden features=0", "race-head row count=21560", "duplicate race_key=0", "market dependency=0", "current outcome dependency=0"]}
+}

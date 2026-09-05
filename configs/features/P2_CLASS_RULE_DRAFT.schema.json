@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "allOf": [
+    {
+      "not": {
+        "required": [
+          "empirical_strength",
+          "class_delta",
+          "same_day_bias"
+        ]
+      }
+    }
+  ],
+  "description": "Non-ordinal class text normalization only. No empirical strength or class delta is produced.",
+  "properties": {
+    "age_scope": {
+      "type": "string"
+    },
+    "class_token": {
+      "type": "string"
+    },
+    "conditions_normalized": {
+      "type": "string"
+    },
+    "conditions_raw": {
+      "type": "string"
+    },
+    "grade_token": {
+      "type": "string"
+    },
+    "mapping_status": {
+      "type": "string"
+    },
+    "mapping_version": {
+      "type": "string"
+    },
+    "race_date": {
+      "type": "string"
+    },
+    "race_key": {
+      "type": "string"
+    },
+    "race_type": {
+      "type": "string"
+    },
+    "sex_scope": {
+      "type": "string"
+    },
+    "venue": {
+      "type": "string"
+    },
+    "weight_condition": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "race_key",
+    "race_date",
+    "venue",
+    "conditions_raw",
+    "conditions_normalized",
+    "age_scope",
+    "sex_scope",
+    "weight_condition",
+    "race_type",
+    "class_token",
+    "mapping_version",
+    "mapping_status"
+  ],
+  "title": "P2_CLASS_RULE draft schema",
+  "type": "object",
+  "version": "P2_CLASS_RULE_DRAFT_v1"
+}

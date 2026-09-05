@@ -1,0 +1,33 @@
+version: P2_CLASS_RULESET_REGISTRY_v1
+scope: NANKAN_TARGET_ONLY
+rulesets:
+  - ruleset_id: NANKAN_LEGACY_PRIZE_BASED
+    effective_from: null
+    effective_to: 2023-03-31
+    applicable_age_scope: ALL
+    class_system: NANKAN_CLASS_LABELS
+    basis: PRIZE_ACCUMULATION
+    official_source_ids: [NKR-2023-02-20]
+    evidence_status: OFFICIAL_CONFIRMED
+    threshold_table_status: UNRESOLVED
+    notes: Legacy thresholds are not reconstructed from prizes.
+  - ruleset_id: NANKAN_POINTS_2YO_PILOT_2023
+    effective_from: 2023-04-01
+    effective_to: 2023-12-31
+    applicable_age_scope: 2YO_ONLY
+    class_system: NANKAN_CLASS_LABELS
+    basis: PROGRAM_POINTS
+    official_source_ids: [NKR-2023-02-20]
+    evidence_status: OFFICIAL_CONFIRMED
+    threshold_table_status: PARTIALLY_CONFIRMED
+    notes: Applies only to 2-year-old races from the documented pilot date.
+  - ruleset_id: NANKAN_POINTS_ALL_HORSES_2024
+    effective_from: 2024-01-01
+    effective_to: null
+    applicable_age_scope: ALL_NANKAN_HORSES
+    class_system: NANKAN_CLASS_LABELS
+    basis: PROGRAM_POINTS
+    official_source_ids: [NKR-2023-10-24, NKR-PROGRAM-QA]
+    evidence_status: OFFICIAL_CONFIRMED
+    threshold_table_status: OFFICIAL_CONFIRMED
+    notes: Historical race-level program points are still not available as-of.

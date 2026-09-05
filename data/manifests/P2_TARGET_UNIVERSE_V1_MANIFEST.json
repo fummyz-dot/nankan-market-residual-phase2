@@ -1,0 +1,32 @@
+{
+  "built_at": "2026-08-19T11:50:24.849977+00:00",
+  "date_max": "2026-07-31",
+  "date_min": "2020-01-01",
+  "development_frozen": true,
+  "final_holdout_frozen": false,
+  "history_db_hash": "cd17b70631af3f17c4a67034f840b0362ba37f0698708c0aa059f6bbe464e07f",
+  "model_foundation_config_hash": "135ba7623c389ecf2e0f8bdf56efa6c242adcbee8d0f49582352b5bb7c4e44af",
+  "outcome_semantics_version": "P2_OUTCOME_SEMANTICS_V1",
+  "race_counts_by_status": {
+    "PRIMARY_ELIGIBLE": 12251,
+    "PRIMARY_EXCLUDED": 4374,
+    "SECONDARY_ONLY": 5224
+  },
+  "race_output_logical_hash": "675eab2c7a7dc6a8c937a7fd053cd25e6314292936d62fa4622acabd19bb6152",
+  "race_output_path": "data/curated/p2_target/nankan_race_target_universe_v1.csv.gz",
+  "reason_counts": {
+    "BELOW_PRIMARY_CLASS_FLOOR_C3": 3376,
+    "CLASS_FLOOR_UNVERIFIABLE": 5111,
+    "EXPLICIT_CLASS_C2_OR_HIGHER": 11566,
+    "HIGH_LEVEL_SPECIAL_OR_OPEN": 685,
+    "JRA_EXCHANGE": 214,
+    "LOCAL_EXCHANGE_CLASS_FLOOR_UNVERIFIABLE": 44,
+    "NEWCOMER": 784,
+    "UNRESOLVED_EXCHANGE_TYPE": 69
+  },
+  "review_required_count": 0,
+  "runner_outcome_logical_hash": "83d06e656ef976f063a1cc33a362540d9e0ec56a7a0aa13063fcf92f4d7691ef",
+  "runner_outcome_output_path": "data/curated/p2_target/nankan_runner_outcome_semantics_v1.csv.gz",
+  "source_class_rule_hash": "fa1fb658e5ba39cebd2b6475ff1663d29c6dcf797e26b7f1c187ce2b42463cce",
+  "target_universe_version": "P2_PRIMARY_RACE_UNIVERSE_V1"
+}
