@@ -11,6 +11,7 @@ import csv
 import hashlib
 import inspect
 import json
+import platform
 import subprocess
 import sys
 from datetime import date
@@ -363,10 +364,25 @@ def run(*, root: Path, implementation_git_commit: str) -> dict[str, Any]:
     branch = _git_value(ROOT, "branch", "--show-current")
     manifest = {
         "job_id": "JOB006", "status": "JOB006_PASS", "vcs_mode": "git", "branch": branch,
+        "git_commit": implementation_git_commit, "workspace_root": str(ROOT),
         "start_main_commit": "28ccc29a7e15f320d50e3ff84d6d4a31869e6993",
         "implementation_git_commit": implementation_git_commit, "final_evidence_commit": "SELF",
         "stage2_json_sha256": STAGE2_JSON_SHA, "stage2_md_sha256": STAGE2_MD_SHA,
         "job004_history_db_sha256": HISTORY_DB_SHA, "artifact_count": len(inventory),
+        "runtime": {
+            "platform": platform.platform(), "python": platform.python_version(),
+            "numpy": __import__("numpy").__version__, "catboost": __import__("catboost").__version__,
+        },
+        "random_seed": None,
+        "code_sha256": sha256_file(Path(__file__)),
+        "input_manifest_hashes": {
+            "stage2_json": STAGE2_JSON_SHA, "stage2_markdown": STAGE2_MD_SHA,
+            "wide_t15_contract_json": "41267996673ff0a4f7053f2a49f24e41e545469d80a11b519e91f5e480c8ade5",
+            "wide_t15_amendment_json": "eff73f9438aefe943ddd98b158e4bf0c9d0c36b3b58d2dc95d4ce17c94f71fbc",
+            "primary_ordered_manifest": "eb6bf0291f55e0a4d11f01987237b82af2e36d5065de395606d06d3600923954",
+            "race_head_ordered_manifest": "023d7a5d0a6570c4350f571d3a5ed5c37885fec1a42ecedf19671dcc731d484b",
+            "runtime_freeze": RUNTIME_FREEZE_SHA,
+        },
         "model_fit_performed": False, "prospective_outcome_access": False,
         "payout_access": False, "stage2_performance_evaluated": False, "network_access": False,
         "commands": ["python -m unittest tests.audit.test_p2s_job006_stage2_scorer_inventory", "python src/audit/p2s_job006_stage2_scorer_inventory.py --implementation-git-commit <SHA>"],
