@@ -7,3 +7,11 @@
 - State transitions: source/tests -> implementation commit -> guarded historical parity -> commit-bound `PHASE_A_PASSED.json` -> Phase-B local replay -> blinded evidence commit/push.
 - Failure handling: denylist attempt, authority/hash mismatch, parity mismatch, immutable conflict, reconciliation mismatch, or incomplete EB update fails closed without Phase-B fallback.
 - Acceptance: the JOB007R2 gates and support-only reporting specified by the task.
+
+## JOB007R3 source-semantics continuation
+
+- Inputs: exact packaged Primary129 target-source authority and retained pre-race card archives only during source audit.
+- Outputs: official-card prize/jockey-affiliation parsers, exact feature encoders, source-coverage audits, then the existing locked replay if coverage passes.
+- Invariants: same-row official jockey binding; race-level ordinal prize binding; exact Decimal yen conversion; no result/payout access during Phase S; no inferred fallback.
+- State transitions: authority/parser/tests -> source-semantics commit -> fresh guarded Phase A -> pre-race-only Phase S -> Phase B only on full source coverage.
+- Failure handling: any ambiguous or missing pre-race semantic blocks before result access and before replay.

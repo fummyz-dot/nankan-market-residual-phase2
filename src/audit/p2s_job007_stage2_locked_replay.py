@@ -9,6 +9,7 @@ import hashlib
 import json
 import math
 import os
+import sqlite3
 import subprocess
 import sys
 from pathlib import Path
@@ -19,8 +20,7 @@ import pandas as pd
 from catboost import CatBoostRegressor
 
 from src.features.online.successor_v1_forward_adapter import (
-    LIVE_T15_UNRESOLVED_PRIMARY_FIELDS, PRIMARY_CATEGORICAL, PRIMARY_NAMES,
-    adapt_materialized_rows, require_live_t15_primary_sources,
+    PRIMARY_CATEGORICAL, PRIMARY_NAMES, adapt_materialized_rows,
 )
 from src.evaluation.successor_v1_stage2_prequential import (
     immutable_json, support_status, validate_blinded_evidence,
@@ -30,6 +30,7 @@ from src.models.successor_v1.forward_scorer import (
     require_hash,
 )
 from src.validation.stage2_causal_access_guard import PhaseAAccessGuard
+from src.ingestion.adapters import nankan_official as official
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -40,6 +41,7 @@ RACE_OOF = ROOT / "outputs/successor_v1/job004/oof/race_predictions.csv.gz"
 PAIR_OOF = ROOT / "outputs/successor_v1/job004/oof/wide_pair_predictions.csv.gz"
 MARKET_DB = ROOT / "db/market_snapshot.sqlite"
 LOCKED_OUTPUT = ROOT / "outputs/successor_v1/stage2_locked_replay"
+LIVE_HISTORY_DB = ROOT / "db/p2_live_history_delta.sqlite"
 EVIDENCE = ROOT / "docs/evidence/successor_v1/job007"
 START_COMMIT = "c118e2a7af03f96f27b75febce15d64fe1e4031a"
 AUTHORITY_HASHES = {
@@ -50,6 +52,8 @@ AUTHORITY_HASHES = {
     "cleanroom_json_sha256": "b5b75dd4fb62743961515981e9aa7625875de40a9768b200104a630fa7ba72c4",
     "cleanroom_md_sha256": "4ab1b797363705ee127e85405297223521cc21122883d78cb835e34e754f1aac",
     "design_sha256": "2aa13f4f752e3c86c3114f3e176034ea9a0795746d54ed709c8bfeac447730ad",
+    "target_source_json_sha256": "501c6b48d5a1e37ec7b3e4c25527d30bac3fea26551abdbf81903193931c5b23",
+    "target_source_md_sha256": "5c55458e4c976f30049d4c649926fb9780ad3e1d601728f89cf8d2be1313724e",
 }
 AUTHORITY_PATHS = {
     "stage2_json_sha256": ROOT / "data/manifests/successor_v1/STAGE2_INCREMENTAL_EDGE_FREEZE_V1.json",
@@ -59,6 +63,8 @@ AUTHORITY_PATHS = {
     "cleanroom_json_sha256": ROOT / "data/manifests/successor_v1/STAGE2_JOB007R2_CLEANROOM_CAUSAL_ACCESS_GUARD_V1.json",
     "cleanroom_md_sha256": ROOT / "docs/successor_v1/STAGE2_JOB007R2_CLEANROOM_CAUSAL_ACCESS_GUARD_V1.md",
     "design_sha256": ROOT / "docs/successor_v1/STAGE2_FOLD4_FORWARD_SCORER_DESIGN_V1.md",
+    "target_source_json_sha256": ROOT / "data/manifests/successor_v1/STAGE2_PRIMARY129_TARGET_SOURCE_SEMANTICS_V1.json",
+    "target_source_md_sha256": ROOT / "docs/successor_v1/STAGE2_PRIMARY129_TARGET_SOURCE_SEMANTICS_V1.md",
 }
 
 
@@ -224,6 +230,195 @@ def validate_phase_a_marker(marker_path: Path = AUDIT / "PHASE_A_PASSED.json") -
     if git("status", "--porcelain", "--untracked-files=no"):
         raise Job007Error("UNCOMMITTED_TRACKED_CHANGE_BEFORE_PHASE_B")
     return marker
+
+
+def _readonly(path: Path) -> sqlite3.Connection:
+    connection = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    connection.row_factory = sqlite3.Row
+    return connection
+
+
+def _archive_path(value: str) -> Path:
+    path = Path(value)
+    return path if path.is_absolute() else ROOT / path
+
+
+def _verified_card(capture: dict[str, Any]) -> tuple[str, str]:
+    path = _archive_path(str(capture.get("raw_archive_path") or ""))
+    if not path.is_file():
+        raise Job007Error(f"PRE_RACE_CARD_ARCHIVE_MISSING:{capture.get('capture_id')}")
+    raw = path.read_bytes()
+    digest = hashlib.sha256(raw).hexdigest()
+    if digest != capture.get("raw_sha256"):
+        raise Job007Error(f"PRE_RACE_CARD_ARCHIVE_HASH_MISMATCH:{capture.get('capture_id')}")
+    return official.decode_html(raw, capture.get("content_type")), digest
+
+
+def _source_status_counts(
+    *, html: str, identity: dict[str, Any], capture_id: str, raw_sha256: str,
+    scope: str,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    prizes = official.parse_pre_race_prize_schedule(html, identity=identity)
+    runners = official.parse_pre_race_jockey_affiliations(html, identity=identity)
+    prize_unresolved = sum(
+        item["source_status"] not in {"EXPLICIT_VALUE_YEN", "EXPLICIT_NOT_PUBLISHED"}
+        for item in prizes.values()
+    )
+    runner_rows = [
+        {
+            "scope": scope,
+            "race_date": identity["race_date"],
+            "venue": identity["venue"],
+            "race_number": int(identity["race_number"]),
+            "capture_id": capture_id,
+            "raw_sha256": raw_sha256,
+            "horse_number": number,
+            "jockey_affiliation_source_status": item["source_status"],
+            "resolved": item["source_status"] in {"EXPLICIT_VALUE", "EXPLICIT_EMPTY"},
+        }
+        for number, item in sorted(runners.items())
+    ]
+    return {
+        "scope": scope,
+        "race_date": identity["race_date"],
+        "venue": identity["venue"],
+        "race_number": int(identity["race_number"]),
+        "capture_id": capture_id,
+        "raw_sha256": raw_sha256,
+        "active_runner_count": len(runner_rows),
+        "prize_source_statuses": "|".join(prizes[place]["source_status"] for place in range(1, 6)),
+        "prize_unresolved_count": prize_unresolved,
+        "jockey_unresolved_count": sum(not row["resolved"] for row in runner_rows),
+    }, runner_rows
+
+
+def run_phase_s() -> dict[str, Any]:
+    """Audit only frozen pre-race card sources after commit-bound Phase A."""
+    validate_phase_a_marker()
+    from src.audit.p2s_job005_wide_t15_preflight import audit_prospective_db
+
+    prospective = audit_prospective_db(MARKET_DB)
+    if prospective["quick_check"] != "ok" or prospective["hard_contract_violation_count"]:
+        raise Job007Error("PHASE_S_MARKET_CONTRACT_INVALID")
+    cohort = [
+        row for row in prospective["inventory"]
+        if "2026-08-01" <= row["race_date"] <= "2026-09-03"
+        and row["classification"] == "T15_STANDARD_ELIGIBLE"
+    ]
+    cohort.sort(key=lambda row: (row["race_date"], row["venue"], int(row["race_number"])))
+
+    market = _readonly(MARKET_DB)
+    t15_races: list[dict[str, Any]] = []
+    t15_runners: list[dict[str, Any]] = []
+    try:
+        for item in cohort:
+            rows = market.execute(
+                """SELECT r.race_registry_id,r.race_date,r.venue,r.race_number,
+                          s.current_snapshot_id,s.snapshot_mark,s.raw_capture_id,
+                          c.capture_id,c.source_type,c.raw_archive_path,c.raw_sha256,c.content_type
+                     FROM race_registry r
+                     JOIN current_info_snapshots s ON s.race_registry_id=r.race_registry_id
+                     JOIN source_captures c ON c.capture_id=s.raw_capture_id
+                    WHERE r.canonical_race_key=? AND s.snapshot_mark='T15'""",
+                (item["canonical_race_key"],),
+            ).fetchall()
+            if len(rows) != 1:
+                raise Job007Error(f"T15_STATIC_CARD_SOURCE_UNRESOLVED:{item['canonical_race_key']}:{len(rows)}")
+            capture = dict(rows[0])
+            html, digest = _verified_card(capture)
+            identity = official.parse_race_identity(html)
+            expected = (item["race_date"], item["venue"], int(item["race_number"]))
+            observed = (identity["race_date"], identity["venue"], int(identity["race_number"]))
+            if observed != expected or capture["snapshot_mark"] != "T15":
+                raise Job007Error(f"T15_STATIC_CARD_IDENTITY_MISMATCH:{item['canonical_race_key']}")
+            race_row, runner_rows = _source_status_counts(
+                html=html, identity=identity, capture_id=str(capture["capture_id"]),
+                raw_sha256=digest, scope="T15_PREDICTION",
+            )
+            t15_races.append(race_row); t15_runners.extend(runner_rows)
+    finally:
+        market.close()
+
+    history = _readonly(LIVE_HISTORY_DB)
+    eb_races: list[dict[str, Any]] = []
+    eb_runners: list[dict[str, Any]] = []
+    try:
+        captures = [dict(row) for row in history.execute(
+            """SELECT capture_id,source_type,source_url,captured_at,raw_archive_path,
+                      raw_sha256,http_status,content_type
+                 FROM source_captures
+                WHERE source_type='OFFICIAL_CARD'
+                ORDER BY captured_at,capture_id"""
+        ).fetchall()]
+        for capture in captures:
+            try:
+                url = official.url_identity(str(capture["source_url"]))
+            except ValueError:
+                continue
+            if not "2026-08-01" <= url["race_date"] <= "2026-09-03":
+                continue
+            html, digest = _verified_card(capture)
+            identity = official.resolve_race(str(capture["source_url"]), html)
+            if identity["venue"] not in {"大井", "川崎", "浦和", "船橋"}:
+                continue
+            race_row, runner_rows = _source_status_counts(
+                html=html, identity=identity, capture_id=str(capture["capture_id"]),
+                raw_sha256=digest, scope="POST_SETTLEMENT_EB_UPDATE",
+            )
+            eb_races.append(race_row); eb_runners.extend(runner_rows)
+    finally:
+        history.close()
+
+    t15_rows = [
+        race | {"active_horse_number": runner["horse_number"],
+                "jockey_affiliation_source_status": runner["jockey_affiliation_source_status"],
+                "jockey_resolved": runner["resolved"]}
+        for race in t15_races for runner in t15_runners
+        if (runner["race_date"], runner["venue"], runner["race_number"], runner["capture_id"])
+        == (race["race_date"], race["venue"], race["race_number"], race["capture_id"])
+    ]
+    eb_rows = [
+        race | {"active_horse_number": runner["horse_number"],
+                "jockey_affiliation_source_status": runner["jockey_affiliation_source_status"],
+                "jockey_resolved": runner["resolved"]}
+        for race in eb_races for runner in eb_runners
+        if (runner["race_date"], runner["venue"], runner["race_number"], runner["capture_id"])
+        == (race["race_date"], race["venue"], race["race_number"], race["capture_id"])
+    ]
+    fields = [
+        "scope", "race_date", "venue", "race_number", "capture_id", "raw_sha256",
+        "active_runner_count", "prize_source_statuses", "prize_unresolved_count",
+        "jockey_unresolved_count", "active_horse_number",
+        "jockey_affiliation_source_status", "jockey_resolved",
+    ]
+    write_csv(AUDIT / "source_semantics_t15_audit.csv", t15_rows, fields)
+    write_csv(AUDIT / "source_semantics_eb_card_audit.csv", eb_rows, fields)
+    summary = {
+        "status": "PASS",
+        "frozen_through": "2026-09-03",
+        "t15_races_audited": len(t15_races),
+        "t15_active_jockey_rows": len(t15_runners),
+        "t15_prize_unresolved": sum(row["prize_unresolved_count"] > 0 for row in t15_races),
+        "t15_jockey_unresolved": sum(not row["resolved"] for row in t15_runners),
+        "eb_official_card_races_audited": len(eb_races),
+        "eb_active_jockey_rows": len(eb_runners),
+        "eb_prize_unresolved": sum(row["prize_unresolved_count"] > 0 for row in eb_races),
+        "eb_jockey_unresolved": sum(not row["resolved"] for row in eb_runners),
+        "inferred_fallback_used": False,
+        "result_access": False,
+        "payout_access": False,
+        "performance_evaluated": False,
+        "network_access": False,
+    }
+    if not t15_races or not eb_races or any(summary[key] for key in (
+        "t15_prize_unresolved", "t15_jockey_unresolved",
+        "eb_prize_unresolved", "eb_jockey_unresolved",
+    )):
+        summary["status"] = "JOB007R3_BLOCKED_SOURCE_SEMANTICS_UNPROVEN"
+    write_json(AUDIT / "source_semantics_summary.json", summary)
+    if summary["status"] != "PASS":
+        raise Job007Error(summary["status"])
+    return summary
 
 
 def guard_data_path(path: Path) -> None:
@@ -433,11 +628,14 @@ def run_phase_b() -> dict[str, Any]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(); parser.add_argument("--phase", choices=("A", "B"), required=True)
+    parser = argparse.ArgumentParser(); parser.add_argument("--phase", choices=("A", "S", "B"), required=True)
     args = parser.parse_args()
     if args.phase == "A":
         result = run_phase_a()
         print(json.dumps({"status": "PHASE_A_PASS", "feature_races": len(result["feature"]), "scorer_races": result["scorer"]["race_count"], "marker_sha256": result["marker_sha256"]}, ensure_ascii=False))
+        return
+    if args.phase == "S":
+        print(json.dumps(run_phase_s(), ensure_ascii=False))
         return
     result = run_phase_b()
     print(json.dumps(result, ensure_ascii=False))

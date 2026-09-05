@@ -11,6 +11,7 @@ import re
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
+from decimal import Decimal, InvalidOperation
 from datetime import datetime, timezone
 from html.parser import HTMLParser
 from pathlib import Path
@@ -489,6 +490,169 @@ def _parse_current_card_declared_jockey_identities_from_table(
         }
         warnings.append({"code": "CURRENT_JOCKEY_UNRESOLVED", "horse_number": horse_number, "reason": "CURRENT_CARD_RUNNER_ROW_MISSING"})
     return jockey_by_number, warnings
+
+
+def _same_race_identity(observed: dict[str, Any], expected: dict[str, Any]) -> None:
+    keys = ("race_date", "venue", "race_number")
+    if any(observed.get(key) != expected.get(key) for key in keys):
+        raise ValueError("OFFICIAL_PRE_RACE_SOURCE_IDENTITY_MISMATCH")
+
+
+def _raw_text_outside(node: Node, excluded: Node) -> str:
+    parts: list[str] = []
+    for child in node.children:
+        if child is excluded:
+            continue
+        if isinstance(child, Node):
+            parts.append(_raw_text_outside(child, excluded))
+        else:
+            parts.append(child)
+    return "".join(parts).strip()
+
+
+def _affiliation_from_jockey_cell(cell: Node, anchor: Node) -> tuple[str, str | None, str]:
+    outside = _raw_text_outside(cell, anchor)
+    outside_candidates = re.findall(r"[（(]([^（）()]*)[）)]", outside)
+    anchor_display = node_text_raw(anchor)
+    anchor_match = re.fullmatch(r".+?[（(]([^（）()]*)[）)]\s*", anchor_display)
+    candidates = outside_candidates + ([anchor_match.group(1)] if anchor_match else [])
+    if len(candidates) != 1:
+        raise ValueError(f"OFFICIAL_PRE_RACE_JOCKEY_AFFILIATION_AMBIGUOUS:{len(candidates)}")
+    value = candidates[0].strip()
+    return ("EXPLICIT_VALUE", value, candidates[0]) if value else ("EXPLICIT_EMPTY", None, candidates[0])
+
+
+def parse_pre_race_jockey_affiliations(
+    html: str, *, identity: dict[str, Any]
+) -> dict[int, dict[str, Any]]:
+    """Parse only same-row, explicitly displayed official jockey affiliation."""
+    _same_race_identity(parse_race_identity(html), identity)
+    statuses = parse_pre_race_card_runner_statuses(html, identity=identity)
+    active = {number for number, row in statuses.items() if row["normalized_status"] == _PRE_RACE_ACTIVE}
+    root = parse_html(html)
+    candidates: list[dict[int, dict[str, Any]]] = []
+    for table in iter_nodes(root, "table"):
+        headings = [node_text(cell) for cell in iter_nodes(table, "th")]
+        if not any("騎手" in value and "所属" in value for value in headings):
+            continue
+        parsed: dict[int, dict[str, Any]] = {}
+        invalid = False
+        for row in _direct_table_rows(table):
+            cells = [cell for cell in direct_cells(row) if cell.tag == "td"]
+            number = _current_card_row_number(cells)
+            if number is None:
+                continue
+            horse_number, _ = number
+            if horse_number not in active:
+                continue
+            horse_anchors = [
+                anchor for cell in cells for anchor in iter_nodes(cell, "a")
+                if re.fullmatch(r"/uma_info/(\d+)\.do", anchor.attrs.get("href", ""))
+            ]
+            jockey_cells = [
+                cell for cell in cells
+                if any(_CURRENT_CARD_JOCKEY_LINK.fullmatch(anchor.attrs.get("href", "")) for anchor in iter_nodes(cell, "a"))
+            ]
+            jockey_anchors = [
+                anchor for cell in jockey_cells for anchor in iter_nodes(cell, "a")
+                if _CURRENT_CARD_JOCKEY_LINK.fullmatch(anchor.attrs.get("href", ""))
+            ]
+            if len(horse_anchors) != 1 or len(jockey_cells) != 1 or len(jockey_anchors) != 1:
+                invalid = True
+                break
+            horse_match = re.fullmatch(r"/uma_info/(\d+)\.do", horse_anchors[0].attrs.get("href", ""))
+            jockey_match = _CURRENT_CARD_JOCKEY_LINK.fullmatch(jockey_anchors[0].attrs.get("href", ""))
+            if horse_match is None or jockey_match is None or horse_match.group(1) != statuses[horse_number]["official_horse_id"]:
+                invalid = True
+                break
+            status, value, raw = _affiliation_from_jockey_cell(jockey_cells[0], jockey_anchors[0])
+            if horse_number in parsed:
+                raise ValueError(f"OFFICIAL_PRE_RACE_JOCKEY_AFFILIATION_DUPLICATE:{horse_number}")
+            parsed[horse_number] = {
+                "horse_number": horse_number,
+                "official_horse_id": horse_match.group(1),
+                "official_jockey_id": jockey_match.group(1),
+                "source_status": status,
+                "affiliation": value,
+                "source_raw": raw,
+            }
+        if not invalid and set(parsed) == active:
+            candidates.append(parsed)
+    if len(candidates) != 1:
+        raise ValueError(f"OFFICIAL_PRE_RACE_JOCKEY_AFFILIATION_TABLE_UNRESOLVED:{len(candidates)}")
+    return candidates[0]
+
+
+_PRIZE_NOT_PUBLISHED = {"未発表", "未掲載", "－", "—", "-"}
+_FULLWIDTH_DIGITS = str.maketrans("０１２３４５６７８９，．", "0123456789,.")
+
+
+def _prize_yen(raw_amount: str, unit: str) -> int:
+    if unit not in {"円", "万円"}:
+        raise ValueError(f"OFFICIAL_PRE_RACE_PRIZE_UNIT_OR_SCALE_INVALID:{raw_amount}:{unit}")
+    token = raw_amount.translate(_FULLWIDTH_DIGITS).replace(",", "")
+    try:
+        amount = Decimal(token)
+    except InvalidOperation as exc:
+        raise ValueError(f"OFFICIAL_PRE_RACE_PRIZE_AMOUNT_INVALID:{raw_amount}") from exc
+    yen = amount if unit == "円" else amount * Decimal(10000)
+    if not yen.is_finite() or yen != yen.to_integral_value():
+        raise ValueError(f"OFFICIAL_PRE_RACE_PRIZE_UNIT_OR_SCALE_INVALID:{raw_amount}:{unit}")
+    return int(yen)
+
+
+def _prize_candidate_tables(root: Node) -> list[Node]:
+    nodes = list(iter_nodes(root))
+    candidates: list[Node] = []
+    for index, node in enumerate(nodes):
+        if node.tag not in {"p", "h2", "h3", "h4"} or node_text(node) != "賞金":
+            continue
+        following = next((item for item in nodes[index + 1:] if item.tag == "table"), None)
+        if following is not None and all(following is not old for old in candidates):
+            candidates.append(following)
+    return candidates
+
+
+def parse_pre_race_prize_schedule(
+    html: str, *, identity: dict[str, Any]
+) -> dict[int, dict[str, Any]]:
+    """Parse an explicit same-card race-level place 1..5 prize schedule."""
+    _same_race_identity(parse_race_identity(html), identity)
+    candidates = _prize_candidate_tables(parse_html(html))
+    if len(candidates) != 1:
+        raise ValueError(f"OFFICIAL_PRE_RACE_PRIZE_SECTION_UNRESOLVED:{len(candidates)}")
+    table = candidates[0]
+    headings = "|".join(node_text(cell) for cell in iter_nodes(table, "th"))
+    if any(token in headings for token in ("馬番", "馬名", "着順", "年月日", "過去")):
+        raise ValueError("OFFICIAL_PRE_RACE_PRIZE_RUNNER_HISTORY_REJECTED")
+    text = " ".join(node_text(cell) for row in _direct_table_rows(table) for cell in direct_cells(row))
+    output: dict[int, dict[str, Any]] = {}
+    for place in range(1, 6):
+        digit = f"(?:{place}|{'１２３４５'[place-1]})"
+        value_matches = re.findall(
+            rf"{digit}\s*着(?:賞金)?\s*[:：]?\s*([0-9０-９,，.．]+)\s*(万円|円)", text
+        )
+        null_matches = re.findall(
+            rf"{digit}\s*着(?:賞金)?\s*[:：]?\s*(未発表|未掲載|－|—|-)", text
+        )
+        if len(value_matches) + len(null_matches) != 1:
+            raise ValueError(f"OFFICIAL_PRE_RACE_PRIZE_ORDINAL_UNRESOLVED:{place}")
+        if value_matches:
+            raw_amount, unit = value_matches[0]
+            output[place] = {
+                "place": place, "source_status": "EXPLICIT_VALUE_YEN",
+                "yen": _prize_yen(raw_amount, unit),
+                "source_raw": f"{raw_amount}{unit}",
+            }
+        else:
+            raw = null_matches[0]
+            if raw not in _PRIZE_NOT_PUBLISHED:
+                raise ValueError(f"OFFICIAL_PRE_RACE_PRIZE_NULL_TOKEN_INVALID:{place}")
+            output[place] = {
+                "place": place, "source_status": "EXPLICIT_NOT_PUBLISHED",
+                "yen": None, "source_raw": raw,
+            }
+    return output
 
 
 def parse_current_card(html: str, *, identity: dict[str, Any], captured_at: str) -> dict[str, Any]:

@@ -1,0 +1,105 @@
+{
+  "contract_id": "STAGE2_PRIMARY129_TARGET_SOURCE_SEMANTICS_V1",
+  "project": "NANKAN_PHASE2_SUCCESSOR_RL_V1",
+  "status": "FROZEN_BEFORE_ANY_STAGE2_OUTCOME_RECONCILIATION",
+  "trigger": {
+    "prior_status": "JOB007R2_BLOCKED_LOCAL_DATA_INSUFFICIENT",
+    "unresolved_fields": [
+      "jockey_affiliation",
+      "log_prize_1",
+      "log_prize_total"
+    ],
+    "historical_parity_already_passed": true,
+    "performance_information_used": false,
+    "outcome_information_used_to_choose_semantics": false
+  },
+  "historical_authority": {
+    "raw_race_prize_fields": {
+      "prize_1": "NAR raw race CSV field 1着賞金(円)",
+      "prize_2": "NAR raw race CSV field 2着賞金(円)",
+      "prize_3": "NAR raw race CSV field 3着賞金(円)",
+      "prize_4": "NAR raw race CSV field 4着賞金(円)",
+      "prize_5": "NAR raw race CSV field 5着賞金(円)",
+      "unit": "integer yen"
+    },
+    "raw_runner_jockey_affiliation": "NAR raw runner CSV field 騎手所属",
+    "feature_transform": {
+      "jockey_affiliation": "clean(raw): strip leading/trailing whitespace; null/explicit-empty -> __MISSING__; no other normalization",
+      "log_prize_1": "log1p(prize_1) if prize_1 is not null else null",
+      "log_prize_total": "log1p(sum(non-null prize_1..prize_5)) if any prize_1..prize_5 is non-null else null"
+    }
+  },
+  "t15_prediction_source": {
+    "source": "exact same T15 official current-card raw archive referenced by current_info_snapshots.raw_capture_id/source_captures",
+    "availability": "must be captured within the frozen T15_STANDARD predecision window",
+    "jockey_affiliation": {
+      "binding": "exact active runner row; exact official /kis_info/<id>.do jockey anchor in that row; explicit displayed affiliation token belonging to that jockey in the same runner row",
+      "output": "inner affiliation semantic text without presentation parentheses, with only leading/trailing whitespace stripped",
+      "prohibited": [
+        "jockey-name dictionary lookup",
+        "prior-race affiliation carry-forward",
+        "trainer affiliation substitution",
+        "venue inference",
+        "result page",
+        "post-race page"
+      ]
+    },
+    "prizes": {
+      "binding": "explicit race-level prize schedule on the same official pre-race card, bound to current race identity and ordinal places 1..5",
+      "accepted_source_units": [
+        "円",
+        "万円"
+      ],
+      "unit_conversion": {
+        "円": "exact integer yen",
+        "万円": "exact Decimal amount multiplied by 10000; result must be integral yen"
+      },
+      "ordinal_status": [
+        "EXPLICIT_VALUE_YEN",
+        "EXPLICIT_NOT_PUBLISHED"
+      ],
+      "parser_absence_or_ambiguity": "HARD_BLOCK, never treat as null or zero",
+      "prohibited": [
+        "class-based prize lookup",
+        "race-name heuristic",
+        "prior/future race prize lookup",
+        "result page prize",
+        "payout table",
+        "external web fetch"
+      ]
+    }
+  },
+  "post_settlement_eb_update_source": {
+    "source": "retained OFFICIAL_CARD raw archive in p2_live_history_delta source_captures, not the result raw archive",
+    "purpose": "reconstruct pre-race-safe fixed-M2 inputs after settlement for future-date EB residual state only",
+    "jockey_affiliation_semantics": "same parser and normalization as T15 source; use final official card runner identity actually associated with the state-update runner",
+    "prize_semantics": "same race-level parser and yen conversion as T15 source",
+    "outcome_columns_may_enter_only_after_raw_m2_score": true,
+    "result_raw_may_not_supply_these_three_fields": true
+  },
+  "null_and_error_semantics": {
+    "explicit_source_empty_jockey_affiliation": "__MISSING__",
+    "unresolved_or_ambiguous_jockey_affiliation": "BLOCK",
+    "explicit_not_published_prize": null,
+    "unresolved_or_ambiguous_prize": "BLOCK",
+    "prize_zero": "accept only if explicitly displayed as numeric zero; do not synthesize zero"
+  },
+  "race_level_invariants": {
+    "prize_values_constant_across_all_runner feature rows": true,
+    "no post-race renormalization_or_replacement": true
+  },
+  "prospective_source_audit": {
+    "initial_locked_replay_through": "2026-09-03",
+    "t15_scope": "all T15_STANDARD_ELIGIBLE races from 2026-08-01 through 2026-09-03",
+    "eb_card_scope": "all retained South-Kanto OFFICIAL_CARD source captures from 2026-08-01 through 2026-09-03 needed for state updates",
+    "t15_required_coverage": "100% of active runner jockey affiliations plus race prize schedule, allowing only explicit source-null semantics",
+    "eb_required_coverage": "100% of active/current-card runner rows needed for eventual actual-starter state update plus race prize schedule",
+    "result_or_payout_access": false
+  },
+  "anti_inference": {
+    "legacy178_substitution": false,
+    "feature_imputation_added": false,
+    "source_semantic_fallback_added": false,
+    "performance_based_choice": false
+  }
+}

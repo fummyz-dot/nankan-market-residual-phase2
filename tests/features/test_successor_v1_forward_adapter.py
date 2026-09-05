@@ -8,8 +8,8 @@ import pandas as pd
 from src.features.online.successor_v1_forward_adapter import (
     ForwardAdapterError, PRIMARY_HASH, PRIMARY_NAMES, RACE_HEAD_HASH,
     RACE_HEAD_NAMES, adapt_materialized_rows, open_phase_b_live_history_source,
-    ordered_hash, reject_outcome_fields, require_live_t15_primary_sources, validate_exact_frame,
-    validate_history_boundary,
+    encode_jockey_affiliation, encode_prize_features, ordered_hash,
+    reject_outcome_fields, validate_exact_frame, validate_history_boundary,
 )
 
 
@@ -46,10 +46,13 @@ class ForwardAdapterTests(unittest.TestCase):
             with self.assertRaisesRegex(ForwardAdapterError, "LOCKED_UNTIL_PHASE_B"):
                 open_phase_b_live_history_source(phase="PHASE_A", target_date="2026-08-01")
 
-    def test_live_primary_source_gap_fails_closed(self) -> None:
-        with self.assertRaisesRegex(ForwardAdapterError, "PRIMARY129_TARGET_SOURCE_UNRESOLVED"):
-            require_live_t15_primary_sources(set())
-        require_live_t15_primary_sources({"log_prize_1", "log_prize_total", "jockey_affiliation"})
+    def test_target_source_encoders_fail_closed(self) -> None:
+        self.assertEqual(encode_jockey_affiliation("EXPLICIT_EMPTY", None), "__MISSING__")
+        self.assertEqual(encode_jockey_affiliation("EXPLICIT_VALUE", " 大井 "), "大井")
+        with self.assertRaisesRegex(ForwardAdapterError, "SOURCE_UNRESOLVED"):
+            encode_jockey_affiliation("UNRESOLVED", None)
+        with self.assertRaisesRegex(ForwardAdapterError, "ORDINALS_UNRESOLVED"):
+            encode_prize_features({})
 
 
 if __name__ == "__main__": unittest.main()

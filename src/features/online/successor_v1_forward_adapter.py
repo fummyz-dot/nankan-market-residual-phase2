@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 import hashlib
 import json
+import math
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -19,11 +20,6 @@ PRIMARY_HASH = "f2d11d6632c94c3826343f5ce3051ebb9d21d26b2c5754ea38a6f06c20604aa5
 RACE_HEAD_COUNT = 32
 RACE_HEAD_HASH = "d65c205307ea63b58b3f284530d6daa747f04bb3411c068c3430735860a11303"
 MODES = {"T15_PREDICTION", "POST_SETTLEMENT_EB_UPDATE"}
-LIVE_T15_UNRESOLVED_PRIMARY_FIELDS = (
-    "log_prize_1",
-    "log_prize_total",
-    "jockey_affiliation",
-)
 OUTCOME_FIELDS = {
     "finish_position", "result_status", "payout", "payouts", "settlement",
     "target_z", "actual_top3", "winning_pairs", "wide_hit",
@@ -34,17 +30,32 @@ class ForwardAdapterError(RuntimeError):
     pass
 
 
-def require_live_t15_primary_sources(resolved_fields: Iterable[str]) -> None:
-    """Fail closed until frozen-equivalent pre-race sources are implemented.
+def encode_jockey_affiliation(source_status: str, raw_value: str | None) -> str:
+    if source_status == "EXPLICIT_EMPTY" and (raw_value is None or not raw_value.strip()):
+        return "__MISSING__"
+    if source_status == "EXPLICIT_VALUE" and raw_value is not None and raw_value.strip():
+        return raw_value.strip()
+    raise ForwardAdapterError("JOCKEY_AFFILIATION_SOURCE_UNRESOLVED")
 
-    The existing live materializer supplies the legacy 178-feature contract.
-    It has no frozen Job003B-equivalent source mapping for these Primary129
-    target fields.  Treating a legacy token or an absent prize as equivalent
-    would change the validated scorer, so the adapter may not synthesize them.
-    """
-    missing = sorted(set(LIVE_T15_UNRESOLVED_PRIMARY_FIELDS) - set(resolved_fields))
-    if missing:
-        raise ForwardAdapterError(f"PRIMARY129_TARGET_SOURCE_UNRESOLVED:{','.join(missing)}")
+
+def encode_prize_features(prizes: Mapping[int, Mapping[str, Any]]) -> dict[str, float | None]:
+    if set(prizes) != set(range(1, 6)):
+        raise ForwardAdapterError("PRIZE_SOURCE_ORDINALS_UNRESOLVED")
+    values: list[int | None] = []
+    for place in range(1, 6):
+        item = prizes[place]
+        status, value = item.get("source_status"), item.get("yen")
+        if status == "EXPLICIT_NOT_PUBLISHED" and value is None:
+            values.append(None)
+        elif status == "EXPLICIT_VALUE_YEN" and isinstance(value, int) and not isinstance(value, bool) and value >= 0:
+            values.append(value)
+        else:
+            raise ForwardAdapterError(f"PRIZE_SOURCE_UNRESOLVED:{place}")
+    present = [value for value in values if value is not None]
+    return {
+        "log_prize_1": math.log1p(values[0]) if values[0] is not None else None,
+        "log_prize_total": math.log1p(sum(present)) if present else None,
+    }
 
 
 class HistorySource(Protocol):

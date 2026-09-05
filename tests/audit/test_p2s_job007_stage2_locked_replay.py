@@ -25,7 +25,7 @@ class Job007AuditTests(unittest.TestCase):
                 with self.assertRaisesRegex(Job007Error, "HEAD_MISMATCH"): validate_phase_a_marker(path)
 
     def test_authority_binding_names_complete(self) -> None:
-        self.assertEqual(set(AUTHORITY_HASHES), {"stage2_json_sha256", "stage2_md_sha256", "amendment_json_sha256", "amendment_md_sha256", "cleanroom_json_sha256", "cleanroom_md_sha256", "design_sha256"})
+        self.assertEqual(set(AUTHORITY_HASHES), {"stage2_json_sha256", "stage2_md_sha256", "amendment_json_sha256", "amendment_md_sha256", "cleanroom_json_sha256", "cleanroom_md_sha256", "design_sha256", "target_source_json_sha256", "target_source_md_sha256"})
 
     def test_phase_b_requires_marker_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
