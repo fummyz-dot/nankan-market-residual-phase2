@@ -1049,7 +1049,12 @@ def run_phase_b() -> dict[str, Any]:
                 state_strengths[safe_race["race_key"]] = float(adapted.primary.iloc[0]["comp_ability_mean"]) if pd.notna(adapted.primary.iloc[0]["comp_ability_mean"]) else None
                 eb_rows.append({"race_date": race_date, "venue": key[0], "race_number": key[1], "race_key": safe_race["race_key"], "official_card_capture_id": capture["capture_id"], "official_card_raw_sha256": card_sha, "prize_source_status": "|".join(provenance["prize_source_status"].values()), "jockey_source_status": "|".join(row["jockey_affiliation_source_status"] for row in provenance["runner_sources"]), "raw_score_before_outcome_attachment": True, "status": "PASS", "gap_count": 0})
             if not settled:
-                raise Job007Error(f"EB_STATE_DATE_MISSING:{race_date}")
+                if race_date in card_dates:
+                    raise Job007Error(f"EB_STATE_DATE_MISSING:{race_date}")
+                # A market-only date has a frozen prediction information set
+                # but no retained settled meeting yet.  It is pending, not an
+                # EB gap, and cannot update either history state.
+                continue
             ledger = pd.concat([ledger, pd.DataFrame(new_ledger_rows)], ignore_index=True)
             feature_state.update_settled_date(state_races, field_strengths=state_strengths)
     finally:
