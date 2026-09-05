@@ -19,6 +19,11 @@ PRIMARY_HASH = "f2d11d6632c94c3826343f5ce3051ebb9d21d26b2c5754ea38a6f06c20604aa5
 RACE_HEAD_COUNT = 32
 RACE_HEAD_HASH = "d65c205307ea63b58b3f284530d6daa747f04bb3411c068c3430735860a11303"
 MODES = {"T15_PREDICTION", "POST_SETTLEMENT_EB_UPDATE"}
+LIVE_T15_UNRESOLVED_PRIMARY_FIELDS = (
+    "log_prize_1",
+    "log_prize_total",
+    "jockey_affiliation",
+)
 OUTCOME_FIELDS = {
     "finish_position", "result_status", "payout", "payouts", "settlement",
     "target_z", "actual_top3", "winning_pairs", "wide_hit",
@@ -27,6 +32,19 @@ OUTCOME_FIELDS = {
 
 class ForwardAdapterError(RuntimeError):
     pass
+
+
+def require_live_t15_primary_sources(resolved_fields: Iterable[str]) -> None:
+    """Fail closed until frozen-equivalent pre-race sources are implemented.
+
+    The existing live materializer supplies the legacy 178-feature contract.
+    It has no frozen Job003B-equivalent source mapping for these Primary129
+    target fields.  Treating a legacy token or an absent prize as equivalent
+    would change the validated scorer, so the adapter may not synthesize them.
+    """
+    missing = sorted(set(LIVE_T15_UNRESOLVED_PRIMARY_FIELDS) - set(resolved_fields))
+    if missing:
+        raise ForwardAdapterError(f"PRIMARY129_TARGET_SOURCE_UNRESOLVED:{','.join(missing)}")
 
 
 class HistorySource(Protocol):

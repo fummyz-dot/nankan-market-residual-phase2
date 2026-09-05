@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+from collections import Counter
 import csv
 import hashlib
 import json
@@ -18,7 +19,11 @@ import pandas as pd
 from catboost import CatBoostRegressor
 
 from src.features.online.successor_v1_forward_adapter import (
-    PRIMARY_CATEGORICAL, PRIMARY_NAMES, adapt_materialized_rows,
+    LIVE_T15_UNRESOLVED_PRIMARY_FIELDS, PRIMARY_CATEGORICAL, PRIMARY_NAMES,
+    adapt_materialized_rows, require_live_t15_primary_sources,
+)
+from src.evaluation.successor_v1_stage2_prequential import (
+    immutable_json, support_status, validate_blinded_evidence,
 )
 from src.models.successor_v1.forward_scorer import (
     M2_PATH, M2_SHA, exact_pl_distribution, preprocess, q_model_from_pairs,
@@ -33,6 +38,9 @@ PRIMARY_DATA = ROOT / "data/processed/successor_v1/runner_primary_deterministic_
 RUNNER_OOF = ROOT / "outputs/successor_v1/job004/oof/runner_predictions.csv.gz"
 RACE_OOF = ROOT / "outputs/successor_v1/job004/oof/race_predictions.csv.gz"
 PAIR_OOF = ROOT / "outputs/successor_v1/job004/oof/wide_pair_predictions.csv.gz"
+MARKET_DB = ROOT / "db/market_snapshot.sqlite"
+LOCKED_OUTPUT = ROOT / "outputs/successor_v1/stage2_locked_replay"
+EVIDENCE = ROOT / "docs/evidence/successor_v1/job007"
 START_COMMIT = "c118e2a7af03f96f27b75febce15d64fe1e4031a"
 AUTHORITY_HASHES = {
     "stage2_json_sha256": "b628b05f68b5746be7543e20b6bea621850b6978fada46f9d0e041c404ec3070",
@@ -223,6 +231,207 @@ def guard_data_path(path: Path) -> None:
         raise Job007Error(f"PAYOUT_OR_SETTLEMENT_PATH_FORBIDDEN:{path}")
 
 
+def aggregate_hash(paths: list[Path]) -> str:
+    digest = hashlib.sha256()
+    for path in sorted(paths, key=lambda item: str(item)):
+        digest.update(str(path.relative_to(ROOT)).encode("utf-8"))
+        digest.update(b"\0")
+        digest.update(bytes.fromhex(sha256_file(path)))
+    return digest.hexdigest()
+
+
+def _write_phase_b_evidence(
+    *, implementation: str, marker_sha: str, cohort: list[dict[str, Any]],
+    exclusion_rows: list[dict[str, Any]], marker_paths: list[Path],
+) -> dict[str, Any]:
+    reasons = dict(sorted(Counter(row["reason"] for row in exclusion_rows).items()))
+    support = support_status([])
+    evidence = {
+        "status": "JOB007R2_BLOCKED_LOCAL_DATA_INSUFFICIENT",
+        "authority_hashes": AUTHORITY_HASHES,
+        "implementation_commit": implementation,
+        "historical_parity": {
+            "status": "PASS", "feature_races": 40, "primary129": "PASS",
+            "racehead32": "PASS", "scorer_races": 1948,
+            "raw_max_abs_error_tolerance": "1e-12",
+            "wide_max_abs_error_tolerance": "1e-10",
+        },
+        "phase_a_forbidden_access_count": 0,
+        "phase_a_passed_sha256": marker_sha,
+        "market_cohort_count": len(cohort),
+        "prediction_frozen_count": 0,
+        "model_input_blocked_count": len(exclusion_rows),
+        "model_input_blocked_reasons": reasons,
+        "valid_reconciliation_count": 0,
+        "outcome_target_unavailable_count": 0,
+        "gate_evaluation_race_count": support["gate_evaluation_races"],
+        "gate_evaluation_date_count": support["gate_evaluation_dates"],
+        "gate_evaluation_venue_counts": support["venue_counts"],
+        "support_status": support["status"],
+        "support_deficiencies": support["deficiencies"],
+        "date_freeze_marker_aggregate_sha256": aggregate_hash(marker_paths),
+        "prediction_artifact_aggregate_sha256": None,
+        "reconciliation_artifact_aggregate_sha256": None,
+        "eb_ledger_sha256": None,
+        "causal_boundary_status": "PASS",
+        "performance_blinded": True,
+        "formal_stage2_evaluated": False,
+    }
+    validate_blinded_evidence(evidence)
+    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    write_json(EVIDENCE / "STAGE2_ACCUMULATION_STATUS.json", evidence)
+    reason_lines = "\n".join(f"- `{key}`: {value}" for key, value in reasons.items())
+    summary = f"""# JOB007R2 Summary
+
+STATUS: `JOB007R2_BLOCKED_LOCAL_DATA_INSUFFICIENT`
+
+Historical clean-room parity passed for 40 feature races and all 1,948 Fold4
+validation races. Phase A opened no forbidden live database and made no network
+access.
+
+Phase B identified {len(cohort)} `T15_STANDARD_ELIGIBLE` market-cohort races.
+All were deterministically classified `MODEL_INPUT_BLOCKED` before outcome
+access because the repository does not define frozen-equivalent prospective
+sources for every required Primary129 target field. The legacy 178-feature live
+contract was not substituted.
+
+## Pre-outcome exclusions
+
+{reason_lines}
+
+Date-freeze markers were written only after every market-cohort race on each
+date had the deterministic blocked classification. No prediction artifact,
+outcome reconciliation, or EB residual update was produced.
+
+## Boundary
+
+- Phase A forbidden access attempts: 0
+- Post-cutoff data opened before Phase A PASS: NO
+- Outcome access: NO
+- Payout access: NO
+- Same-day outcome leakage: NO
+- Performance blinded: YES
+- Formal Stage2 evaluated: NO
+- Network data access: NO
+
+NEXT: Research Lead must freeze exact pre-race source semantics for the missing
+Primary129 target fields before the locked replay can continue.
+"""
+    (EVIDENCE / "JOB007R2_SUMMARY.md").write_text(summary, encoding="utf-8")
+    return evidence
+
+
+def run_phase_b() -> dict[str, Any]:
+    marker = validate_phase_a_marker()
+    implementation = git("rev-parse", "HEAD")
+    # Import only after the commit-bound Phase-A marker has unlocked Phase B.
+    from src.audit.p2s_job005_wide_t15_preflight import audit_prospective_db
+
+    prospective = audit_prospective_db(MARKET_DB)
+    if prospective["quick_check"] != "ok" or prospective["hard_contract_violation_count"]:
+        raise Job007Error("PHASE_B_MARKET_CONTRACT_INVALID")
+    cohort = [
+        row for row in prospective["inventory"]
+        if row["race_date"] >= "2026-08-01" and row["classification"] == "T15_STANDARD_ELIGIBLE"
+    ]
+    cohort.sort(key=lambda row: (row["race_date"], row["venue"], int(row["race_number"])))
+
+    try:
+        require_live_t15_primary_sources(set())
+    except Exception as exc:
+        source_reason = str(exc)
+    else:
+        raise Job007Error("LIVE_PRIMARY_SOURCE_GAP_NOT_REPRODUCED")
+    expected_suffix = ",".join(sorted(LIVE_T15_UNRESOLVED_PRIMARY_FIELDS))
+    if source_reason != f"PRIMARY129_TARGET_SOURCE_UNRESOLVED:{expected_suffix}":
+        raise Job007Error("LIVE_PRIMARY_SOURCE_GAP_CHANGED")
+
+    exclusion_rows = [
+        {
+            "race_date": row["race_date"], "venue": row["venue"],
+            "race_number": int(row["race_number"]),
+            "canonical_race_key": row["canonical_race_key"],
+            "status": "MODEL_INPUT_BLOCKED", "reason": source_reason,
+            "outcome_accessed": False,
+        }
+        for row in cohort
+    ]
+    marker_paths: list[Path] = []
+    by_date: dict[str, list[dict[str, Any]]] = {}
+    for row in exclusion_rows:
+        by_date.setdefault(row["race_date"], []).append(row)
+    for race_date, rows in sorted(by_date.items()):
+        marker_path = LOCKED_OUTPUT / "predictions" / race_date / "_DATE_FROZEN.json"
+        immutable_json(marker_path, {
+            "schema_version": "STAGE2_DATE_FREEZE_V1",
+            "race_date": race_date,
+            "market_cohort_count": len(rows),
+            "prediction_frozen_count": 0,
+            "model_input_blocked_count": len(rows),
+            "blocked_race_keys": [row["canonical_race_key"] for row in rows],
+            "outcome_accessed": False,
+            "payout_accessed": False,
+        })
+        marker_paths.append(marker_path)
+
+    write_csv(AUDIT / "prediction_inventory.csv", exclusion_rows, list(exclusion_rows[0]) if exclusion_rows else ["race_date", "venue", "race_number", "canonical_race_key", "status", "reason", "outcome_accessed"])
+    write_csv(AUDIT / "pre_outcome_exclusion_inventory.csv", exclusion_rows, list(exclusion_rows[0]) if exclusion_rows else ["race_date", "venue", "race_number", "canonical_race_key", "status", "reason", "outcome_accessed"])
+    write_csv(AUDIT / "reconciliation_inventory.csv", [], ["race_date", "venue", "race_number", "status", "reason"])
+    write_csv(AUDIT / "eb_state_update_inventory.csv", [{
+        "scope": "ALL_POST_CUTOFF_SOUTH_KANTO", "state_update_races": 0,
+        "status": "BLOCKED_BEFORE_OUTCOME_ACCESS", "gap_count": 1,
+        "reason": source_reason,
+    }], ["scope", "state_update_races", "status", "gap_count", "reason"])
+    causal = {
+        "status": "PASS", "phase_a_marker_valid": True,
+        "postcutoff_data_opened_before_phase_a_pass": False,
+        "market_db_opened_in_phase_b": True,
+        "outcome_db_opened": False, "outcome_access": False,
+        "payout_access": False, "same_day_outcome_leakage": False,
+        "network_data_access": False, "legacy178_substitution": False,
+    }
+    write_json(AUDIT / "causal_access_audit.json", causal)
+    support = support_status([])
+    write_json(AUDIT / "stage2_support_status.json", support | {
+        "performance_blinded": True, "formal_stage2_evaluated": False,
+    })
+    write_json(AUDIT / "run_manifest.json", {
+        "job_id": "JOB007R2", "vcs_mode": "git",
+        "branch": git("branch", "--show-current"),
+        "start_main_commit": START_COMMIT,
+        "implementation_git_commit": implementation,
+        "authority_hashes": AUTHORITY_HASHES,
+        "fold4_model_hashes": {
+            "m2": M2_SHA,
+            "race_head": "58357312e69516e57c52121ec57c64093a686e101e2d0b3ae0fc0e482e6d41ec",
+            "eb_components": "b2e56f153e0ce0b056e3117f52e50d9e841da0e33e0831244ff67516f543bab2",
+        },
+        "prospective_market_db_path": str(MARKET_DB),
+        "prospective_market_db_sha256": sha256_file(MARKET_DB),
+        "live_history_raw_db_sha256": "NOT_OPENED_UPSTREAM_MODEL_INPUT_BLOCK",
+        "live_history_normalized_db_sha256": "NOT_OPENED_UPSTREAM_MODEL_INPUT_BLOCK",
+        "network_access": False, "payout_access": False,
+        "performance_blinded": True, "formal_stage2_evaluated": False,
+        "historical_parity_pass": True,
+        "final_evidence_commit": "SELF_OR_LATER",
+    })
+    (AUDIT / "JOB007_REPORT.md").write_text(
+        "# JOB007R2 Report\n\nSTATUS: `JOB007R2_BLOCKED_LOCAL_DATA_INSUFFICIENT`\n\n"
+        f"Market cohort: {len(cohort)}; MODEL_INPUT_BLOCKED: {len(exclusion_rows)}.\n\n"
+        f"Reason: `{source_reason}`.\n\nNo outcome, payout, or performance aggregate was accessed.\n",
+        encoding="utf-8",
+    )
+    evidence = _write_phase_b_evidence(
+        implementation=implementation, marker_sha=sha256_file(AUDIT / "PHASE_A_PASSED.json"),
+        cohort=cohort, exclusion_rows=exclusion_rows, marker_paths=marker_paths,
+    )
+    return {
+        "status": evidence["status"], "market_cohort": len(cohort),
+        "model_input_blocked": len(exclusion_rows), "eb_gaps": 1,
+        "support": support,
+    }
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(); parser.add_argument("--phase", choices=("A", "B"), required=True)
     args = parser.parse_args()
@@ -230,8 +439,8 @@ def main() -> None:
         result = run_phase_a()
         print(json.dumps({"status": "PHASE_A_PASS", "feature_races": len(result["feature"]), "scorer_races": result["scorer"]["race_count"], "marker_sha256": result["marker_sha256"]}, ensure_ascii=False))
         return
-    validate_phase_a_marker()
-    raise Job007Error("JOB007R2_BLOCKED_PHASE_B_IMPLEMENTATION_INCOMPLETE")
+    result = run_phase_b()
+    print(json.dumps(result, ensure_ascii=False))
 
 
 if __name__ == "__main__":

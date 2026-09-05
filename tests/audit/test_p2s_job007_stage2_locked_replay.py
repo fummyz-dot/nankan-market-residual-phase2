@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from src.audit.p2s_job007_stage2_locked_replay import (
-    AUTHORITY_HASHES, Job007Error, guard_data_path, validate_phase_a_marker,
+    AUTHORITY_HASHES, Job007Error, aggregate_hash, guard_data_path, validate_phase_a_marker,
 )
 
 
@@ -29,7 +29,15 @@ class Job007AuditTests(unittest.TestCase):
 
     def test_phase_b_requires_marker_file(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            with self.assertRaises(FileNotFoundError): validate_phase_a_marker(Path(directory) / "missing.json")
+                with self.assertRaises(FileNotFoundError): validate_phase_a_marker(Path(directory) / "missing.json")
+
+    def test_aggregate_hash_is_order_independent(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            left = root / "a"; right = root / "b"
+            left.write_bytes(b"a"); right.write_bytes(b"b")
+            with patch("src.audit.p2s_job007_stage2_locked_replay.ROOT", root):
+                self.assertEqual(aggregate_hash([left, right]), aggregate_hash([right, left]))
 
 
 if __name__ == "__main__": unittest.main()

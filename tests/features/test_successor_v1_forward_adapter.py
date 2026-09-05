@@ -8,7 +8,7 @@ import pandas as pd
 from src.features.online.successor_v1_forward_adapter import (
     ForwardAdapterError, PRIMARY_HASH, PRIMARY_NAMES, RACE_HEAD_HASH,
     RACE_HEAD_NAMES, adapt_materialized_rows, open_phase_b_live_history_source,
-    ordered_hash, reject_outcome_fields, validate_exact_frame,
+    ordered_hash, reject_outcome_fields, require_live_t15_primary_sources, validate_exact_frame,
     validate_history_boundary,
 )
 
@@ -45,6 +45,11 @@ class ForwardAdapterTests(unittest.TestCase):
         with patch.dict("sys.modules", {"src.features.online.normalized_history_provider": None}):
             with self.assertRaisesRegex(ForwardAdapterError, "LOCKED_UNTIL_PHASE_B"):
                 open_phase_b_live_history_source(phase="PHASE_A", target_date="2026-08-01")
+
+    def test_live_primary_source_gap_fails_closed(self) -> None:
+        with self.assertRaisesRegex(ForwardAdapterError, "PRIMARY129_TARGET_SOURCE_UNRESOLVED"):
+            require_live_t15_primary_sources(set())
+        require_live_t15_primary_sources({"log_prize_1", "log_prize_total", "jockey_affiliation"})
 
 
 if __name__ == "__main__": unittest.main()
