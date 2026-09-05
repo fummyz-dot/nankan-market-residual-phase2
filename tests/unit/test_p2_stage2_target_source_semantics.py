@@ -66,6 +66,15 @@ class Stage2TargetSourceParserTests(unittest.TestCase):
         self.assertEqual(parsed[2]["yen"], 350_000)
         self.assertEqual(parsed[1]["source_raw"], "1000000円")
 
+    def test_prize_official_inline_race_section_parse(self) -> None:
+        html = card().replace(
+            '<h3>賞金</h3><table id="prize"><tr><th>賞金区分</th></tr><tr><td>1着賞金: 1000000円 2着賞金: 35万円 3着賞金: 未発表 4着賞金: － 5着賞金: 未掲載</td></tr></table>',
+            '<p class="nk23_c-tab1__accor__grtext">サラブレッド系 3歳 賞金 1着1,200,000円 2着48万円 3着300,000円 4着180,000円 5着120,000円 番組ポイント</p>',
+        )
+        parsed = official.parse_pre_race_prize_schedule(html, identity=IDENTITY)
+        self.assertEqual(parsed[1]["yen"], 1_200_000)
+        self.assertEqual(parsed[2]["yen"], 480_000)
+
     def test_prize_manyen_decimal_conversion_is_exact(self) -> None:
         html = card(prize="1着賞金: 12.3456万円 2着賞金: 未発表 3着賞金: 未発表 4着賞金: 未発表 5着賞金: 未発表")
         self.assertEqual(official.parse_pre_race_prize_schedule(html, identity=IDENTITY)[1]["yen"], 123_456)

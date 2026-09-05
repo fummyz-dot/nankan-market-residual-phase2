@@ -601,15 +601,19 @@ def _prize_yen(raw_amount: str, unit: str) -> int:
     return int(yen)
 
 
-def _prize_candidate_tables(root: Node) -> list[Node]:
+def _prize_candidate_sections(root: Node) -> list[Node]:
     nodes = list(iter_nodes(root))
     candidates: list[Node] = []
     for index, node in enumerate(nodes):
-        if node.tag not in {"p", "h2", "h3", "h4"} or node_text(node) != "賞金":
+        value = node_text(node)
+        css = node.attrs.get("class", "")
+        if node.tag == "p" and "nk23_c-tab1__accor__grtext" in css.split() and "賞金" in value:
+            candidates.append(node)
             continue
-        following = next((item for item in nodes[index + 1:] if item.tag == "table"), None)
-        if following is not None and all(following is not old for old in candidates):
-            candidates.append(following)
+        if node.tag in {"p", "h2", "h3", "h4"} and value == "賞金":
+            following = next((item for item in nodes[index + 1:] if item.tag == "table"), None)
+            if following is not None and all(following is not old for old in candidates):
+                candidates.append(following)
     return candidates
 
 
@@ -618,14 +622,17 @@ def parse_pre_race_prize_schedule(
 ) -> dict[int, dict[str, Any]]:
     """Parse an explicit same-card race-level place 1..5 prize schedule."""
     _same_race_identity(parse_race_identity(html), identity)
-    candidates = _prize_candidate_tables(parse_html(html))
+    candidates = _prize_candidate_sections(parse_html(html))
     if len(candidates) != 1:
         raise ValueError(f"OFFICIAL_PRE_RACE_PRIZE_SECTION_UNRESOLVED:{len(candidates)}")
     table = candidates[0]
     headings = "|".join(node_text(cell) for cell in iter_nodes(table, "th"))
     if any(token in headings for token in ("馬番", "馬名", "着順", "年月日", "過去")):
         raise ValueError("OFFICIAL_PRE_RACE_PRIZE_RUNNER_HISTORY_REJECTED")
-    text = " ".join(node_text(cell) for row in _direct_table_rows(table) for cell in direct_cells(row))
+    text = (
+        " ".join(node_text(cell) for row in _direct_table_rows(table) for cell in direct_cells(row))
+        if table.tag == "table" else node_text(table)
+    )
     output: dict[int, dict[str, Any]] = {}
     for place in range(1, 6):
         digit = f"(?:{place}|{'１２３４５'[place-1]})"
