@@ -1,10 +1,10 @@
 {
-  "T15_STANDARD_ELIGIBLE_count": 26,
+  "T15_STANDARD_ELIGIBLE_count": 34,
   "date_range": {
     "max": "2026-09-03",
     "min": "2026-07-31"
   },
-  "hard_contract_violations": 8,
+  "hard_contract_violations": 0,
   "historical_odds_snapshots_count": 0,
   "ordinary_ineligible_count": 59,
   "outcome_tables_read": 0,
@@ -25,10 +25,9 @@
     ]
   },
   "race_counts_by_classification": {
-    "JOB005_BLOCKED_DATA_CONTRACT": 8,
     "NON_STANDARD_REFERENCE": 3,
     "NO_T15_CAPTURE": 27,
-    "T15_STANDARD_ELIGIBLE": 26,
+    "T15_STANDARD_ELIGIBLE": 34,
     "T15_TIMING_INVALID": 1,
     "WIDE_CAPTURE_MISSING": 28
   },
